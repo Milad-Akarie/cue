@@ -5,8 +5,7 @@ import 'package:flutter/material.dart';
 
 @optionalTypeArgs
 typedef ShowModalFunction<T extends Object> = Future<T?> Function();
-
-typedef CreateSimulationFunction = Simulation? Function(bool forward);
+typedef SimulationBuilder = Simulation Function(bool forward);
 
 class ModalTransition extends StatefulWidget {
   const ModalTransition({
@@ -19,7 +18,7 @@ class ModalTransition extends StatefulWidget {
     this.alignment,
     this.barrierDismissible = true,
     this.barrierColor = const Color(0x80000000),
-    this.createSimulation,
+    this.simulation,
   });
 
   final Duration duration;
@@ -30,7 +29,7 @@ class ModalTransition extends StatefulWidget {
   final Widget? backdrop;
   final bool barrierDismissible;
   final Color? barrierColor;
-  final CreateSimulationFunction? createSimulation;
+  final SimulationBuilder? simulation;
 
   @override
   State<ModalTransition> createState() => _ModalTransitionState();
@@ -84,7 +83,7 @@ class _ModalTransitionState extends State<ModalTransition> {
       barrierColor: widget.barrierColor,
       transitionDuration: widget.duration,
       transitionBuilder: (context, _, _, child) => child,
-      simulationBuilder: widget.createSimulation,
+      simulation: widget.simulation,
       pageBuilder: (context, animation, _) {
         return _ModelContent(
           animation: animation,
@@ -205,9 +204,9 @@ class _ModalRoute<T extends Object> extends RawDialogRoute<T> {
     super.barrierColor,
     super.transitionDuration,
     super.transitionBuilder,
-    this.simulationBuilder,
+    this.simulation,
   });
-  final CreateSimulationFunction? simulationBuilder;
+  final SimulationBuilder? simulation;
   final ValueChanged<AnimationController> onAnimationControllerReady;
 
   @override
@@ -219,8 +218,8 @@ class _ModalRoute<T extends Object> extends RawDialogRoute<T> {
 
   @override
   Simulation? createSimulation({required bool forward}) {
-    if (simulationBuilder case final builder?) {
-      return builder(forward);
+    if (simulation case final simulation?) {
+      return simulation(forward);
     }
     return super.createSimulation(forward: forward);
   }

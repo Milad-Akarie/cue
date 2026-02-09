@@ -26,6 +26,9 @@ class Timing {
       assert(end >= 0 && end <= 1, 'end must be between 0 and 1'),
       assert(start <= end, 'start must be less than or equal to end');
 
+  const Timing.endAt(this.end) : assert(end >= 0 && end <= 1, 'end must be between 0 and 1'), start = 0.0;
+  const Timing.startAt(this.start) : assert(start >= 0 && start <= 1, 'start must be between 0 and 1'), end = 1.0;
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -33,9 +36,6 @@ class Timing {
 
   @override
   int get hashCode => Object.hash(start, end);
-
-  const Timing.endAt(this.end) : assert(end >= 0 && end <= 1, 'end must be between 0 and 1'), start = 0.0;
-  const Timing.startAt(this.start) : assert(start >= 0 && start <= 1, 'start must be between 0 and 1'), end = 1.0;
 
   @override
   String toString() => 'Timing(start: $start, end: $end)';

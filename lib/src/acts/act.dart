@@ -10,6 +10,24 @@ part 'resize_act.dart';
 
 typedef TweenBuilder<T> = Animatable<T> Function(T begin, T end);
 
+class ActGroup extends Act {
+  final List<Act> acts;
+
+  const ActGroup(
+    this.acts, {
+    super.timing,
+    super.curve,
+  });
+
+  @override
+  Widget wrapWidget(AnimationContext context, Widget child) {
+    return acts.fold(child, (current, act) => act.wrapWidget(context, current));
+  }
+
+  @override
+  List<Act> get resolved => List.unmodifiable(acts.expand((act) => act.resolved));
+}
+
 abstract class Act {
   final Timing? timing;
   final Curve? curve;
@@ -19,95 +37,18 @@ abstract class Act {
     this.curve,
   });
 
-  const factory Act.scale({
-    double begin,
-    double end,
-    List<Phase<double>> then,
-    Curve? curve,
-    Timing? timing,
-    AlignmentGeometry? alignment,
-  }) = ScaleAct;
+  const factory Act.group(List<Act> acts, {Timing? timing, Curve? curve}) = ActGroup;
 
-  const factory Act.fade({
-    double begin,
-    double end,
-    List<Phase<double>> then,
-    Curve? curve,
-    Timing? timing,
-  }) = FadeAct;
+  Act operator &(Act other) {
+    // If we are already a group, just add the new one to our list
+    if (this is ActGroup) {
+      return ActGroup([...(this as ActGroup).acts, other]);
+    }
+    // Otherwise, create a new group with both acts
+    return ActGroup([this, other]);
+  }
 
-  const factory Act.rotate({
-    double begin,
-    double end,
-    List<Phase<double>> then,
-    Curve? curve,
-    Timing? timing,
-  }) = RotateAct;
-
-  const factory Act.blur({
-    double begin,
-    double end,
-    List<Phase<double>> then,
-    Curve? curve,
-    Timing? timing,
-  }) = BlurAct;
-
-  const factory Act.resize({
-    SizeOrNull? begin,
-    SizeOrNull? end,
-    List<Phase<SizeOrNull>> then,
-    Curve? curve,
-    Timing? timing,
-    AlignmentGeometry? alignment,
-  }) = ResizeAct;
-
-  const factory Act.align({
-    AlignmentGeometry? begin,
-    AlignmentGeometry? end,
-    List<Phase<AlignmentGeometry?>> then,
-    Curve? curve,
-    Timing? timing,
-  }) = AlignAct;
-
-  const factory Act.slide({
-    Offset begin,
-    Offset end,
-    List<Phase<Offset>> then,
-    Curve? curve,
-    Timing? timing,
-  }) = SlideAct;
-
-  const factory Act.translate({
-    Offset begin,
-    Offset end,
-    List<Phase<Offset>> then,
-    Curve? curve,
-    Timing? timing,
-  }) = TranslationAct;
-
-  const factory Act.textStyle({
-    required TextStyle begin,
-    required TextStyle end,
-    List<Phase<TextStyle>> then,
-    Curve? curve,
-    Timing? timing,
-  }) = TextStyleAct;
-
-  const factory Act.pad({
-    EdgeInsetsGeometry begin,
-    EdgeInsetsGeometry end,
-    List<Phase<EdgeInsetsGeometry>> then,
-    Curve? curve,
-    Timing? timing,
-  }) = PaddingAct;
-
-  const factory Act.clipReveal({
-    Size beginSize,
-    BorderRadius borderRadius,
-    AlignmentGeometry? alignment,
-    Curve? curve,
-    Timing? timing,
-  }) = ClipRevealAct;
+  List<Act> get resolved => List.unmodifiable([this]);
 
   Widget wrapWidget(AnimationContext context, Widget child);
 }
@@ -115,28 +56,32 @@ abstract class Act {
 abstract class TweenAct<T> extends Act {
   final T begin;
   final T? end;
-  final List<Phase<T>> then;
+  final List<Phase<T>>? _phases;
 
   const TweenAct({
     required this.begin,
     required this.end,
-    required this.then,
     super.curve,
     super.timing,
-  });
+  }) : _phases = null;
+
+  const TweenAct.seq(
+    this.begin, {
+    required List<Phase<T>> then,
+    super.curve,
+    super.timing,
+  }) : _phases = then,
+       end = null;
 
   Animatable<T> _defaultTweenBuilder(T begin, T end) => Tween<T>(begin: begin, end: end);
 
   Animation<T> build(AnimationContext context, {TweenBuilder<T>? tweenBuilder}) {
     final List<FullPhase<T>> phases;
-    if (then.isEmpty) {
+    if (_phases == null) {
       phases = [FullPhase<T>(begin: begin, end: end ?? begin, weight: 1.0)];
     } else {
       assert(begin != null, 'Begin value must be provided when using phases');
-      if (end case final end?) {
-        then.add(.to(end));
-      }
-      phases = Phase.normalize(begin, then);
+      phases = Phase.normalize(begin, _phases);
     }
     return TweenAct._build<T>(context, phases, tweenBuilder ?? _defaultTweenBuilder);
   }
@@ -175,25 +120,30 @@ abstract class TweenAct<T> extends Act {
           runtimeType == other.runtimeType &&
           begin == other.begin &&
           end == other.end &&
-          then == other.then &&
+          _phases == other._phases &&
           curve == other.curve &&
           timing == other.timing;
 
   @override
-  int get hashCode => Object.hash(begin, end, then, curve, timing);
+  int get hashCode => Object.hash(begin, end, _phases, curve, timing);
 }
 
-class ScaleAct extends TweenAct<double> {
-  const ScaleAct({
+class Scale extends TweenAct<double> {
+  const Scale({
     super.begin = 1.0,
     super.end,
-    super.then = const [],
     super.curve,
     super.timing,
     this.alignment,
   });
 
   final AlignmentGeometry? alignment;
+
+  const Scale.up({super.begin = 0.0, super.curve, super.timing, this.alignment}) : super(end: 1.0);
+
+  const Scale.down({super.end = 0.0, super.curve, super.timing, this.alignment}) : super(begin: 1.0);
+
+  const Scale.seq(super.begin, {required super.then, super.curve, super.timing, this.alignment}) : super.seq();
 
   @override
   Widget wrapWidget(AnimationContext context, Widget child) {
@@ -205,14 +155,17 @@ class ScaleAct extends TweenAct<double> {
   }
 }
 
-class FadeAct extends TweenAct<double> {
-  const FadeAct({
+class Fade extends TweenAct<double> {
+  const Fade({
     super.begin = 0.0,
     super.end = 1.0,
-    super.then = const [],
     super.curve,
     super.timing,
   });
+
+  const Fade.out({super.begin = 1.0, super.curve, super.timing}) : super(end: 0);
+
+  const Fade.seq(super.begin, {required super.then, super.curve, super.timing}) : super.seq();
 
   @override
   Widget wrapWidget(AnimationContext context, Widget child) {
@@ -223,11 +176,10 @@ class FadeAct extends TweenAct<double> {
   }
 }
 
-class RotateAct extends TweenAct<double> {
-  const RotateAct({
+class Rotate extends TweenAct<double> {
+  const Rotate({
     super.begin = 0,
-    super.end,
-    super.then = const [],
+    super.end = 0,
     super.curve,
     super.timing,
   }) : assert(begin >= -360 && begin <= 360, 'Begin angle must be between 0 and 360 degrees'),
@@ -249,11 +201,10 @@ class RotateAct extends TweenAct<double> {
   }
 }
 
-class BlurAct extends TweenAct<double> {
-  const BlurAct({
+class Blur extends TweenAct<double> {
+  const Blur({
     super.begin = 0.0,
     super.end = 0.0,
-    super.then = const [],
     super.curve,
     super.timing,
   });
@@ -278,11 +229,10 @@ class BlurAct extends TweenAct<double> {
   }
 }
 
-class AlignAct extends TweenAct<AlignmentGeometry?> {
-  const AlignAct({
+class Anchor extends TweenAct<AlignmentGeometry?> {
+  const Anchor({
     super.begin,
     super.end,
-    super.then = const [],
     super.curve,
     super.timing,
   });
@@ -306,11 +256,10 @@ class AlignAct extends TweenAct<AlignmentGeometry?> {
   }
 }
 
-class SlideAct extends TweenAct<Offset> {
-  const SlideAct({
+class Slide extends TweenAct<Offset> {
+  const Slide({
     super.begin = Offset.zero,
     super.end,
-    super.then = const [],
     super.curve,
     super.timing,
   });
@@ -324,14 +273,19 @@ class SlideAct extends TweenAct<Offset> {
   }
 }
 
-class TranslationAct extends TweenAct<Offset> {
-  const TranslationAct({
+class Translate extends TweenAct<Offset> {
+  const Translate({
     super.begin = Offset.zero,
-    super.end,
-    super.then = const [],
+    super.end = Offset.zero,
     super.curve,
     super.timing,
   });
+
+  Translate.x({double begin = 0, double end = 0, Curve? curve, Timing? timing})
+    : this(begin: Offset(begin, 0), end: Offset(end, 0), curve: curve, timing: timing);
+
+  Translate.y({double begin = 0, double end = 0, Curve? curve, Timing? timing})
+    : this(begin: Offset(0, begin), end: Offset(0, end), curve: curve, timing: timing);
 
   @override
   Widget wrapWidget(AnimationContext context, Widget child) {
@@ -349,41 +303,10 @@ class TranslationAct extends TweenAct<Offset> {
   }
 }
 
-class TextStyleAct extends TweenAct<TextStyle> {
-  const TextStyleAct({
-    required super.begin,
-    super.end,
-    super.then = const [],
-    super.curve,
-    super.timing,
-  });
-
-  @override
-  Widget wrapWidget(AnimationContext context, Widget child) {
-    final animation = build(
-      context,
-      tweenBuilder: (begin, end) {
-        return TextStyleTween(begin: begin, end: end);
-      },
-    );
-    return AnimatedBuilder(
-      animation: animation,
-      builder: (context, child) {
-        return DefaultTextStyle(
-          style: animation.value,
-          child: child!,
-        );
-      },
-      child: child,
-    );
-  }
-}
-
-class PaddingAct extends TweenAct<EdgeInsetsGeometry> {
-  const PaddingAct({
+class Pad extends TweenAct<EdgeInsetsGeometry> {
+  const Pad({
     super.begin = EdgeInsets.zero,
     super.end = EdgeInsets.zero,
-    super.then = const [],
     super.curve,
     super.timing,
   });
@@ -409,14 +332,14 @@ class PaddingAct extends TweenAct<EdgeInsetsGeometry> {
   }
 }
 
-class ClipRevealAct extends TweenAct<double> {
-  const ClipRevealAct({
+class ClipReveal extends TweenAct<double> {
+  const ClipReveal({
     this.beginSize = Size.zero,
     this.borderRadius = BorderRadius.zero,
     this.alignment,
     super.curve,
     super.timing,
-  }) : super(begin: 0, end: 1, then: const []);
+  }) : super(begin: 0, end: 1);
 
   final Size beginSize;
   final BorderRadius borderRadius;
@@ -494,5 +417,76 @@ class ExpandingPathClipper extends CustomClipper<Path> {
   @override
   bool shouldReclip(covariant ExpandingPathClipper oldClipper) {
     return oldClipper.progress != progress || oldClipper.minSize != minSize;
+  }
+}
+
+abstract class Style extends Act {
+  const factory Style.text({
+    required TextStyle begin,
+    TextStyle? end,
+    Curve? curve,
+    Timing? timing,
+  }) = _TextStyleAct;
+
+  const factory Style.iconTheme({
+    required IconThemeData begin,
+    IconThemeData? end,
+    Curve? curve,
+    Timing? timing,
+  }) = _IconThemeAct;
+}
+
+class _TextStyleAct extends TweenAct<TextStyle> implements Style {
+  const _TextStyleAct({
+    required super.begin,
+    super.end,
+    super.curve,
+    super.timing,
+  });
+
+  @override
+  Widget wrapWidget(AnimationContext context, Widget child) {
+    final animation = build(
+      context,
+      tweenBuilder: (begin, end) {
+        return TextStyleTween(begin: begin, end: end);
+      },
+    );
+    return DefaultTextStyleTransition(style: animation, child: child);
+  }
+}
+
+class _IconThemeAct extends TweenAct<IconThemeData> implements Style {
+  const _IconThemeAct({
+    required super.begin,
+    super.end,
+    super.curve,
+    super.timing,
+  });
+
+  @override
+  Widget wrapWidget(AnimationContext context, Widget child) {
+    final animation = build(
+      context,
+      tweenBuilder: (begin, end) {
+        return _IconThemeDataTween(begin: begin, end: end);
+      },
+    );
+    return AnimatedBuilder(
+      animation: animation,
+      builder: (context, child) {
+        return IconTheme(data: animation.value, child: child!);
+      },
+      child: child,
+    );
+  }
+}
+
+class _IconThemeDataTween extends Tween<IconThemeData> {
+  _IconThemeDataTween({required super.begin, required super.end});
+
+  @override
+  IconThemeData lerp(double t) {
+    return IconThemeData.lerp(begin, end, t);
   }
 }

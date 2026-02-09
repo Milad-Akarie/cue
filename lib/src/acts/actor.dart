@@ -6,63 +6,15 @@ abstract class Actor extends Widget {
   factory Actor({
     Key? key,
     required Widget child,
-    required List<Act> acts,
+    required Act act,
     Curve? curve,
     Timing? timing,
   }) {
     return _ActorImpl(
       key: key,
-      acts: acts,
+      act: act,
       curve: curve,
       timing: timing,
-      child: child,
-    );
-  }
-
-  factory Actor.fade({
-    Key? key,
-    required Widget child,
-    double begin = 0.0,
-    double? end,
-    Curve? curve,
-    Timing? timing,
-    List<Phase<double>> then = const [],
-  }) {
-    return Actor(
-      key: key,
-      acts: [
-        FadeAct(
-          begin: begin,
-          then: then,
-          end: end,
-          timing: timing,
-          curve: curve,
-        ),
-      ],
-      child: child,
-    );
-  }
-
-  factory Actor.rotate({
-    Key? key,
-    required Widget child,
-    double begin = 0,
-    double? end,
-    List<Phase<double>> then = const [],
-    Curve? curve,
-    Timing? timing,
-  }) {
-    return Actor(
-      key: key,
-      acts: [
-        RotateAct(
-          begin: begin,
-          end: end,
-          then: then,
-          timing: timing,
-          curve: curve,
-        ),
-      ],
       child: child,
     );
   }
@@ -81,208 +33,6 @@ abstract class Actor extends Widget {
       builder: (context, value, child) => builder(context, value),
       curve: curve,
       timing: timing,
-      child: child,
-    );
-  }
-
-  factory Actor.translate({
-    Key? key,
-    required Widget child,
-    Offset begin = Offset.zero,
-    Offset? end,
-    List<Phase<Offset>> then = const [],
-    Curve? curve,
-    Timing? timing,
-  }) {
-    return Actor(
-      key: key,
-      acts: [
-        TranslationAct(
-          begin: begin,
-          end: end,
-          then: then,
-          timing: timing,
-          curve: curve,
-        ),
-      ],
-      child: child,
-    );
-  }
-
-  factory Actor.scale({
-    Key? key,
-    required Widget child,
-    double begin = 1.0,
-    double? end,
-    List<Phase<double>> then = const [],
-    Curve? curve,
-    Timing? timing,
-    AlignmentGeometry? alignment,
-  }) {
-    return Actor(
-      key: key,
-      acts: [
-        ScaleAct(
-          begin: begin,
-          end: end,
-          then: then,
-          timing: timing,
-          curve: curve,
-          alignment: alignment,
-        ),
-      ],
-      child: child,
-    );
-  }
-
-  factory Actor.slide({
-    Key? key,
-    required Widget child,
-    Offset begin = Offset.zero,
-    Offset? end,
-    List<Phase<Offset>> then = const [],
-    Curve? curve,
-    Timing? timing,
-  }) {
-    return Actor(
-      key: key,
-      acts: [
-        SlideAct(
-          begin: begin,
-          end: end,
-          then: then,
-          timing: timing,
-          curve: curve,
-        ),
-      ],
-      child: child,
-    );
-  }
-
-  factory Actor.align({
-    Key? key,
-    required Widget child,
-    AlignmentGeometry? begin,
-    AlignmentGeometry? end,
-    List<Phase<AlignmentGeometry>> then = const [],
-    Curve? curve,
-    Timing? timing,
-  }) {
-    return Actor(
-      key: key,
-      acts: [
-        AlignAct(
-          begin: begin,
-          end: end,
-          then: then,
-          timing: timing,
-          curve: curve,
-        ),
-      ],
-      child: child,
-    );
-  }
-
-  factory Actor.blur({
-    Key? key,
-    required Widget child,
-    double begin = 0,
-    double? end = 0,
-    List<Phase<double>> then = const [],
-    Curve? curve,
-    Timing? timing,
-  }) {
-    return Actor(
-      key: key,
-      acts: [
-        BlurAct(
-          begin: begin,
-          end: end,
-          then: then,
-          timing: timing,
-          curve: curve,
-        ),
-      ],
-      child: child,
-    );
-  }
-
-  factory Actor.clipReveal({
-    Key? key,
-    required Widget child,
-    Size intrinsicSize = Size.zero,
-    BorderRadius borderRadius = BorderRadius.zero,
-    Curve? curve,
-    Timing? timing,
-    AlignmentGeometry? alignment,
-  }) {
-    return Actor(
-      key: key,
-      acts: [
-        ClipRevealAct(
-          beginSize: intrinsicSize,
-          borderRadius: borderRadius,
-          timing: timing,
-          curve: curve,
-          alignment: alignment,
-        ),
-      ],
-      child: child,
-    );
-  }
-
-  factory Actor.resize({
-    Key? key,
-    required Widget child,
-    SizeOrNull? begin,
-    SizeOrNull? end,
-    List<Phase<SizeOrNull>> then = const [],
-    Curve? curve,
-    Timing? timing,
-    AlignmentGeometry? alignment,
-  }) {
-    return Actor(
-      key: key,
-      acts: [
-        ResizeAct(
-          begin: begin,
-          end: end,
-          then: then,
-          timing: timing,
-          curve: curve,
-          alignment: alignment,
-        ),
-      ],
-      child: child,
-    );
-  }
-
-  factory Actor.textStyle({
-    Key? key,
-    required Widget child,
-    required TextStyle begin,
-    required TextStyle end,
-    Curve? curve,
-    Timing? timing,
-  }) {
-    return Actor(
-      key: key,
-      acts: [TextStyleAct(begin: begin, end: end, timing: timing, curve: curve)],
-      child: child,
-    );
-  }
-
-  factory Actor.pad({
-    Key? key,
-    required Widget child,
-    EdgeInsetsGeometry begin = EdgeInsets.zero,
-    EdgeInsetsGeometry end = EdgeInsets.zero,
-    Curve? curve,
-    Timing? timing,
-  }) {
-    return Actor(
-      key: key,
-      acts: [PaddingAct(begin: begin, end: end, timing: timing, curve: curve)],
       child: child,
     );
   }
@@ -347,11 +97,11 @@ abstract class Actor extends Widget {
 }
 
 class _ActorImpl extends StatelessWidget implements Actor {
-  const _ActorImpl({super.key, required this.acts, required this.child, this.timing, this.curve});
+  const _ActorImpl({super.key, required this.act, required this.child, this.timing, this.curve});
 
   final Curve? curve;
   final Timing? timing;
-  final List<Act> acts;
+  final Act act;
 
   final Widget child;
 
@@ -359,7 +109,7 @@ class _ActorImpl extends StatelessWidget implements Actor {
   Widget build(BuildContext context) {
     final scope = CueScope.of(context);
     Widget current = child;
-    for (final effect in acts.reversed) {
+    for (final effect in act.resolved.reversed) {
       current = effect.wrapWidget(
         AnimationContext(
           buildContext: context,
@@ -505,16 +255,7 @@ class PropsTween extends Tween<Props> {
 }
 
 extension StaggeredActorExtension on Iterable<Widget> {
-  List<Widget> stagger({required List<Act> Function(int index) acts}) {
-    return [for (var i = 0; i < length; i++) Actor(acts: acts(i), child: elementAt(i))];
-  }
-}
-
-extension WidgetAnimatableExtension on Widget {
-  Widget animate({List<Act> acts = const [], Curve? curve, Timing? timing}) {
-    if (acts.isEmpty) {
-      return this;
-    }
-    return Actor(acts: acts, curve: curve, timing: timing, child: this);
+  List<Widget> stagger({required Act Function(int index) act}) {
+    return [for (var i = 0; i < length; i++) Actor(act: act(i), child: elementAt(i))];
   }
 }

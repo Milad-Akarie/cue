@@ -1,10 +1,10 @@
 part of 'act.dart';
 
-class ResizeAct extends Act {
-  const ResizeAct({
+class Resize extends Act {
+  const Resize({
     this.begin,
     this.end,
-    this.then = const [],
+    this.steps = const [],
     super.curve,
     super.timing,
     this.alignment,
@@ -14,7 +14,7 @@ class ResizeAct extends Act {
   final SizeOrNull? begin;
   final SizeOrNull? end;
 
-  final List<Phase<SizeOrNull>> then;
+  final List<Phase<SizeOrNull>> steps;
 
   SizeOrNullTween _buildTween(SizeOrNull begin, SizeOrNull end, Size maxSize) {
     final effectiveBeginWidth = begin.width != null && begin.width!.isInfinite ? maxSize.width : begin.width;
@@ -30,13 +30,13 @@ class ResizeAct extends Act {
   Animation<SizeOrNull> build(AnimationContext context, Size maxSize) {
     final List<FullPhase<SizeOrNull>> phases;
     final begin = this.begin ?? SizeOrNull.nullSize;
-    if (then.isEmpty) {
+    if (steps.isEmpty) {
       phases = [FullPhase<SizeOrNull>(begin: begin, end: end ?? begin, weight: 1.0)];
     } else {
       if (end case final end?) {
-        then.add(.to(end));
+        steps.add(Phase.to(end));
       }
-      phases = Phase.normalize(begin, then);
+      phases = Phase.normalize(begin, steps);
     }
     return TweenAct._build<SizeOrNull>(context, phases, (begin, end) {
       return _buildTween(begin, end, maxSize);

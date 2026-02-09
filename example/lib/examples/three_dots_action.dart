@@ -7,12 +7,10 @@ class ThreeDotsAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ModalTransition(
-      showDebug: true,
+      showDebug: false,
       barrierColor: Colors.transparent,
       alignment: Alignment.bottomRight,
-      createSimulation: (bool forward) {
-        return Spring.buildIosStyle(forward: forward);
-      },
+      simulation: Spring.iosDefault,
       triggerBuilder: (context, showModal) => FloatingActionButton(
         shape: CircleBorder(),
         onPressed: showModal,
@@ -29,32 +27,27 @@ class ThreeDotsAction extends StatelessWidget {
                 shape: CircleBorder(),
                 onPressed: () => Navigator.of(context).pop(),
                 child: Actor(
-                  acts: [
-                    .blur(begin: 6, end: 0),
-                    .fade(begin: 0, end: 1),
-                    .translate(begin: Offset(0, rect.height / 3), end: Offset.zero),
-                  ],
+                  act:
+                      Blur(begin: 6, timing: .startAt(.5)) &
+                      Fade() &
+                      Translate.y(begin: rect.height / 3) &
+                      Scale.seq(1, then: [.to(0.8), .to(0.6)]),
                   child: const Icon(Icons.keyboard_arrow_down),
                 ),
               ),
-              Actor.translate(
-                begin: Offset(0, -(rect.height / 3)),
-                end: Offset(0, -rect.height),
+              Actor(
+                act: Translate(
+                  begin: Offset(0, -(rect.height / 3)),
+                  end: Offset(0, -rect.height),
+                ),
                 child: Column(
                   mainAxisSize: .min,
                   children: [
                     for (var icon in [Icons.add, Icons.edit, Icons.translate])
                       Actor(
-                        acts: [
-                          .pad(
-                            begin: EdgeInsets.all(.5),
-                            end: const EdgeInsets.only(bottom: 10.0),
-                          ),
-                          .resize(
-                            begin: .square(5),
-                            end: .square(48),
-                          ),
-                        ],
+                        act:
+                            Pad(begin: .all(.5), end: .only(bottom: 10.0)) &
+                            Resize(begin: .square(5), end: .square(48)),
                         child: FloatingActionButton(
                           mini: true,
                           backgroundColor: Colors.black,
@@ -62,13 +55,7 @@ class ThreeDotsAction extends StatelessWidget {
                           shape: CircleBorder(),
                           onPressed: () {},
                           child: Actor(
-                            acts: [
-                              .clipReveal(
-                                borderRadius: BorderRadius.circular(4),
-                                alignment: Alignment.bottomRight,
-                              ),
-                              .blur(begin: 8),
-                            ],
+                            act: ClipReveal(borderRadius: .circular(4), alignment: .bottomRight) & Blur(begin: 8),
                             child: Icon(icon, color: Colors.white, size: 24),
                           ),
                         ),

@@ -202,6 +202,15 @@ class _SelfAnimatedCueState extends _SelfAnimatedState<_SelfAnimatedCue> {
 
   @override
   Animation<double> getAnimation(BuildContext context) => animation;
+
+  @override
+  void didUpdateWidget(covariant _SelfAnimatedCue oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.loop != oldWidget.loop || widget.reverseOnLoop != oldWidget.reverseOnLoop) {
+      controller.stop();
+      play(loop: widget.loop, reverseOnLoop: widget.reverseOnLoop);
+    }
+  }
 }
 
 abstract class _SelfAnimatedState<T extends Cue> extends _CueState<T> with SingleTickerProviderStateMixin {
@@ -257,6 +266,9 @@ abstract class _SelfAnimatedState<T extends Cue> extends _CueState<T> with Singl
         if (loop) {
           _loopWithSimulation(simulation!, reverseOnLoop: reverseOnLoop);
         } else {
+          if (_statusListener != null) {
+            controller.removeStatusListener(_statusListener!);
+          }
           controller.animateWith(simulation!);
         }
       } else {

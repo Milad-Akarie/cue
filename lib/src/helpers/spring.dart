@@ -1,109 +1,165 @@
 // holds default values for spring simulation
-import 'package:flutter/animation.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/physics.dart';
 
 const double _kStandardIosStiffness = 522.35;
 const double _kStandardIosDamping = 45.7099552;
 const Tolerance _kStandardIosTolerance = Tolerance(velocity: 0.03);
 
-class Spring {
-  static SpringSimulation withDurationAndBounce({
+class Spring extends SpringSimulation {
+  final SpringDescription _springDesc;
+  final double _start;
+  final double _end;
+  final double _velocity;
+  final bool _snapToEnd;
+
+  Spring(
+    super.spring,
+    super.start,
+    super.end,
+    super.velocity, {
+    super.tolerance,
+    super.snapToEnd,
+  }) : _springDesc = spring,
+       _start = start,
+       _end = end,
+       _velocity = velocity,
+       _snapToEnd = snapToEnd;
+
+  Spring copyWith({
+    SpringDescription? spring,
+    double? start,
+    double? end,
+    double? velocity,
+    Tolerance? tolerance,
+    bool? snapToEnd,
+  }) {
+    return Spring(
+      spring ?? _springDesc,
+      start ?? _start,
+      end ?? _end,
+      velocity ?? _velocity,
+      snapToEnd: snapToEnd ?? _snapToEnd,
+      tolerance: tolerance ?? this.tolerance,
+    );
+  }
+
+  Curve get curve => SpringCurve(this);
+
+  Spring withDirection(bool forward) {
+    final start = forward ? 0.0 : 1.0;
+    if (start == _start) return this;
+    return copyWith(
+      start: start,
+      end: forward ? 1.0 : 0.0,
+    );
+  }
+
+  factory Spring.iosDefault([bool forward = true]) => Spring(
+    SpringDescription(
+      mass: 1.0,
+      stiffness: _kStandardIosStiffness,
+      damping: _kStandardIosDamping,
+    ),
+    forward ? 0.0 : 1.0,
+    forward ? 1.0 : 0.0,
+    0.0,
+    tolerance: _kStandardIosTolerance,
+    snapToEnd: true,
+  );
+
+  factory Spring.smooth([bool forward = true]) => Spring(
+    SpringDescription(
+      mass: 1.0,
+      stiffness: 157.91,
+      damping: 25.13,
+    ),
+    forward ? 0.0 : 1.0,
+    forward ? 1.0 : 0.0,
+    0.0,
+    tolerance: Tolerance(distance: 0.01, velocity: 0.03),
+    snapToEnd: true,
+  );
+
+  factory Spring.snappy([bool forward = true]) => Spring(
+    SpringDescription(
+      mass: 1.0,
+      stiffness: 246.74,
+      damping: 26.70,
+    ),
+    forward ? 0.0 : 1.0,
+    forward ? 1.0 : 0.0,
+    0.0,
+    tolerance: Tolerance(distance: 0.01, velocity: 0.03),
+    snapToEnd: true,
+  );
+
+  factory Spring.bouncy([bool forward = true]) => Spring(
+    SpringDescription(
+      mass: 1.0,
+      stiffness: 157.91,
+      damping: 15.08,
+    ),
+    forward ? 0.0 : 1.0,
+    forward ? 1.0 : 0.0,
+    0.0,
+    tolerance: Tolerance(distance: 0.01, velocity: 0.03),
+    snapToEnd: true,
+  );
+
+  factory Spring.interactive([bool forward = true]) => Spring(
+    SpringDescription(
+      mass: 1.0,
+      stiffness: 1754.17,
+      damping: 72.11,
+    ),
+    forward ? 0.0 : 1.0,
+    forward ? 1.0 : 0.0,
+    0.0,
+    tolerance: Tolerance(distance: 0.01, velocity: 0.03),
+    snapToEnd: true,
+  );
+
+  factory Spring.gentle([bool forward = true]) => Spring(
+    SpringDescription(
+      mass: 1.0,
+      stiffness: 61.69,
+      damping: 15.71,
+    ),
+    forward ? 0.0 : 1.0,
+    forward ? 1.0 : 0.0,
+    0.0,
+    tolerance: Tolerance(distance: 0.01, velocity: 0.03),
+    snapToEnd: true,
+  );
+
+  factory Spring.stiff([bool forward = true]) => Spring(
+    SpringDescription(
+      mass: 1.0,
+      stiffness: 438.65,
+      damping: 41.89,
+    ),
+    forward ? 0.0 : 1.0,
+    forward ? 1.0 : 0.0,
+    0.0,
+    tolerance: Tolerance(distance: 0.01, velocity: 0.03),
+    snapToEnd: true,
+  );
+
+  factory Spring.withDurationAndBounce({
     Duration duration = const Duration(milliseconds: 500),
     double bounce = 0,
   }) {
-    return SpringSimulation(
+    return Spring(
       SpringDescription.withDurationAndBounce(
         duration: duration,
         bounce: bounce,
       ),
-      0,
-      1,
+      0.0,
+      1.0,
       0,
     );
   }
-
-  static SpringSimulation buildIosStyle({
-    double mass = 1,
-    double stiffness = _kStandardIosStiffness,
-    double damping = _kStandardIosDamping,
-    bool forward = true,
-    Tolerance tolerance = _kStandardIosTolerance,
-    bool snapToEnd = true,
-  }) {
-    return SpringSimulation(
-      SpringDescription(
-        mass: mass,
-        stiffness: stiffness,
-        damping: damping,
-      ),
-      forward ? 0.0 : 1.0,
-      forward ? 1.0 : 0.0,
-      0,
-      tolerance: tolerance,
-      snapToEnd: snapToEnd,
-    );
-  }
-
-  static SpringSimulation build({
-    double mass = 1,
-    double stiffness = 100,
-    double damping = 10,
-    double initialVelocity = 0,
-    bool snapToEnd = false,
-    Tolerance tolerance = Tolerance.defaultTolerance,
-    double start = 0,
-    double end = 1,
-  }) {
-    return SpringSimulation(
-      SpringDescription(
-        mass: mass,
-        stiffness: stiffness,
-        damping: damping,
-      ),
-      start,
-      end,
-      initialVelocity,
-      tolerance: tolerance,
-      snapToEnd: snapToEnd,
-    );
-  }
-
-  static final SpringSimulation smooth = SpringSimulation(
-    SpringDescription(
-      mass: 1,
-      stiffness: 100,
-      damping: 10,
-    ),
-    0,
-    1,
-    0,
-  );
-
-  static final SpringSimulation bouncy = SpringSimulation(
-    SpringDescription(
-      mass: 1,
-      stiffness: 100,
-      damping: 7, // ζ ≈ 0.35 - balanced bounce
-    ),
-    0,
-    1,
-    0,
-  );
-
-  static final SpringSimulation snappy = SpringSimulation(
-    SpringDescription(
-      mass: 1,
-      stiffness: 100,
-      damping: 20,
-    ),
-    0,
-    1,
-    0,
-  );
-}
-
-extension SpringSimulationAsCurve on SpringSimulation {
-  Curve get curve => SpringCurve(this);
 }
 
 class SpringCurve extends Curve {
