@@ -48,6 +48,8 @@ class FullPhase<T> extends Phase<T> {
     required super.weight,
   }) : super._();
 
+  bool get isAlwaysStopped => begin == end;
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||

@@ -10,6 +10,9 @@ class ThreeDotsAction extends StatelessWidget {
       showDebug: true,
       barrierColor: Colors.transparent,
       alignment: Alignment.bottomRight,
+      createSimulation: (bool forward) {
+        return Spring.buildIosStyle(forward: forward);
+      },
       triggerBuilder: (context, showModal) => FloatingActionButton(
         shape: CircleBorder(),
         onPressed: showModal,
@@ -29,7 +32,7 @@ class ThreeDotsAction extends StatelessWidget {
                   acts: [
                     .blur(begin: 6, end: 0),
                     .fade(begin: 0, end: 1),
-                    .translate(begin: Offset(0, rect.height / 3)),
+                    .translate(begin: Offset(0, rect.height / 3), end: Offset.zero),
                   ],
                   child: const Icon(Icons.keyboard_arrow_down),
                 ),
@@ -48,10 +51,8 @@ class ThreeDotsAction extends StatelessWidget {
                             end: const EdgeInsets.only(bottom: 10.0),
                           ),
                           .resize(
-                            beginWidth: 5,
-                            beginHeight: 5,
-                            endWidth: 48,
-                            endHeight: 48,
+                            begin: .square(5),
+                            end: .square(48),
                           ),
                         ],
                         child: FloatingActionButton(

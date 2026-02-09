@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 @optionalTypeArgs
 typedef ShowModalFunction<T extends Object> = Future<T?> Function();
 
+typedef CreateSimulationFunction = Simulation? Function(bool forward);
+
 class ModalTransition extends StatefulWidget {
   const ModalTransition({
     super.key,
@@ -17,6 +19,7 @@ class ModalTransition extends StatefulWidget {
     this.alignment,
     this.barrierDismissible = true,
     this.barrierColor = const Color(0x80000000),
+    this.createSimulation,
   });
 
   final Duration duration;
@@ -27,6 +30,7 @@ class ModalTransition extends StatefulWidget {
   final Widget? backdrop;
   final bool barrierDismissible;
   final Color? barrierColor;
+  final CreateSimulationFunction? createSimulation;
 
   @override
   State<ModalTransition> createState() => _ModalTransitionState();
@@ -80,6 +84,7 @@ class _ModalTransitionState extends State<ModalTransition> {
       barrierColor: widget.barrierColor,
       transitionDuration: widget.duration,
       transitionBuilder: (context, _, _, child) => child,
+      simulationBuilder: widget.createSimulation,
       pageBuilder: (context, animation, _) {
         return _ModelContent(
           animation: animation,
@@ -200,8 +205,9 @@ class _ModalRoute<T extends Object> extends RawDialogRoute<T> {
     super.barrierColor,
     super.transitionDuration,
     super.transitionBuilder,
+    this.simulationBuilder,
   });
-
+  final CreateSimulationFunction? simulationBuilder;
   final ValueChanged<AnimationController> onAnimationControllerReady;
 
   @override
@@ -209,5 +215,13 @@ class _ModalRoute<T extends Object> extends RawDialogRoute<T> {
     final ctrl = super.createAnimationController();
     onAnimationControllerReady(ctrl);
     return ctrl;
+  }
+
+  @override
+  Simulation? createSimulation({required bool forward}) {
+    if (simulationBuilder case final builder?) {
+      return builder(forward);
+    }
+    return super.createSimulation(forward: forward);
   }
 }

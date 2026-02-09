@@ -30,6 +30,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  sprung: ^3.0.1
   cue:
     path: ..
 

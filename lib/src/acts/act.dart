@@ -53,11 +53,9 @@ abstract class Act {
   }) = BlurAct;
 
   const factory Act.resize({
-    double? beginWidth,
-    double? beginHeight,
-    double? endWidth,
-    double? endHeight,
-
+    SizeOrNull? begin,
+    SizeOrNull? end,
+    List<Phase<SizeOrNull>> then,
     Curve? curve,
     Timing? timing,
     AlignmentGeometry? alignment,
@@ -104,7 +102,7 @@ abstract class Act {
   }) = PaddingAct;
 
   const factory Act.clipReveal({
-    Size intrinsicSize,
+    Size beginSize,
     BorderRadius borderRadius,
     AlignmentGeometry? alignment,
     Curve? curve,
@@ -116,7 +114,7 @@ abstract class Act {
 
 abstract class TweenAct<T> extends Act {
   final T begin;
-  final T end;
+  final T? end;
   final List<Phase<T>> then;
 
   const TweenAct({
@@ -132,10 +130,10 @@ abstract class TweenAct<T> extends Act {
   Animation<T> build(AnimationContext context, {TweenBuilder<T>? tweenBuilder}) {
     final List<FullPhase<T>> phases;
     if (then.isEmpty) {
-      phases = [FullPhase<T>(begin: begin, end: end, weight: 1.0)];
+      phases = [FullPhase<T>(begin: begin, end: end ?? begin, weight: 1.0)];
     } else {
       assert(begin != null, 'Begin value must be provided when using phases');
-      if (end != null) {
+      if (end case final end?) {
         then.add(.to(end));
       }
       phases = Phase.normalize(begin, then);
@@ -147,12 +145,17 @@ abstract class TweenAct<T> extends Act {
     Animatable<T> tween;
     if (phases.length == 1) {
       final phase = phases.single;
+      if (phase.begin == phase.end) {
+        return AlwaysStoppedAnimation<T>(phase.begin);
+      }
       tween = tweenBuilder(phase.begin, phase.end);
     } else {
       tween = TweenSequence<T>([
         for (final phase in phases)
           TweenSequenceItem(
-            tween: phase is ConstantPhase<T> ? ConstantTween<T>(phase.begin) : tweenBuilder(phase.begin, phase.end),
+            tween: phase is ConstantPhase<T> || phase.isAlwaysStopped
+                ? ConstantTween<T>(phase.begin)
+                : tweenBuilder(phase.begin, phase.end),
             weight: phase.weight,
           ),
       ]);
@@ -183,7 +186,7 @@ abstract class TweenAct<T> extends Act {
 class ScaleAct extends TweenAct<double> {
   const ScaleAct({
     super.begin = 1.0,
-    super.end = 1.0,
+    super.end,
     super.then = const [],
     super.curve,
     super.timing,
@@ -223,12 +226,12 @@ class FadeAct extends TweenAct<double> {
 class RotateAct extends TweenAct<double> {
   const RotateAct({
     super.begin = 0,
-    super.end = 360,
+    super.end,
     super.then = const [],
     super.curve,
     super.timing,
   }) : assert(begin >= -360 && begin <= 360, 'Begin angle must be between 0 and 360 degrees'),
-       assert(end >= -360 && end <= 360, 'End angle must be between 0 and 360 degrees');
+       assert(end == null || (end >= -360 && end <= 360), 'End angle must be between 0 and 360 degrees');
 
   @override
   Widget wrapWidget(AnimationContext ctx, Widget child) {
@@ -306,7 +309,7 @@ class AlignAct extends TweenAct<AlignmentGeometry?> {
 class SlideAct extends TweenAct<Offset> {
   const SlideAct({
     super.begin = Offset.zero,
-    super.end = Offset.zero,
+    super.end,
     super.then = const [],
     super.curve,
     super.timing,
@@ -324,7 +327,7 @@ class SlideAct extends TweenAct<Offset> {
 class TranslationAct extends TweenAct<Offset> {
   const TranslationAct({
     super.begin = Offset.zero,
-    super.end = Offset.zero,
+    super.end,
     super.then = const [],
     super.curve,
     super.timing,
@@ -349,7 +352,7 @@ class TranslationAct extends TweenAct<Offset> {
 class TextStyleAct extends TweenAct<TextStyle> {
   const TextStyleAct({
     required super.begin,
-    required super.end,
+    super.end,
     super.then = const [],
     super.curve,
     super.timing,
@@ -408,14 +411,14 @@ class PaddingAct extends TweenAct<EdgeInsetsGeometry> {
 
 class ClipRevealAct extends TweenAct<double> {
   const ClipRevealAct({
-    this.intrinsicSize = Size.zero,
+    this.beginSize = Size.zero,
     this.borderRadius = BorderRadius.zero,
     this.alignment,
     super.curve,
     super.timing,
   }) : super(begin: 0, end: 1, then: const []);
 
-  final Size intrinsicSize;
+  final Size beginSize;
   final BorderRadius borderRadius;
   final AlignmentGeometry? alignment;
 
@@ -434,7 +437,7 @@ class ClipRevealAct extends TweenAct<double> {
           child: ClipPath(
             clipper: ExpandingPathClipper(
               progress: animation.value,
-              minSize: intrinsicSize,
+              minSize: beginSize,
               borderRadius: borderRadius,
               alignment: effectiveAlignment.resolve(directionality),
             ),

@@ -2,10 +2,8 @@ part of 'act.dart';
 
 class ResizeAct extends Act {
   const ResizeAct({
-    this.beginWidth,
-    this.beginHeight,
-    this.endWidth,
-    this.endHeight,
+    this.begin,
+    this.end,
     this.then = const [],
     super.curve,
     super.timing,
@@ -13,10 +11,9 @@ class ResizeAct extends Act {
   });
 
   final AlignmentGeometry? alignment;
-  final double? beginWidth;
-  final double? beginHeight;
-  final double? endWidth;
-  final double? endHeight;
+  final SizeOrNull? begin;
+  final SizeOrNull? end;
+
   final List<Phase<SizeOrNull>> then;
 
   SizeOrNullTween _buildTween(SizeOrNull begin, SizeOrNull end, Size maxSize) {
@@ -32,13 +29,13 @@ class ResizeAct extends Act {
 
   Animation<SizeOrNull> build(AnimationContext context, Size maxSize) {
     final List<FullPhase<SizeOrNull>> phases;
-    final begin = SizeOrNull(beginWidth, beginHeight);
-    final end = SizeOrNull(endWidth, endHeight);
+    final begin = this.begin ?? SizeOrNull.nullSize;
     if (then.isEmpty) {
-      phases = [FullPhase<SizeOrNull>(begin: begin, end: end, weight: 1.0)];
+      phases = [FullPhase<SizeOrNull>(begin: begin, end: end ?? begin, weight: 1.0)];
     } else {
-      //todo: rethink this
-      then.add(.to(end));
+      if (end case final end?) {
+        then.add(.to(end));
+      }
       phases = Phase.normalize(begin, then);
     }
     return TweenAct._build<SizeOrNull>(context, phases, (begin, end) {
@@ -86,6 +83,10 @@ class SizeOrNull {
 
   static const nullSize = SizeOrNull(null, null);
 
+  factory SizeOrNull.width(double width) => SizeOrNull(width, null);
+  factory SizeOrNull.height(double height) => SizeOrNull(null, height);
+  factory SizeOrNull.size(double? width, double? height) => SizeOrNull(width, height);
+  factory SizeOrNull.square(double size) => SizeOrNull(size, size);
   factory SizeOrNull.fromSize(Size size) => SizeOrNull(size.width, size.height);
 
   @override

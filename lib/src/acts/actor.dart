@@ -1,10 +1,6 @@
 import 'dart:ui';
-
-import 'package:cue/src/core/core.dart';
-import 'package:cue/src/cue/cue.dart';
+import 'package:cue/cue.dart';
 import 'package:flutter/material.dart';
-
-import 'act.dart';
 
 abstract class Actor extends Widget {
   factory Actor({
@@ -27,13 +23,22 @@ abstract class Actor extends Widget {
     Key? key,
     required Widget child,
     double begin = 0.0,
-    double end = 1.0,
+    double? end,
     Curve? curve,
     Timing? timing,
+    List<Phase<double>> then = const [],
   }) {
     return Actor(
       key: key,
-      acts: [FadeAct(begin: begin, end: end, timing: timing, curve: curve)],
+      acts: [
+        FadeAct(
+          begin: begin,
+          then: then,
+          end: end,
+          timing: timing,
+          curve: curve,
+        ),
+      ],
       child: child,
     );
   }
@@ -42,13 +47,22 @@ abstract class Actor extends Widget {
     Key? key,
     required Widget child,
     double begin = 0,
-    double end = 360,
+    double? end,
+    List<Phase<double>> then = const [],
     Curve? curve,
     Timing? timing,
   }) {
     return Actor(
       key: key,
-      acts: [RotateAct(begin: begin, end: end, timing: timing, curve: curve)],
+      acts: [
+        RotateAct(
+          begin: begin,
+          end: end,
+          then: then,
+          timing: timing,
+          curve: curve,
+        ),
+      ],
       child: child,
     );
   }
@@ -75,7 +89,8 @@ abstract class Actor extends Widget {
     Key? key,
     required Widget child,
     Offset begin = Offset.zero,
-    Offset end = Offset.zero,
+    Offset? end,
+    List<Phase<Offset>> then = const [],
     Curve? curve,
     Timing? timing,
   }) {
@@ -85,6 +100,7 @@ abstract class Actor extends Widget {
         TranslationAct(
           begin: begin,
           end: end,
+          then: then,
           timing: timing,
           curve: curve,
         ),
@@ -97,7 +113,8 @@ abstract class Actor extends Widget {
     Key? key,
     required Widget child,
     double begin = 1.0,
-    double end = 1.0,
+    double? end,
+    List<Phase<double>> then = const [],
     Curve? curve,
     Timing? timing,
     AlignmentGeometry? alignment,
@@ -108,6 +125,7 @@ abstract class Actor extends Widget {
         ScaleAct(
           begin: begin,
           end: end,
+          then: then,
           timing: timing,
           curve: curve,
           alignment: alignment,
@@ -121,13 +139,22 @@ abstract class Actor extends Widget {
     Key? key,
     required Widget child,
     Offset begin = Offset.zero,
-    Offset end = Offset.zero,
+    Offset? end,
+    List<Phase<Offset>> then = const [],
     Curve? curve,
     Timing? timing,
   }) {
     return Actor(
       key: key,
-      acts: [SlideAct(begin: begin, end: end, timing: timing, curve: curve)],
+      acts: [
+        SlideAct(
+          begin: begin,
+          end: end,
+          then: then,
+          timing: timing,
+          curve: curve,
+        ),
+      ],
       child: child,
     );
   }
@@ -137,12 +164,21 @@ abstract class Actor extends Widget {
     required Widget child,
     AlignmentGeometry? begin,
     AlignmentGeometry? end,
+    List<Phase<AlignmentGeometry>> then = const [],
     Curve? curve,
     Timing? timing,
   }) {
     return Actor(
       key: key,
-      acts: [AlignAct(begin: begin, end: end, timing: timing, curve: curve)],
+      acts: [
+        AlignAct(
+          begin: begin,
+          end: end,
+          then: then,
+          timing: timing,
+          curve: curve,
+        ),
+      ],
       child: child,
     );
   }
@@ -151,13 +187,22 @@ abstract class Actor extends Widget {
     Key? key,
     required Widget child,
     double begin = 0,
-    double end = 10.0,
+    double? end = 0,
+    List<Phase<double>> then = const [],
     Curve? curve,
     Timing? timing,
   }) {
     return Actor(
       key: key,
-      acts: [BlurAct(begin: begin, end: end, timing: timing, curve: curve)],
+      acts: [
+        BlurAct(
+          begin: begin,
+          end: end,
+          then: then,
+          timing: timing,
+          curve: curve,
+        ),
+      ],
       child: child,
     );
   }
@@ -175,7 +220,7 @@ abstract class Actor extends Widget {
       key: key,
       acts: [
         ClipRevealAct(
-          intrinsicSize: intrinsicSize,
+          beginSize: intrinsicSize,
           borderRadius: borderRadius,
           timing: timing,
           curve: curve,
@@ -189,10 +234,9 @@ abstract class Actor extends Widget {
   factory Actor.resize({
     Key? key,
     required Widget child,
-    double? beginWidth,
-    double? beginHeight,
-    double? endWidth,
-    double? endHeight,
+    SizeOrNull? begin,
+    SizeOrNull? end,
+    List<Phase<SizeOrNull>> then = const [],
     Curve? curve,
     Timing? timing,
     AlignmentGeometry? alignment,
@@ -201,10 +245,9 @@ abstract class Actor extends Widget {
       key: key,
       acts: [
         ResizeAct(
-          beginWidth: beginWidth,
-          beginHeight: beginHeight,
-          endWidth: endWidth,
-          endHeight: endHeight,
+          begin: begin,
+          end: end,
+          then: then,
           timing: timing,
           curve: curve,
           alignment: alignment,

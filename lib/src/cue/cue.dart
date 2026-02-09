@@ -18,6 +18,7 @@ abstract class Cue extends StatefulWidget {
     bool debug,
     Duration duration,
     Duration? reverseDuration,
+    Simulation? simulation,
     Duration? delay,
     bool loop,
     bool reverseOnLoop,
@@ -29,6 +30,7 @@ abstract class Cue extends StatefulWidget {
     Curve curve,
     bool debug,
     Duration duration,
+    Simulation? simulation,
     Duration? reverseDuration,
     MouseCursor cursor,
     bool opaque,
@@ -49,6 +51,7 @@ abstract class Cue extends StatefulWidget {
     bool debug,
     Duration duration,
     Duration? reverseDuration,
+    Simulation? simulation,
     required bool toggled,
     bool skipFirstAnimation,
   }) = _ToggledCue;
@@ -161,10 +164,11 @@ class _SelfAnimatedCue extends Cue {
     this.duration = const Duration(milliseconds: 300),
     this.reverseDuration,
     this.loop = false,
+    this.simulation,
     this.reverseOnLoop = false,
     this.delay,
   });
-
+  final Simulation? simulation;
   final Duration duration;
   final Duration? reverseDuration;
   final Duration? delay;
@@ -186,6 +190,9 @@ class _SelfAnimatedCueState extends _SelfAnimatedState<_SelfAnimatedCue> {
   Duration? get reverseDuration => widget.reverseDuration;
 
   @override
+  Simulation? get simulation => widget.simulation;
+
+  @override
   void onControllerReady() async {
     if (widget.delay case final delay?) {
       await Future.delayed(delay);
@@ -200,10 +207,13 @@ class _SelfAnimatedCueState extends _SelfAnimatedState<_SelfAnimatedCue> {
 abstract class _SelfAnimatedState<T extends Cue> extends _CueState<T> with SingleTickerProviderStateMixin {
   late final AnimationController controller;
   Animation<double> _animation = const AlwaysStoppedAnimation(0.0);
+  AnimationStatusListener? _statusListener;
 
   Animation<double> get animation => _animation;
 
   Curve get curve;
+
+  Simulation? get simulation => null;
 
   Duration get duration;
 
@@ -243,16 +253,46 @@ abstract class _SelfAnimatedState<T extends Cue> extends _CueState<T> with Singl
 
   void play({bool loop = false, bool reverseOnLoop = false}) {
     if (mounted) {
-      if (loop) {
-        controller.repeat(reverse: reverseOnLoop);
+      if (simulation != null) {
+        if (loop) {
+          _loopWithSimulation(simulation!, reverseOnLoop: reverseOnLoop);
+        } else {
+          controller.animateWith(simulation!);
+        }
       } else {
-        controller.forward();
+        if (loop) {
+          controller.repeat(reverse: reverseOnLoop);
+        } else {
+          controller.forward();
+        }
       }
     }
   }
 
+  void _loopWithSimulation(Simulation simulation, {bool reverseOnLoop = false}) {
+    if (_statusListener != null) {
+      controller.removeStatusListener(_statusListener!);
+    }
+    _statusListener = (status) {
+      if (status == AnimationStatus.completed) {
+        if (reverseOnLoop) {
+          controller.animateBack(0.0);
+        } else {
+          controller.animateWith(simulation);
+        }
+      } else if (status == AnimationStatus.dismissed && reverseOnLoop) {
+        controller.animateWith(simulation);
+      }
+    };
+    controller.addStatusListener(_statusListener!);
+    controller.animateWith(simulation);
+  }
+
   @override
   void dispose() {
+    if (_statusListener != null) {
+      controller.removeStatusListener(_statusListener!);
+    }
     controller.dispose();
     super.dispose();
   }
@@ -264,12 +304,14 @@ class _OnHoverCue extends Cue {
     required super.child,
     super.curve,
     super.debug,
+    this.simulation,
     this.duration = const Duration(milliseconds: 200),
     this.reverseDuration,
     this.cursor = MouseCursor.defer,
     this.opaque = false,
   });
 
+  final Simulation? simulation;
   final Duration duration;
   final Duration? reverseDuration;
   final MouseCursor cursor;
@@ -288,6 +330,9 @@ class _OnHoverStageState extends _SelfAnimatedState<_OnHoverCue> {
 
   @override
   Duration? get reverseDuration => widget.reverseDuration;
+
+  @override
+  Simulation? get simulation => widget.simulation;
 
   @override
   Animation<double> getAnimation(BuildContext context) => animation;
@@ -310,12 +355,14 @@ class _ToggledCue extends Cue {
     required super.child,
     super.curve,
     super.debug,
+    this.simulation,
     this.duration = const Duration(milliseconds: 300),
     this.reverseDuration,
     required this.toggled,
     this.skipFirstAnimation = true,
   });
 
+  final Simulation? simulation;
   final Duration duration;
   final Duration? reverseDuration;
   final bool toggled;
@@ -334,6 +381,9 @@ class _ToggledStageState extends _SelfAnimatedState<_ToggledCue> {
 
   @override
   Duration? get reverseDuration => widget.reverseDuration;
+
+  @override
+  Simulation? get simulation => widget.simulation;
 
   @override
   Animation<double> getAnimation(BuildContext context) => animation;
