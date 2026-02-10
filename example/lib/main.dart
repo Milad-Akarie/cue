@@ -2,8 +2,6 @@ import 'package:cue/cue.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import 'examples/three_dots_action.dart';
-
 void main() {
   runApp(const MyApp());
 }
@@ -50,8 +48,9 @@ class _DemoPageState extends State<DemoPage> {
           debug: true,
           duration: Duration(seconds: 2),
           child: Actor(
-            act: .group([
+            acts: [
               Translate.keyframes([
+                .begin(Offset(0, 0)),
                 .key(Offset(0, -120), at: 0.25),
                 .key(Offset(0, 0), at: 0.5),
                 .key(Offset(0, -80), at: 0.65),
@@ -59,23 +58,26 @@ class _DemoPageState extends State<DemoPage> {
                 .key(Offset(0, -40), at: 0.9),
                 .end(Offset(0, 0)),
               ]),
-              Resize.keyframes([
-                .start(.size(50, 50)),
-                .key(.size(80, 80), at: 0.25),
-                .key(.size(50, 50), at: 0.5),
-                .key(.size(70, 70), at: 0.65),
-                .key(.size(50, 50), at: 0.8),
-                .key(.size(60, 60), at: 0.9),
-                .end(.size(50, 50)),
+              Scale.keyframes([
+                .begin(1.0),
+                .key(1.5, at: 0.25),
+                .key(1.0, at: 0.5),
+                .key(1.25, at: 0.65),
+                .key(1.0, at: 0.8),
+                .key(1.125, at: 0.9),
+                .end(1.0),
               ]),
-            ]),
-            child: Container(
-              width: 50,
-              height: 50,
-              decoration: BoxDecoration(
-                color: Colors.deepPurple,
-                shape: BoxShape.circle,
-              ),
+            ],
+            child: TweenActor(
+              timing: .startAt(.5),
+              tween: ColorTween(begin: Colors.deepPurple, end: Colors.green),
+              builder: (context, value, _) {
+                return Container(
+                  width: 50,
+                  height: 50,
+                  color: value,
+                );
+              },
             ),
           ),
         ),

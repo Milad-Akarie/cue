@@ -7,14 +7,16 @@ class ThreeDotsAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ModalTransition(
-      showDebug: false,
-      barrierColor: Colors.transparent,
+      showDebug: true,
+      barrierColor: Colors.black12,
       alignment: Alignment.bottomRight,
       simulation: Spring.iosDefault,
       triggerBuilder: (context, showModal) => FloatingActionButton(
         shape: CircleBorder(),
         onPressed: showModal,
-        child: const Icon(Icons.more_vert),
+        child: CustomPaint(
+          painter: _DotsPainter(),
+        ),
       ),
       builder: (context, rect) {
         return SizedBox(
@@ -27,23 +29,30 @@ class ThreeDotsAction extends StatelessWidget {
                 shape: CircleBorder(),
                 onPressed: () => Navigator.of(context).pop(),
                 child: Actor(
-                  act: Blur(begin: 6) & Fade() & Translate.y(begin: rect.height / 3),
+                  acts: [
+                    Blur(begin: 6),
+                    Fade(),
+                    Translate.y(begin: rect.height / 3),
+                  ],
                   child: const Icon(Icons.keyboard_arrow_down),
                 ),
               ),
               Actor(
-                act: Translate(
-                  begin: Offset(0, -(rect.height / 3)),
-                  end: Offset(0, -rect.height),
-                ),
+                acts: [
+                  Translate(
+                    begin: Offset(0, -(rect.height / 3)),
+                    end: Offset(0, -rect.height),
+                  ),
+                ],
                 child: Column(
                   mainAxisSize: .min,
                   children: [
                     for (var icon in [Icons.add, Icons.edit, Icons.translate])
                       Actor(
-                        act:
-                            Pad(begin: .all(.5), end: .only(bottom: 10.0)) &
-                            Resize(begin: .square(5), end: .square(48)),
+                        acts: [
+                          Pad(begin: .all(1), end: .only(bottom: 10.0)),
+                          Resize(begin: .square(5), end: .square(48)),
+                        ],
                         child: FloatingActionButton(
                           mini: true,
                           backgroundColor: Colors.black,
@@ -51,7 +60,11 @@ class ThreeDotsAction extends StatelessWidget {
                           shape: CircleBorder(),
                           onPressed: () {},
                           child: Actor(
-                            act: ClipReveal(borderRadius: .circular(4), alignment: .bottomRight) & Blur(begin: 8),
+                            acts: [
+                              ClipReveal(borderRadius: .circular(5), alignment: .center),
+                              Blur(begin: 8),
+                              Fade(),
+                            ],
                             child: Icon(icon, color: Colors.white, size: 24),
                           ),
                         ),
@@ -65,4 +78,22 @@ class ThreeDotsAction extends StatelessWidget {
       },
     );
   }
+}
+
+class _DotsPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..color = Colors.black;
+    final radius = 2.5;
+    final spacing = 2.0;
+    double yAnchor = -spacing;
+    for (int i = 0; i < 3; i++) {
+      final offset = Offset(size.width / 2, (size.height / 2 + (i - 1) * radius * 2) + yAnchor);
+      yAnchor += spacing;
+      canvas.drawCircle(offset, radius, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

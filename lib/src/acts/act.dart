@@ -8,26 +8,9 @@ import 'package:flutter/widgets.dart';
 
 part 'resize.dart';
 part 'translate.dart';
+part 'decorate.dart';
 
 typedef TweenBuilder<T> = Animatable<T> Function(T begin, T end);
-
-class ActGroup extends Act {
-  final List<Act> acts;
-
-  const ActGroup(
-    this.acts, {
-    super.timing,
-    super.curve,
-  });
-
-  @override
-  Widget wrapWidget(AnimationContext context, Widget child) {
-    return acts.fold(child, (current, act) => act.wrapWidget(context, current));
-  }
-
-  @override
-  List<Act> get resolved => List.unmodifiable(acts.expand((act) => act.resolved));
-}
 
 abstract class Act {
   final Timing? timing;
@@ -37,19 +20,6 @@ abstract class Act {
     this.timing,
     this.curve,
   });
-
-  const factory Act.group(List<Act> acts, {Timing? timing, Curve? curve}) = ActGroup;
-
-  Act operator &(Act other) {
-    // If we are already a group, just add the new one to our list
-    if (this is ActGroup) {
-      return ActGroup([...(this as ActGroup).acts, other]);
-    }
-    // Otherwise, create a new group with both acts
-    return ActGroup([this, other]);
-  }
-
-  List<Act> get resolved => List.unmodifiable([this]);
 
   Widget wrapWidget(AnimationContext context, Widget child);
 }
@@ -298,6 +268,8 @@ class Pad extends TweenAct<EdgeInsetsGeometry> {
     super.curve,
     super.timing,
   });
+
+  const Pad.keyframes(super.keyframes, {super.curve}) : super.keyframes();
 
   @override
   Widget wrapWidget(AnimationContext context, Widget child) {
