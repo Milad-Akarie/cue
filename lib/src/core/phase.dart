@@ -1,76 +1,90 @@
-sealed class Phase<T> {
-  const Phase._({required this.weight}) : assert(weight > 0.0);
-  final double weight;
+import 'core.dart';
 
-  const factory Phase({
-    required T begin,
-    required T end,
-    required double weight,
-  }) = FullPhase<T>;
+class Keyframe<T extends Object?> {
+  final T value;
+  final double at;
 
-  const factory Phase.to(T begin, {double weight}) = _EndPhase<T>;
-  const factory Phase.from(T end, {double weight}) = _BeginPhase<T>;
-  const factory Phase.hold(T value, {double weight}) = ConstantPhase<T>;
-
-  static List<FullPhase<T>> normalize<T>(T base, List<Phase<T>> partialPhase) {
-    final List<FullPhase<T>> fullPhases = [];
-    T currentBase = base;
-    for (final phase in partialPhase) {
-      switch (phase) {
-        case FullPhase<T>():
-          fullPhases.add(phase);
-          currentBase = phase.end;
-        case _BeginPhase<T>():
-          // Begin-only phase: needs an end value (use next phase's begin or current base)
-          final nextPhase = partialPhase.indexOf(phase) < partialPhase.length - 1
-              ? partialPhase[partialPhase.indexOf(phase) + 1]
-              : null;
-          final end = nextPhase is _EndPhase<T> ? nextPhase.end : currentBase;
-          fullPhases.add(FullPhase(begin: phase.begin, end: end, weight: phase.weight));
-          currentBase = end;
-        case _EndPhase<T>():
-          fullPhases.add(FullPhase(begin: currentBase, end: phase.end, weight: phase.weight));
-          currentBase = phase.end;
-      }
-    }
-
-    return fullPhases;
-  }
-}
-
-class FullPhase<T> extends Phase<T> {
-  final T begin;
-  final T end;
-
-  const FullPhase({
-    required this.begin,
-    required this.end,
-    required super.weight,
-  }) : super._();
-
-  bool get isAlwaysStopped => begin == end;
+  const Keyframe(this.value, {required this.at});
+  const Keyframe.key(this.value, {required this.at});
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is FullPhase && runtimeType == other.runtimeType && begin == other.begin && end == other.end;
+      other is Keyframe && runtimeType == other.runtimeType && value == other.value && at == other.at;
 
   @override
-  int get hashCode => Object.hash(begin, end);
+  int get hashCode => Object.hash(value, at);
 }
 
-class _EndPhase<T> extends Phase<T> {
+class Phase<T extends Object?> {
+  final double weight;
+  final T begin;
   final T end;
 
-  const _EndPhase(this.end, {super.weight = 1.0}) : super._();
-}
+  const Phase({
+    required this.begin,
+    required this.end,
+    required this.weight,
+  });
 
-class _BeginPhase<T> extends Phase<T> {
-  final T begin;
-  const _BeginPhase(this.begin, {super.weight = 1.0}) : super._();
-}
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Phase &&
+          runtimeType == other.runtimeType &&
+          weight == other.weight &&
+          begin == other.begin &&
+          end == other.end;
 
-class ConstantPhase<T> extends FullPhase<T> {
-  final T value;
-  const ConstantPhase(this.value, {super.weight = 1.0}) : super(begin: value, end: value);
+  @override
+  int get hashCode => Object.hash(weight, begin, end);
+
+  bool get isAlwaysStopped => begin == end;
+
+  static ({List<Phase<T>> phases, Timing? timing}) normalize<T extends Object?>(List<Keyframe<T>> frames) {
+    if (frames.isEmpty) {
+      return (phases: [], timing: null);
+    }
+
+    // Remove duplicates (keep last) and clamp time points to [0, 1]
+    final Map<double, T> uniqueFrames = {};
+    for (final frame in frames) {
+      final clampedTime = frame.at.clamp(0.0, 1.0);
+      uniqueFrames[clampedTime] = frame.value;
+    }
+
+    // Sort by time
+    final sortedTimes = uniqueFrames.keys.toList()..sort();
+
+    // Handle single keyframe case - return constant phase (100% weight)
+    if (sortedTimes.length < 2) {
+      final time = sortedTimes.first;
+      final value = uniqueFrames[time] as T;
+      final timing = (time != 0.0 && time != 1.0) ? Timing(start: time, end: time) : null;
+      return (phases: [Phase(begin: value, end: value, weight: 100.0)], timing: timing);
+    }
+
+    // Calculate phases with weights based on time differences (converted to percentage 0-100)
+    final List<Phase<T>> phases = [];
+    for (int i = 0; i < sortedTimes.length - 1; i++) {
+      final currentTime = sortedTimes[i];
+      final nextTime = sortedTimes[i + 1];
+      final weight = (nextTime - currentTime) * 100.0;
+
+      phases.add(
+        Phase(
+          begin: uniqueFrames[currentTime] as T,
+          end: uniqueFrames[nextTime] as T,
+          weight: weight,
+        ),
+      );
+    }
+
+    // Create timing if frames don't span [0, 1]
+    final startTime = sortedTimes.first;
+    final endTime = sortedTimes.last;
+    final timing = (startTime != 0.0 || endTime != 1.0) ? Timing(start: startTime, end: endTime) : null;
+
+    return (phases: phases, timing: timing);
+  }
 }

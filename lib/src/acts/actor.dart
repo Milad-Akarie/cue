@@ -3,21 +3,13 @@ import 'package:cue/cue.dart';
 import 'package:flutter/material.dart';
 
 abstract class Actor extends Widget {
-  factory Actor({
+  const factory Actor({
     Key? key,
     required Widget child,
     required Act act,
     Curve? curve,
     Timing? timing,
-  }) {
-    return _ActorImpl(
-      key: key,
-      act: act,
-      curve: curve,
-      timing: timing,
-      child: child,
-    );
-  }
+  }) = _ActorImpl;
 
   static TweenActor<T> tween<T>({
     Key? key,
@@ -102,7 +94,6 @@ class _ActorImpl extends StatelessWidget implements Actor {
   final Curve? curve;
   final Timing? timing;
   final Act act;
-
   final Widget child;
 
   @override

@@ -4,17 +4,16 @@ class Resize extends Act {
   const Resize({
     this.begin,
     this.end,
-    this.steps = const [],
     super.curve,
     super.timing,
     this.alignment,
-  });
+  }) : _keyframes = null;
 
   final AlignmentGeometry? alignment;
   final SizeOrNull? begin;
   final SizeOrNull? end;
 
-  final List<Phase<SizeOrNull>> steps;
+  final List<Keyframe<SizeOrNull>>? _keyframes;
 
   SizeOrNullTween _buildTween(SizeOrNull begin, SizeOrNull end, Size maxSize) {
     final effectiveBeginWidth = begin.width != null && begin.width!.isInfinite ? maxSize.width : begin.width;
@@ -28,15 +27,14 @@ class Resize extends Act {
   }
 
   Animation<SizeOrNull> build(AnimationContext context, Size maxSize) {
-    final List<FullPhase<SizeOrNull>> phases;
+    final List<Phase<SizeOrNull>> phases;
     final begin = this.begin ?? SizeOrNull.nullSize;
-    if (steps.isEmpty) {
-      phases = [FullPhase<SizeOrNull>(begin: begin, end: end ?? begin, weight: 1.0)];
+    if (_keyframes == null) {
+      phases = [Phase<SizeOrNull>(begin: begin, end: end ?? begin, weight: 1.0)];
     } else {
-      if (end case final end?) {
-        steps.add(Phase.to(end));
-      }
-      phases = Phase.normalize(begin, steps);
+      final result = Phase.normalize(_keyframes);
+      phases = result.phases;
+      context = context.copyWith(timing: result.timing);
     }
     return TweenAct._build<SizeOrNull>(context, phases, (begin, end) {
       return _buildTween(begin, end, maxSize);

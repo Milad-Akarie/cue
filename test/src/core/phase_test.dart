@@ -1,451 +1,475 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:cue/src/core/phase.dart';
+import 'package:cue/src/core/core.dart';
 
 void main() {
   group('Phase.normalize', () {
     group('Basic functionality', () {
-      test('empty list returns empty list', () {
-        final result = Phase.normalize<double>(0.0, []);
-        expect(result, isEmpty);
+      test('empty list returns empty phases and no timing', () {
+        final result = Phase.normalize<double>([]);
+        expect(result.phases, isEmpty);
+        expect(result.timing, isNull);
       });
 
-      test('single FullPhase returns unchanged', () {
-        final phases = [
-          const Phase(begin: 0.0, end: 100.0, weight: 1.0),
-        ];
-        final result = Phase.normalize(0.0, phases);
-        expect(result, [
-          const FullPhase(begin: 0.0, end: 100.0, weight: 1.0),
+      test('single keyframe at 0.0 returns constant phase and no timing', () {
+        final frames = [Keyframe(100.0, at: 0.0)];
+        final result = Phase.normalize(frames);
+        expect(result.phases, [
+          const Phase(begin: 100.0, end: 100.0, weight: 100.0),
         ]);
+        expect(result.phases.first.isAlwaysStopped, isTrue);
+        expect(result.timing, isNull);
       });
 
-      test('single .to() phase uses base as begin', () {
-        final phases = [
-          const Phase.to(100.0),
-        ];
-        final result = Phase.normalize(0.0, phases);
-        expect(result, [
-          const FullPhase(begin: 0.0, end: 100.0, weight: 1.0),
+      test('single keyframe at 1.0 returns constant phase and no timing', () {
+        final frames = [Keyframe(100.0, at: 1.0)];
+        final result = Phase.normalize(frames);
+        expect(result.phases, [
+          const Phase(begin: 100.0, end: 100.0, weight: 100.0),
         ]);
+        expect(result.phases.first.isAlwaysStopped, isTrue);
+        expect(result.timing, isNull);
       });
 
-      test('single .from() phase uses from value as begin and base as end', () {
-        final phases = [
-          const Phase.from(50.0),
-        ];
-        final result = Phase.normalize(0.0, phases);
-        expect(result, [
-          const FullPhase(begin: 50.0, end: 0.0, weight: 1.0),
+      test('single keyframe at 0.5 returns constant phase with timing', () {
+        final frames = [Keyframe(50.0, at: 0.5)];
+        final result = Phase.normalize(frames);
+        expect(result.phases, [
+          const Phase(begin: 50.0, end: 50.0, weight: 100.0),
         ]);
+        expect(result.phases.first.isAlwaysStopped, isTrue);
+        expect(result.timing, const Timing(start: 0.5, end: 0.5));
       });
 
-      test('single .hold() phase creates constant phase', () {
-        final phases = [
-          const Phase.hold(50.0),
-        ];
-        final result = Phase.normalize(0.0, phases);
-        expect(result, [
-          const ConstantPhase(50.0),
+      test('two keyframes at 0.0 and 1.0 creates one phase with weight 1.0', () {
+        final frames = [Keyframe(0.0, at: 0.0), Keyframe(100.0, at: 1.0)];
+        final result = Phase.normalize(frames);
+        expect(result.phases, [
+          const Phase(begin: 0.0, end: 100.0, weight: 100.0),
         ]);
+        expect(result.timing, isNull);
+      });
+
+      test('two keyframes at 0.0 and 0.5 creates one phase with weight 0.5 and timing', () {
+        final frames = [Keyframe(0.0, at: 0.0), Keyframe(100.0, at: 0.5)];
+        final result = Phase.normalize(frames);
+        expect(result.phases, [
+          const Phase(begin: 0.0, end: 100.0, weight: 50.0),
+        ]);
+        expect(result.timing, const Timing(start: 0.0, end: 0.5));
+      });
+
+      test('three keyframes evenly spaced creates two phases', () {
+        final result = Phase.normalize([
+          .key(0.0, at: 0.0),
+          .key(50.0, at: 0.5),
+          .key(100.0, at: 1.0),
+        ]);
+        expect(result.phases, [
+          const Phase(begin: 0.0, end: 50.0, weight: 50.0),
+          const Phase(begin: 50.0, end: 100.0, weight: 50.0),
+        ]);
+        expect(result.timing, isNull);
       });
     });
 
-    group('Sequential .to() phases (chaining)', () {
-      test('two .to() phases chain correctly', () {
-        final phases = [
-          const Phase.to(50.0),
-          const Phase.to(100.0),
+    group('Weight calculation based on time differences', () {
+      test('uneven spacing creates different weights', () {
+        final frames = [
+          Keyframe(0.0, at: 0.0),
+          Keyframe(25.0, at: 0.25),
+          Keyframe(50.0, at: 0.75),
+          Keyframe(100.0, at: 1.0),
         ];
-        final result = Phase.normalize(0.0, phases);
-        expect(result, [
-          const FullPhase(begin: 0.0, end: 50.0, weight: 1.0),
-          const FullPhase(begin: 50.0, end: 100.0, weight: 1.0),
+        final result = Phase.normalize(frames);
+        expect(result.phases, [
+          const Phase(begin: 0.0, end: 25.0, weight: 25.0),
+          const Phase(begin: 25.0, end: 50.0, weight: 50.0),
+          const Phase(begin: 50.0, end: 100.0, weight: 25.0),
         ]);
+        expect(result.timing, isNull);
       });
 
-      test('multiple .to() phases chain correctly', () {
-        final phases = [
-          const Phase.to(25.0),
-          const Phase.to(50.0),
-          const Phase.to(75.0),
-          const Phase.to(100.0),
+      test('keyframes at 0.1, 0.2, 0.9 create phases with correct weights', () {
+        final frames = [
+          Keyframe(10.0, at: 0.1),
+          Keyframe(20.0, at: 0.2),
+          Keyframe(90.0, at: 0.9),
         ];
-        final result = Phase.normalize(0.0, phases);
-        expect(result, [
-          const FullPhase(begin: 0.0, end: 25.0, weight: 1.0),
-          const FullPhase(begin: 25.0, end: 50.0, weight: 1.0),
-          const FullPhase(begin: 50.0, end: 75.0, weight: 1.0),
-          const FullPhase(begin: 75.0, end: 100.0, weight: 1.0),
+        final result = Phase.normalize(frames);
+        expect(result.phases, [
+          const Phase(begin: 10.0, end: 20.0, weight: 10.0),
+          const Phase(begin: 20.0, end: 90.0, weight: 70.0),
         ]);
+        expect(result.timing, const Timing(start: 0.1, end: 0.9));
       });
 
-      test('Offset sequence like user example', () {
-        final phases = [
-          const Phase.to(Offset(50, 0)),
-          const Phase.to(Offset(50, 50)),
-          const Phase.to(Offset(0, 50)),
-          const Phase.to(Offset(0, 0)),
+      test('very close keyframes create small weights', () {
+        final frames = [
+          Keyframe(0.0, at: 0.0),
+          Keyframe(50.0, at: 0.01),
+          Keyframe(100.0, at: 1.0),
         ];
-        final result = Phase.normalize(Offset.zero, phases);
-        expect(result, [
-          const FullPhase(begin: Offset(0, 0), end: Offset(50, 0), weight: 1.0),
-          const FullPhase(begin: Offset(50, 0), end: Offset(50, 50), weight: 1.0),
-          const FullPhase(begin: Offset(50, 50), end: Offset(0, 50), weight: 1.0),
-          const FullPhase(begin: Offset(0, 50), end: Offset(0, 0), weight: 1.0),
-        ]);
-      });
-    });
-
-    group('Weight handling', () {
-      test('.to() phase with custom weight', () {
-        final phases = [
-          const Phase.to(100.0, weight: 2.0),
-        ];
-        final result = Phase.normalize(0.0, phases);
-        expect(result, [
-          const FullPhase(begin: 0.0, end: 100.0, weight: 2.0),
-        ]);
-      });
-
-      test('multiple .to() phases with different weights', () {
-        final phases = [
-          const Phase.to(25.0, weight: 1.0),
-          const Phase.to(50.0, weight: 2.0),
-          const Phase.to(100.0, weight: 3.0),
-        ];
-        final result = Phase.normalize(0.0, phases);
-        expect(result, [
-          const FullPhase(begin: 0.0, end: 25.0, weight: 1.0),
-          const FullPhase(begin: 25.0, end: 50.0, weight: 2.0),
-          const FullPhase(begin: 50.0, end: 100.0, weight: 3.0),
-        ]);
-      });
-
-      test('.hold() phase with custom weight', () {
-        final phases = [
-          const Phase.hold(50.0, weight: 5.0),
-        ];
-        final result = Phase.normalize(0.0, phases);
-        expect(result, [
-          const ConstantPhase(50.0, weight: 5.0),
-        ]);
-      });
-
-      test('.from() phase with custom weight', () {
-        final phases = [
-          const Phase.from(75.0, weight: 3.0),
-        ];
-        final result = Phase.normalize(0.0, phases);
-        expect(result, [
-          const FullPhase(begin: 75.0, end: 0.0, weight: 3.0),
-        ]);
-      });
-
-      test('FullPhase with custom weight', () {
-        final phases = [
-          const Phase(begin: 0.0, end: 100.0, weight: 4.0),
-        ];
-        final result = Phase.normalize(0.0, phases);
-        expect(result, [
-          const FullPhase(begin: 0.0, end: 100.0, weight: 4.0),
-        ]);
-      });
-
-      test('Offset sequence with mixed weights', () {
-        final phases = [
-          const Phase.to(Offset(50, 0), weight: 1.0),
-          const Phase.to(Offset(50, 50), weight: 2.0),
-          const Phase.to(Offset(0, 50), weight: 1.5),
-          const Phase.to(Offset(0, 0), weight: 0.5),
-        ];
-        final result = Phase.normalize(Offset.zero, phases);
-        expect(result, [
-          const FullPhase(begin: Offset(0, 0), end: Offset(50, 0), weight: 1.0),
-          const FullPhase(begin: Offset(50, 0), end: Offset(50, 50), weight: 2.0),
-          const FullPhase(begin: Offset(50, 50), end: Offset(0, 50), weight: 1.5),
-          const FullPhase(begin: Offset(0, 50), end: Offset(0, 0), weight: 0.5),
-        ]);
-      });
-    });
-
-    group('Mixed phase types', () {
-      test('FullPhase followed by .to()', () {
-        final phases = [
+        final result = Phase.normalize(frames);
+        expect(result.phases, [
           const Phase(begin: 0.0, end: 50.0, weight: 1.0),
-          const Phase.to(100.0),
-        ];
-        final result = Phase.normalize(0.0, phases);
-        expect(result, [
-          const FullPhase(begin: 0.0, end: 50.0, weight: 1.0),
-          const FullPhase(begin: 50.0, end: 100.0, weight: 1.0),
+          const Phase(begin: 50.0, end: 100.0, weight: 99.0),
         ]);
-      });
-
-      test('.to() followed by FullPhase', () {
-        final phases = [
-          const Phase.to(50.0),
-          const Phase(begin: 100.0, end: 150.0, weight: 1.0),
-        ];
-        final result = Phase.normalize(0.0, phases);
-        expect(result, [
-          const FullPhase(begin: 0.0, end: 50.0, weight: 1.0),
-          const FullPhase(begin: 100.0, end: 150.0, weight: 1.0),
-        ]);
-      });
-
-      test('.to() with .hold()', () {
-        final phases = [
-          const Phase.to(50.0),
-          const Phase.hold(50.0, weight: 2.0),
-        ];
-        final result = Phase.normalize(0.0, phases);
-        expect(result, [
-          const FullPhase(begin: 0.0, end: 50.0, weight: 1.0),
-          const ConstantPhase(50.0, weight: 2.0),
-        ]);
-      });
-
-      test('sequence with .hold() in the middle', () {
-        final phases = [
-          const Phase.to(50.0),
-          const Phase.hold(50.0, weight: 3.0),
-          const Phase.to(100.0),
-        ];
-        final result = Phase.normalize(0.0, phases);
-        expect(result.length, 3);
-        expect(result[0], const FullPhase(begin: 0.0, end: 50.0, weight: 1.0));
-        expect(result[1], isA<ConstantPhase<double>>());
-        expect(result[1].begin, 50.0);
-        expect(result[1].end, 50.0);
-        expect(result[1].weight, 3.0);
-        expect(result[2], const FullPhase(begin: 50.0, end: 100.0, weight: 1.0));
-      });
-
-      test('.from() followed by .to()', () {
-        final phases = [
-          const Phase.from(25.0),
-          const Phase.to(100.0),
-        ];
-        final result = Phase.normalize(0.0, phases);
-        expect(result, [
-          const FullPhase(begin: 25.0, end: 100.0, weight: 1.0),
-          const FullPhase(begin: 100.0, end: 100.0, weight: 1.0),
-        ]);
+        expect(result.timing, isNull);
       });
     });
 
-    group('User-like shorthand patterns', () {
-      test('simple square path with .to()', () {
-        final phases = [
-          const Phase.to(Offset(50, 0)),
-          const Phase.to(Offset(50, 50)),
-          const Phase.to(Offset(0, 50)),
-          const Phase.to(Offset(0, 0)),
+    group('Duplicate time points (keep last)', () {
+      test('duplicate at same time keeps last value', () {
+        final frames = [
+          Keyframe(0.0, at: 0.0),
+          Keyframe(25.0, at: 0.5),
+          Keyframe(75.0, at: 0.5), // This should override the previous one
+          Keyframe(100.0, at: 1.0),
         ];
-        final result = Phase.normalize(Offset.zero, phases);
-        expect(result.length, 4);
-        expect(result[0].begin, Offset.zero);
-        expect(result[0].end, const Offset(50, 0));
-        expect(result[1].begin, const Offset(50, 0));
-        expect(result[1].end, const Offset(50, 50));
-        expect(result[2].begin, const Offset(50, 50));
-        expect(result[2].end, const Offset(0, 50));
-        expect(result[3].begin, const Offset(0, 50));
-        expect(result[3].end, Offset.zero);
+        final result = Phase.normalize(frames);
+        expect(result.phases, [
+          const Phase(begin: 0.0, end: 75.0, weight: 50.0),
+          const Phase(begin: 75.0, end: 100.0, weight: 50.0),
+        ]);
+        expect(result.timing, isNull);
       });
 
-      test('square path with .hold() at end', () {
-        final phases = [
-          const Phase.to(Offset(50, 0)),
-          const Phase.to(Offset(50, 50)),
-          const Phase.to(Offset(0, 50)),
-          const Phase.to(Offset(0, 0)),
-          const Phase.hold(Offset.zero, weight: 2.0),
+      test('multiple duplicates keeps only last', () {
+        final frames = [
+          Keyframe(0.0, at: 0.0),
+          Keyframe(10.0, at: 0.5),
+          Keyframe(20.0, at: 0.5),
+          Keyframe(30.0, at: 0.5),
+          Keyframe(100.0, at: 1.0),
         ];
-        final result = Phase.normalize(Offset.zero, phases);
-        expect(result.length, 5);
-        expect(result[4], isA<ConstantPhase<Offset>>());
-        expect(result[4].begin, Offset.zero);
-        expect(result[4].end, Offset.zero);
-        expect(result[4].weight, 2.0);
+        final result = Phase.normalize(frames);
+        expect(result.phases, [
+          const Phase(begin: 0.0, end: 30.0, weight: 50.0),
+          const Phase(begin: 30.0, end: 100.0, weight: 50.0),
+        ]);
       });
 
-      test('complex sequence with varied weights', () {
-        final phases = [
-          const Phase.to(Offset(100, 0), weight: 2.0),
-          const Phase.hold(Offset(100, 0), weight: 1.0),
-          const Phase.to(Offset(100, 100), weight: 2.0),
-          const Phase.hold(Offset(100, 100), weight: 1.0),
-          const Phase.to(Offset(0, 100), weight: 2.0),
-          const Phase.hold(Offset(0, 100), weight: 1.0),
-          const Phase.to(Offset.zero, weight: 2.0),
+      test('all duplicates at same time results in single constant phase', () {
+        final frames = [
+          Keyframe(10.0, at: 0.5),
+          Keyframe(20.0, at: 0.5),
+          Keyframe(30.0, at: 0.5),
         ];
-        final result = Phase.normalize(Offset.zero, phases);
-        expect(result.length, 7);
-        expect(result[0].weight, 2.0);
-        expect(result[1].weight, 1.0);
-        expect(result[2].weight, 2.0);
-        expect(result[3].weight, 1.0);
+        final result = Phase.normalize(frames);
+        expect(result.phases, [
+          const Phase(begin: 30.0, end: 30.0, weight: 100.0),
+        ]);
+        expect(result.phases.first.isAlwaysStopped, isTrue);
+        expect(result.timing, const Timing(start: 0.5, end: 0.5));
       });
     });
 
-    group('Different types', () {
-      test('works with int', () {
-        final phases = [
-          const Phase.to(10),
-          const Phase.to(20),
-          const Phase.to(30),
+    group('Clamping time points to [0, 1]', () {
+      test('negative time clamped to 0.0', () {
+        final frames = [
+          Keyframe(0.0, at: -0.5),
+          Keyframe(100.0, at: 1.0),
         ];
-        final result = Phase.normalize(0, phases);
-        expect(result, [
-          const FullPhase(begin: 0, end: 10, weight: 1.0),
-          const FullPhase(begin: 10, end: 20, weight: 1.0),
-          const FullPhase(begin: 20, end: 30, weight: 1.0),
+        final result = Phase.normalize(frames);
+        expect(result.phases, [
+          const Phase(begin: 0.0, end: 100.0, weight: 100.0),
         ]);
+        expect(result.timing, isNull);
       });
 
-      test('works with Color', () {
-        final phases = [
-          const Phase.to(Colors.red),
-          const Phase.to(Colors.green),
-          const Phase.to(Colors.blue),
+      test('time > 1.0 clamped to 1.0', () {
+        final frames = [
+          Keyframe(0.0, at: 0.0),
+          Keyframe(100.0, at: 1.5),
         ];
-        final result = Phase.normalize(Colors.white, phases);
-        expect(result.length, 3);
-        expect(result[0].begin, Colors.white);
-        expect(result[0].end, Colors.red);
-        expect(result[1].begin, Colors.red);
-        expect(result[1].end, Colors.green);
-        expect(result[2].begin, Colors.green);
-        expect(result[2].end, Colors.blue);
+        final result = Phase.normalize(frames);
+        expect(result.phases, [
+          const Phase(begin: 0.0, end: 100.0, weight: 100.0),
+        ]);
+        expect(result.timing, isNull);
       });
 
-      test('works with Size', () {
-        final phases = [
-          const Phase.to(Size(100, 100)),
-          const Phase.to(Size(200, 200)),
+      test('multiple out-of-range times clamped and deduplicated', () {
+        final frames = [
+          Keyframe(0.0, at: -0.5),
+          Keyframe(10.0, at: -0.1),
+          Keyframe(100.0, at: 1.2),
+          Keyframe(200.0, at: 1.5),
         ];
-        final result = Phase.normalize(const Size(0, 0), phases);
-        expect(result, [
-          const FullPhase(begin: Size(0, 0), end: Size(100, 100), weight: 1.0),
-          const FullPhase(begin: Size(100, 100), end: Size(200, 200), weight: 1.0),
+        final result = Phase.normalize(frames);
+        // After clamping: -0.5->0.0, -0.1->0.0, 1.2->1.0, 1.5->1.0
+        // After deduplication (keep last): 0.0->10.0, 1.0->200.0
+        expect(result.phases, [
+          const Phase(begin: 10.0, end: 200.0, weight: 100.0),
         ]);
+        expect(result.timing, isNull);
+      });
+
+      test('clamping causes collision and deduplication', () {
+        final frames = [
+          Keyframe(50.0, at: 0.5),
+          Keyframe(75.0, at: 1.1),
+          Keyframe(100.0, at: 1.5),
+        ];
+        final result = Phase.normalize(frames);
+        // After clamping: 0.5->0.5, 1.1->1.0, 1.5->1.0
+        // After deduplication: 0.5->50.0, 1.0->100.0
+        expect(result.phases, [
+          const Phase(begin: 50.0, end: 100.0, weight: 50.0),
+        ]);
+        expect(result.timing, const Timing(start: 0.5, end: 1.0));
       });
     });
 
-    group('Edge cases', () {
-      test('base value is used correctly', () {
-        final phases = [
-          const Phase.to(100.0),
+    group('Timing return values', () {
+      test('frames starting at 0.0 and ending at 1.0 return null timing', () {
+        final frames = [Keyframe(0.0, at: 0.0), Keyframe(100.0, at: 1.0)];
+        final result = Phase.normalize(frames);
+        expect(result.timing, isNull);
+      });
+
+      test('frames starting at 0.2 return timing with start', () {
+        final frames = [Keyframe(0.0, at: 0.2), Keyframe(100.0, at: 1.0)];
+        final result = Phase.normalize(frames);
+        expect(result.timing, const Timing(start: 0.2, end: 1.0));
+      });
+
+      test('frames ending at 0.8 return timing with end', () {
+        final frames = [Keyframe(0.0, at: 0.0), Keyframe(100.0, at: 0.8)];
+        final result = Phase.normalize(frames);
+        expect(result.timing, const Timing(start: 0.0, end: 0.8));
+      });
+
+      test('frames in middle return timing with both start and end', () {
+        final frames = [Keyframe(0.0, at: 0.3), Keyframe(100.0, at: 0.7)];
+        final result = Phase.normalize(frames);
+        expect(result.timing, const Timing(start: 0.3, end: 0.7));
+      });
+
+      test('timing respects exact values', () {
+        final frames = [Keyframe(0.0, at: 0.123), Keyframe(100.0, at: 0.789)];
+        final result = Phase.normalize(frames);
+        expect(result.timing, const Timing(start: 0.123, end: 0.789));
+      });
+    });
+
+    group('Edge cases and weird scenarios', () {
+      test('zero weight phase when keyframes are at same time', () {
+        final frames = [
+          Keyframe(0.0, at: 0.0),
+          Keyframe(50.0, at: 0.5),
+          Keyframe(100.0, at: 0.5), // Duplicate, will replace previous
+          Keyframe(200.0, at: 1.0),
         ];
-        final result = Phase.normalize(50.0, phases);
-        expect(result, [
-          const FullPhase(begin: 50.0, end: 100.0, weight: 1.0),
+        final result = Phase.normalize(frames);
+        expect(result.phases.length, 2);
+        expect(result.phases[0].weight, 50.0);
+        expect(result.phases[1].weight, 50.0);
+      });
+
+      test('backwards time order gets sorted', () {
+        final frames = [
+          Keyframe(100.0, at: 1.0),
+          Keyframe(50.0, at: 0.5),
+          Keyframe(0.0, at: 0.0),
+        ];
+        final result = Phase.normalize(frames);
+        expect(result.phases, [
+          const Phase(begin: 0.0, end: 50.0, weight: 50.0),
+          const Phase(begin: 50.0, end: 100.0, weight: 50.0),
         ]);
       });
 
-      test('non-zero base with multiple phases', () {
-        final phases = [
-          const Phase.to(200.0),
-          const Phase.to(300.0),
+      test('random order gets sorted correctly', () {
+        final frames = [
+          Keyframe(75.0, at: 0.75),
+          Keyframe(0.0, at: 0.0),
+          Keyframe(100.0, at: 1.0),
+          Keyframe(25.0, at: 0.25),
+          Keyframe(50.0, at: 0.5),
         ];
-        final result = Phase.normalize(100.0, phases);
-        expect(result, [
-          const FullPhase(begin: 100.0, end: 200.0, weight: 1.0),
-          const FullPhase(begin: 200.0, end: 300.0, weight: 1.0),
+        final result = Phase.normalize(frames);
+        expect(result.phases.length, 4);
+        expect(result.phases[0], const Phase(begin: 0.0, end: 25.0, weight: 25.0));
+        expect(result.phases[1], const Phase(begin: 25.0, end: 50.0, weight: 25.0));
+        expect(result.phases[2], const Phase(begin: 50.0, end: 75.0, weight: 25.0));
+        expect(result.phases[3], const Phase(begin: 75.0, end: 100.0, weight: 25.0));
+      });
+
+      test('all keyframes at same time after clamping and deduplication', () {
+        final frames = [
+          Keyframe(10.0, at: -1.0),
+          Keyframe(20.0, at: -0.5),
+          Keyframe(30.0, at: 0.0),
+        ];
+        final result = Phase.normalize(frames);
+        // All negative times clamped to 0.0, last wins (30.0)
+        expect(result.phases, [
+          const Phase(begin: 30.0, end: 30.0, weight: 100.0),
+        ]);
+        expect(result.phases.first.isAlwaysStopped, isTrue);
+        expect(result.timing, isNull);
+      });
+
+      test('negative values work correctly', () {
+        final frames = [
+          Keyframe(-100.0, at: 0.0),
+          Keyframe(0.0, at: 0.5),
+          Keyframe(100.0, at: 1.0),
+        ];
+        final result = Phase.normalize(frames);
+        expect(result.phases, [
+          const Phase(begin: -100.0, end: 0.0, weight: 50.0),
+          const Phase(begin: 0.0, end: 100.0, weight: 50.0),
         ]);
       });
 
-      test('phases with same begin and end values', () {
-        final phases = [
-          const Phase.to(50.0),
-          const Phase.hold(50.0),
-          const Phase.to(50.0),
+      test('backwards animation (decreasing values)', () {
+        final frames = [
+          Keyframe(100.0, at: 0.0),
+          Keyframe(50.0, at: 0.5),
+          Keyframe(0.0, at: 1.0),
         ];
-        final result = Phase.normalize(50.0, phases);
-        expect(result.length, 3);
-        expect(result[0], const FullPhase(begin: 50.0, end: 50.0, weight: 1.0));
-        expect(result[1], isA<ConstantPhase<double>>());
-        expect(result[1].begin, 50.0);
-        expect(result[1].end, 50.0);
-        expect(result[1].weight, 1.0);
-        expect(result[2], const FullPhase(begin: 50.0, end: 50.0, weight: 1.0));
-      });
-
-      test('backwards movement (decreasing values)', () {
-        final phases = [
-          const Phase.to(100.0),
-          const Phase.to(50.0),
-          const Phase.to(0.0),
-        ];
-        final result = Phase.normalize(0.0, phases);
-        expect(result, [
-          const FullPhase(begin: 0.0, end: 100.0, weight: 1.0),
-          const FullPhase(begin: 100.0, end: 50.0, weight: 1.0),
-          const FullPhase(begin: 50.0, end: 0.0, weight: 1.0),
+        final result = Phase.normalize(frames);
+        expect(result.phases, [
+          const Phase(begin: 100.0, end: 50.0, weight: 50.0),
+          const Phase(begin: 50.0, end: 0.0, weight: 50.0),
         ]);
       });
 
-      test('negative values', () {
-        final phases = [
-          const Phase.to(-50.0),
-          const Phase.to(-100.0),
+      test('constant value across all keyframes creates zero-change phases', () {
+        final frames = [
+          Keyframe(50.0, at: 0.0),
+          Keyframe(50.0, at: 0.5),
+          Keyframe(50.0, at: 1.0),
         ];
-        final result = Phase.normalize(0.0, phases);
-        expect(result, [
-          const FullPhase(begin: 0.0, end: -50.0, weight: 1.0),
-          const FullPhase(begin: -50.0, end: -100.0, weight: 1.0),
+        final result = Phase.normalize(frames);
+        expect(result.phases, [
+          const Phase(begin: 50.0, end: 50.0, weight: 50.0),
+          const Phase(begin: 50.0, end: 50.0, weight: 50.0),
         ]);
+      });
+
+      test('very small time differences', () {
+        final frames = [
+          Keyframe(0.0, at: 0.0),
+          Keyframe(50.0, at: 0.001),
+          Keyframe(100.0, at: 1.0),
+        ];
+        final result = Phase.normalize(frames);
+        expect(result.phases.length, 2);
+        expect(result.phases[0].weight, closeTo(0.1, 0.01));
+        expect(result.phases[1].weight, closeTo(99.9, 0.01));
+      });
+
+      test('precision at boundaries', () {
+        final frames = [
+          Keyframe(0.0, at: 0.0),
+          Keyframe(50.0, at: 0.0000001),
+          Keyframe(100.0, at: 0.9999999),
+          Keyframe(200.0, at: 1.0),
+        ];
+        final result = Phase.normalize(frames);
+        expect(result.phases.length, 3);
+        expect(result.timing, isNull);
       });
     });
 
     group('Real-world animation scenarios', () {
-      test('bounce animation pattern', () {
-        final phases = [
-          const Phase.to(100.0, weight: 2.0),
-          const Phase.to(80.0, weight: 0.5),
-          const Phase.to(100.0, weight: 0.5),
-          const Phase.to(90.0, weight: 0.3),
-          const Phase.to(100.0, weight: 0.3),
+      test('bounce effect with varying speeds', () {
+        final frames = [
+          Keyframe(0.0, at: 0.0),
+          Keyframe(100.0, at: 0.4), // Fast up
+          Keyframe(80.0, at: 0.6), // Quick down
+          Keyframe(90.0, at: 0.8), // Small bounce
+          Keyframe(100.0, at: 1.0), // Settle
         ];
-        final result = Phase.normalize(0.0, phases);
-        expect(result.length, 5);
-        expect(result[0].begin, 0.0);
-        expect(result[0].end, 100.0);
-        expect(result[1].begin, 100.0);
-        expect(result[1].end, 80.0);
+        final result = Phase.normalize(frames);
+        expect(result.phases.length, 4);
+        expect(result.phases[0].weight.roundToDouble(), 40.0);
+        expect(result.phases[1].weight.roundToDouble(), 20.0);
+        expect(result.phases[2].weight.roundToDouble(), 20.0);
+        expect(result.phases[3].weight.roundToDouble(), 20.0);
       });
 
-      test('pause and resume pattern', () {
-        final phases = [
-          const Phase.to(Offset(100, 0), weight: 2.0),
-          const Phase.hold(Offset(100, 0), weight: 3.0),
-          const Phase.to(Offset(200, 0), weight: 2.0),
-          const Phase.hold(Offset(200, 0), weight: 3.0),
-          const Phase.to(Offset(300, 0), weight: 2.0),
+      test('ease-in effect (slow start, fast end)', () {
+        final frames = [
+          Keyframe(0.0, at: 0.0),
+          Keyframe(10.0, at: 0.5), // Slow first half
+          Keyframe(100.0, at: 1.0), // Fast second half
         ];
-        final result = Phase.normalize(Offset.zero, phases);
-        expect(result.length, 5);
-        expect(result[1].begin, const Offset(100, 0));
-        expect(result[1].end, const Offset(100, 0));
-        expect(result[3].begin, const Offset(200, 0));
-        expect(result[3].end, const Offset(200, 0));
+        final result = Phase.normalize(frames);
+        expect(result.phases, [
+          const Phase(begin: 0.0, end: 10.0, weight: 50.0),
+          const Phase(begin: 10.0, end: 100.0, weight: 50.0),
+        ]);
       });
 
-      test('diagonal movement with holds', () {
-        final phases = [
-          const Phase.to(Offset(50, 50), weight: 1.0),
-          const Phase.hold(Offset(50, 50), weight: 0.5),
-          const Phase.to(Offset(100, 100), weight: 1.0),
-          const Phase.hold(Offset(100, 100), weight: 0.5),
-          const Phase.to(Offset(0, 0), weight: 2.0),
+      test('pause in middle of animation', () {
+        final frames = [
+          Keyframe(0.0, at: 0.0),
+          Keyframe(100.0, at: 0.3),
+          Keyframe(100.0, at: 0.7), // Hold position
+          Keyframe(200.0, at: 1.0),
         ];
-        final result = Phase.normalize(Offset.zero, phases);
-        expect(result.length, 5);
-        expect(result[0].weight, 1.0);
-        expect(result[1].weight, 0.5);
-        expect(result[4].weight, 2.0);
+        final result = Phase.normalize(frames);
+        expect(result.phases.length, 3);
+        expect(result.phases[0].begin, 0.0);
+        expect(result.phases[0].end, 100.0);
+        expect(result.phases[0].weight.roundToDouble(), 30.0);
+
+        expect(result.phases[1].begin, 100.0);
+        expect(result.phases[1].end, 100.0);
+        expect(result.phases[1].weight.roundToDouble(), 40.0);
+
+        expect(result.phases[2].begin, 100.0);
+        expect(result.phases[2].end, 200.0);
+        expect(result.phases[2].weight.roundToDouble(), 30.0);
+      });
+
+      test('complex multi-stage animation', () {
+        final frames = [
+          Keyframe(0.0, at: 0.0),
+          Keyframe(20.0, at: 0.1),
+          Keyframe(30.0, at: 0.15),
+          Keyframe(80.0, at: 0.6),
+          Keyframe(85.0, at: 0.8),
+          Keyframe(100.0, at: 1.0),
+        ];
+        final result = Phase.normalize(frames);
+        expect(result.phases.length, 5);
+        expect(result.phases[0].weight.roundToDouble(), 10.0);
+        expect(result.phases[1].weight.roundToDouble(), 5.0);
+        expect(result.phases[2].weight.roundToDouble(), 45.0);
+        expect(result.phases[3].weight.roundToDouble(), 20.0);
+        expect(result.phases[4].weight.roundToDouble(), 20.0);
+      });
+    });
+
+    group('Phase equality', () {
+      test('identical phases are equal', () {
+        const phase1 = Phase(begin: 0.0, end: 100.0, weight: 100.0);
+        const phase2 = Phase(begin: 0.0, end: 100.0, weight: 100.0);
+        expect(phase1, equals(phase2));
+      });
+
+      test('phases with different weights are not equal', () {
+        const phase1 = Phase(begin: 0.0, end: 100.0, weight: 100.0);
+        const phase2 = Phase(begin: 0.0, end: 100.0, weight: 50.0);
+        expect(phase1, isNot(equals(phase2)));
+      });
+
+      test('phases with different begin values are not equal', () {
+        const phase1 = Phase(begin: 0.0, end: 100.0, weight: 100.0);
+        const phase2 = Phase(begin: 50.0, end: 100.0, weight: 100.0);
+        expect(phase1, isNot(equals(phase2)));
+      });
+
+      test('phases with different end values are not equal', () {
+        const phase1 = Phase(begin: 0.0, end: 100.0, weight: 100.0);
+        const phase2 = Phase(begin: 0.0, end: 50.0, weight: 100.0);
+        expect(phase1, isNot(equals(phase2)));
       });
     });
   });

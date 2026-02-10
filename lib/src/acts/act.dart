@@ -53,40 +53,54 @@ abstract class Act {
   Widget wrapWidget(AnimationContext context, Widget child);
 }
 
-abstract class TweenAct<T> extends Act {
-  final T begin;
-  final T? end;
-  final List<Phase<T>>? _phases;
+abstract class TweenAct<T extends Object?> extends Act {
+  final T? _begin;
+  final T? _end;
+  final List<Keyframe<T>>? _keyframes;
+
+  T? get begin => _begin;
+
+  T? get end => _end;
 
   const TweenAct({
-    required this.begin,
-    required this.end,
+    required T begin,
+    required T end,
     super.curve,
     super.timing,
-  }) : _phases = null;
+  }) : _keyframes = null,
+       _begin = begin,
+       _end = end;
 
-  const TweenAct.seq(
-    this.begin, {
-    required List<Phase<T>> then,
+  const TweenAct.keyframes(
+    List<Keyframe<T>> keyframes, {
     super.curve,
-    super.timing,
-  }) : _phases = then,
-       end = null;
+  }) : _keyframes = keyframes,
+       _begin = null,
+       _end = null,
+       super(timing: null);
 
   Animatable<T> _defaultTweenBuilder(T begin, T end) => Tween<T>(begin: begin, end: end);
 
   Animation<T> build(AnimationContext context, {TweenBuilder<T>? tweenBuilder}) {
-    final List<FullPhase<T>> phases;
-    if (_phases == null) {
-      phases = [FullPhase<T>(begin: begin, end: end ?? begin, weight: 1.0)];
+    final List<Phase<T>> phases;
+    if (_keyframes == null) {
+      assert(_begin != null && _end != null, 'Begin and end values must be provided when not using keyframes');
+      phases = [Phase<T>(begin: _begin as T, end: _end as T, weight: 100)];
     } else {
-      assert(begin != null, 'Begin value must be provided when using phases');
-      phases = Phase.normalize(begin, _phases);
+      final result = Phase.normalize(_keyframes);
+      phases = result.phases;
+      if (result.timing != null) {
+        context = context.copyWith(timing: result.timing);
+      }
     }
     return TweenAct._build<T>(context, phases, tweenBuilder ?? _defaultTweenBuilder);
   }
 
-  static Animation<T> _build<T>(AnimationContext context, List<FullPhase<T>> phases, TweenBuilder<T> tweenBuilder) {
+  static Animation<T> _build<T extends Object?>(
+    AnimationContext context,
+    List<Phase<T>> phases,
+    TweenBuilder<T> tweenBuilder,
+  ) {
     Animatable<T> tween;
     if (phases.length == 1) {
       final phase = phases.single;
@@ -98,9 +112,7 @@ abstract class TweenAct<T> extends Act {
       tween = TweenSequence<T>([
         for (final phase in phases)
           TweenSequenceItem(
-            tween: phase is ConstantPhase<T> || phase.isAlwaysStopped
-                ? ConstantTween<T>(phase.begin)
-                : tweenBuilder(phase.begin, phase.end),
+            tween: phase.isAlwaysStopped ? ConstantTween<T>(phase.begin) : tweenBuilder(phase.begin, phase.end),
             weight: phase.weight,
           ),
       ]);
@@ -120,18 +132,18 @@ abstract class TweenAct<T> extends Act {
           runtimeType == other.runtimeType &&
           begin == other.begin &&
           end == other.end &&
-          _phases == other._phases &&
+          _keyframes == other._keyframes &&
           curve == other.curve &&
           timing == other.timing;
 
   @override
-  int get hashCode => Object.hash(begin, end, _phases, curve, timing);
+  int get hashCode => Object.hash(begin, end, _keyframes, curve, timing);
 }
 
 class Scale extends TweenAct<double> {
   const Scale({
     super.begin = 1.0,
-    super.end,
+    super.end = 1.0,
     super.curve,
     super.timing,
     this.alignment,
@@ -143,7 +155,7 @@ class Scale extends TweenAct<double> {
 
   const Scale.down({super.end = 0.0, super.curve, super.timing, this.alignment}) : super(begin: 1.0);
 
-  const Scale.seq(super.begin, {required super.then, super.curve, super.timing, this.alignment}) : super.seq();
+  const Scale.keyframes(super.keyframes, {super.curve, this.alignment}) : super.keyframes();
 
   @override
   Widget wrapWidget(AnimationContext context, Widget child) {
@@ -165,7 +177,7 @@ class Fade extends TweenAct<double> {
 
   const Fade.out({super.begin = 1.0, super.curve, super.timing}) : super(end: 0);
 
-  const Fade.seq(super.begin, {required super.then, super.curve, super.timing}) : super.seq();
+  const Fade.seq(super.keyframes, {super.curve}) : super.keyframes();
 
   @override
   Widget wrapWidget(AnimationContext context, Widget child) {
@@ -183,7 +195,7 @@ class Rotate extends TweenAct<double> {
     super.curve,
     super.timing,
   }) : assert(begin >= -360 && begin <= 360, 'Begin angle must be between 0 and 360 degrees'),
-       assert(end == null || (end >= -360 && end <= 360), 'End angle must be between 0 and 360 degrees');
+       assert((end >= -360 && end <= 360), 'End angle must be between 0 and 360 degrees');
 
   @override
   Widget wrapWidget(AnimationContext ctx, Widget child) {
@@ -259,7 +271,7 @@ class Anchor extends TweenAct<AlignmentGeometry?> {
 class Slide extends TweenAct<Offset> {
   const Slide({
     super.begin = Offset.zero,
-    super.end,
+    super.end = Offset.zero,
     super.curve,
     super.timing,
   });
@@ -280,6 +292,8 @@ class Translate extends TweenAct<Offset> {
     super.curve,
     super.timing,
   });
+
+  const Translate.keyframes(super.keyframes, {super.curve}) : super.keyframes();
 
   Translate.x({double begin = 0, double end = 0, Curve? curve, Timing? timing})
     : this(begin: Offset(begin, 0), end: Offset(end, 0), curve: curve, timing: timing);
@@ -423,14 +437,14 @@ class ExpandingPathClipper extends CustomClipper<Path> {
 abstract class Style extends Act {
   const factory Style.text({
     required TextStyle begin,
-    TextStyle? end,
+    required TextStyle end,
     Curve? curve,
     Timing? timing,
   }) = _TextStyleAct;
 
   const factory Style.iconTheme({
     required IconThemeData begin,
-    IconThemeData? end,
+    required IconThemeData end,
     Curve? curve,
     Timing? timing,
   }) = _IconThemeAct;
@@ -439,7 +453,7 @@ abstract class Style extends Act {
 class _TextStyleAct extends TweenAct<TextStyle> implements Style {
   const _TextStyleAct({
     required super.begin,
-    super.end,
+    required super.end,
     super.curve,
     super.timing,
   });
@@ -459,7 +473,7 @@ class _TextStyleAct extends TweenAct<TextStyle> implements Style {
 class _IconThemeAct extends TweenAct<IconThemeData> implements Style {
   const _IconThemeAct({
     required super.begin,
-    super.end,
+    required super.end,
     super.curve,
     super.timing,
   });

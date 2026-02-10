@@ -14,6 +14,20 @@ class AnimationContext {
   final Curve? curve;
 
   TextDirection get textDirection => Directionality.of(buildContext);
+
+  AnimationContext copyWith({
+    BuildContext? buildContext,
+    Animation<double>? driver,
+    Timing? timing,
+    Curve? curve,
+  }) {
+    return AnimationContext(
+      buildContext: buildContext ?? this.buildContext,
+      driver: driver ?? this.driver,
+      timing: timing ?? this.timing,
+      curve: curve ?? this.curve,
+    );
+  }
 }
 
 class Timing {

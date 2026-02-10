@@ -27,11 +27,7 @@ class ThreeDotsAction extends StatelessWidget {
                 shape: CircleBorder(),
                 onPressed: () => Navigator.of(context).pop(),
                 child: Actor(
-                  act:
-                      Blur(begin: 6, timing: .startAt(.5)) &
-                      Fade() &
-                      Translate.y(begin: rect.height / 3) &
-                      Scale.seq(1, then: [.to(0.8), .to(0.6)]),
+                  act: Blur(begin: 6) & Fade() & Translate.y(begin: rect.height / 3),
                   child: const Icon(Icons.keyboard_arrow_down),
                 ),
               ),
