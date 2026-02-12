@@ -1,10 +1,4 @@
-import 'package:cue/cue.dart';
-import 'package:cue/src/acts/act.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
-import 'actor_factory.dart';
-part 'actor.dart';
+part of 'actor.dart';
 
 @internal
 class ActorBase extends StatelessWidget implements Actor {
@@ -94,22 +88,6 @@ class TweenActor<T> extends StatefulWidget {
        _keyframes = null,
        _tweenBuilder = null;
 
-  factory TweenActor.lerp({
-    Key? key,
-    required ValueWidgetBuilder<double> builder,
-    Curve? curve,
-    Timing? timing,
-    Widget? child,
-  }) =>
-      _LerpDoubleTweenActor(
-            key: key,
-            builder: builder,
-            curve: curve,
-            timing: timing,
-            child: child,
-          )
-          as TweenActor<T>;
-
   const TweenActor.keyframes({
     super.key,
     required this.builder,
@@ -126,7 +104,7 @@ class TweenActor<T> extends StatefulWidget {
   State<StatefulWidget> createState() => _TweenActorState<T>();
 }
 
-class _LerpDoubleTweenActor extends TweenActor<double> {
+class _LerpDoubleTweenActor extends TweenActor<double> implements Actor {
   _LerpDoubleTweenActor({
     super.key,
     required super.builder,

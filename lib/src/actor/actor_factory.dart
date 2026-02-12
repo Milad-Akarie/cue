@@ -1,8 +1,7 @@
 import 'package:cue/src/acts/act.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
-
-import 'actor_impl.dart';
+import 'actor.dart';
 
 @internal
 class RotateActorFactory extends SingleActProxy {

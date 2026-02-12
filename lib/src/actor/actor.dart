@@ -1,4 +1,9 @@
-part of 'actor_impl.dart';
+import 'package:cue/cue.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
+import 'actor_factory.dart';
+part 'actor_impl.dart';
 
 abstract class Actor extends Widget {
   const factory Actor({
@@ -245,4 +250,12 @@ abstract class Actor extends Widget {
     Timing? timing,
     BoxOverflow overflow,
   }) = ColorActorFactory;
+
+  factory Actor.lerp({
+    Key? key,
+    required ValueWidgetBuilder<double> builder,
+    Curve? curve,
+    Timing? timing,
+    Widget? child,
+  }) = _LerpDoubleTweenActor;
 }
