@@ -1,5 +1,4 @@
-export 'src/acts/act.dart';
-export 'src/actor/actor.dart';
+export 'src/actor/actor_impl.dart';
 export 'src/widgets/model_transition.dart';
 export 'src/cue/cue.dart';
 export 'src/core/core.dart';

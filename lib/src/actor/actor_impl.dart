@@ -1,24 +1,11 @@
 import 'package:cue/cue.dart';
+import 'package:cue/src/acts/act.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 part 'actor.dart';
 
-abstract class SingleActProxy extends StatelessWidget implements Actor {
-  final Widget child;
-  final Curve? curve;
-  final Timing? timing;
-  final BoxOverflow overflow;
-
-  const SingleActProxy({
-    super.key,
-    required this.child,
-    this.curve,
-    this.timing,
-    this.overflow = const BoxOverflow.none(),
-  });
-}
-
+@internal
 class ActorBase extends StatelessWidget implements Actor {
   final Curve? curve;
   final Timing? timing;
@@ -68,6 +55,22 @@ class ActorBase extends StatelessWidget implements Actor {
     }
     return current;
   }
+}
+
+@internal
+abstract class SingleActProxy extends StatelessWidget implements Actor {
+  final Widget child;
+  final Curve? curve;
+  final Timing? timing;
+  final BoxOverflow overflow;
+
+  const SingleActProxy({
+    super.key,
+    required this.child,
+    this.curve,
+    this.timing,
+    this.overflow = const BoxOverflow.none(),
+  });
 }
 
 class TweenActor<T> extends StatefulWidget {
