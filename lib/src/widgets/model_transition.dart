@@ -6,12 +6,13 @@ import 'package:flutter/material.dart';
 @optionalTypeArgs
 typedef ShowModalFunction<T extends Object> = Future<T?> Function();
 typedef SimulationBuilder = Simulation Function(bool forward);
+typedef ModalContentBuilder = Widget Function(BuildContext context, Rect triggerRect);
 
 class ModalTransition extends StatefulWidget {
   const ModalTransition({
     super.key,
-    required this.builder,
     required this.triggerBuilder,
+    required this.builder,
     this.duration = const Duration(milliseconds: 300),
     this.showDebug = false,
     this.backdrop,
@@ -22,7 +23,7 @@ class ModalTransition extends StatefulWidget {
   });
 
   final Duration duration;
-  final Widget Function(BuildContext context, Rect triggerRect) builder;
+  final ModalContentBuilder builder;
   final Widget Function(BuildContext context, ShowModalFunction showDialog) triggerBuilder;
   final AlignmentGeometry? alignment;
   final bool showDebug;
@@ -60,13 +61,16 @@ class _ModalTransitionState extends State<ModalTransition> {
         animation = CueDebugTools.animationOf(context);
       }
     }
-    return Cue.controlled(
+    return Cue(
       key: _triggerKey,
       animation: animation,
-      child: Builder(
-        builder: (context) {
-          return widget.triggerBuilder(context, _showModel);
-        },
+      child: Hero(
+        tag: 'modal_transition_',
+        child: Builder(
+          builder: (context) {
+            return widget.triggerBuilder(context, _showModel);
+          },
+        ),
       ),
     );
   }
@@ -76,7 +80,6 @@ class _ModalTransitionState extends State<ModalTransition> {
     final renderBox = _triggerKey.currentContext?.findRenderObject() as RenderBox?;
     final triggerOffset = renderBox?.localToGlobal(Offset.zero) ?? Offset.zero;
     final triggerRect = triggerOffset & (renderBox?.size ?? Size.zero);
-
     final model = _ModalRoute<T>(
       barrierDismissible: widget.barrierDismissible,
       barrierLabel: 'ModalTransition',
@@ -89,7 +92,13 @@ class _ModalTransitionState extends State<ModalTransition> {
           animation: animation,
           backdrop: widget.backdrop,
           alignment: widget.alignment,
-          builder: widget.builder,
+          builder: (context, rect) {
+            return Builder(
+              builder: (ctx) {
+                return widget.builder(context, rect);
+              },
+            );
+          },
           barrierDismissible: widget.barrierDismissible,
           showDebug: _showDebug,
           triggerRect: triggerRect,
@@ -120,7 +129,7 @@ class _ModelContent extends StatelessWidget {
   final Animation<double> animation;
   final Widget? backdrop;
   final AlignmentGeometry? alignment;
-  final Widget Function(BuildContext context, Rect triggerRect) builder;
+  final ModalContentBuilder builder;
   final bool barrierDismissible;
   final ValueNotifier<bool> showDebug;
   final Rect triggerRect;
@@ -156,7 +165,7 @@ class _ModelContent extends StatelessWidget {
         ),
       ),
       builder: (context, debug, child) {
-        return Cue.controlled(
+        return Cue(
           debug: debug,
           animation: animation,
           child: child!,
@@ -191,7 +200,7 @@ class _ModalPositionDelegate extends SingleChildLayoutDelegate {
 
   @override
   bool shouldRelayout(_ModalPositionDelegate oldDelegate) {
-    return triggerRect != oldDelegate.triggerRect;
+    return triggerRect != oldDelegate.triggerRect || alignment != oldDelegate.alignment;
   }
 }
 
@@ -206,6 +215,7 @@ class _ModalRoute<T extends Object> extends RawDialogRoute<T> {
     super.transitionBuilder,
     this.simulation,
   });
+
   final SimulationBuilder? simulation;
   final ValueChanged<AnimationController> onAnimationControllerReady;
 

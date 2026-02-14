@@ -55,8 +55,8 @@ class _AxisClipRevealAct extends TweenAct<double> implements ClipRevealAct {
         return ClipRect(
           child: Align(
             alignment: effectiveAlignment,
-            widthFactor: _axis == Axis.horizontal ? animation.value : null,
-            heightFactor: _axis == Axis.vertical ? animation.value : null,
+            widthFactor: _axis == Axis.horizontal ? animation.value.clamp(0, 1) : null,
+            heightFactor: _axis == Axis.vertical ? animation.value.clamp(0, 1) : null,
             child: child,
           ),
         );
@@ -90,8 +90,8 @@ class _ClipRevealAct extends TweenAct<double> implements ClipRevealAct {
       builder: (context, child) {
         return Align(
           alignment: effectiveAlignment,
-          widthFactor: animation.value,
-          heightFactor: animation.value,
+          widthFactor: animation.value.clamp(0, 1.0),
+          heightFactor: animation.value.clamp(0, 1.0),
           child: ClipPath(
             clipper: ExpandingPathClipper(
               progress: animation.value,
@@ -140,7 +140,6 @@ class ExpandingPathClipper extends CustomClipper<Path> {
     final alignmentOffset = alignment.alongSize(size);
     // Calculate the alignment point within the clipped rect
     final rectAlignmentOffset = alignment.alongSize(Size(currentWidth, currentHeight));
-
     // Position the rect so its alignment point matches the size's alignment point
     final left = alignmentOffset.dx - rectAlignmentOffset.dx;
     final top = alignmentOffset.dy - rectAlignmentOffset.dy;

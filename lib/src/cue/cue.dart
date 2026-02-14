@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 abstract class Cue extends StatefulWidget {
-  const Cue({super.key, required this.child, this.curve = Curves.linear, this.debug = false});
+  const Cue._({super.key, required this.child, this.curve = Curves.linear, this.debug = false});
 
   final bool debug;
   final Curve curve;
@@ -36,7 +36,7 @@ abstract class Cue extends StatefulWidget {
     bool opaque,
   }) = _OnHoverCue;
 
-  const factory Cue.controlled({
+  const factory Cue({
     Key? key,
     required Widget child,
     Curve curve,
@@ -149,7 +149,7 @@ abstract class _CueState<T extends Cue> extends State<Cue> {
 }
 
 class _RouteTransitionStage extends Cue {
-  const _RouteTransitionStage({super.key, required super.child, super.curve, super.debug});
+  const _RouteTransitionStage({super.key, required super.child, super.curve, super.debug}) : super._();
 
   @override
   State<StatefulWidget> createState() => _RouteTransitionStageState();
@@ -167,7 +167,7 @@ class _SelfAnimatedCue extends Cue {
     this.simulation,
     this.reverseOnLoop = false,
     this.delay,
-  });
+  }) : super._();
   final SimulationBuilder? simulation;
   final Duration duration;
   final Duration? reverseDuration;
@@ -321,7 +321,7 @@ class _OnHoverCue extends Cue {
     this.reverseDuration,
     this.cursor = MouseCursor.defer,
     this.opaque = false,
-  });
+  }) : super._();
 
   final SimulationBuilder? simulation;
   final Duration duration;
@@ -372,7 +372,7 @@ class _TogglableCue extends Cue {
     this.reverseDuration,
     required this.toggled,
     this.skipFirstAnimation = true,
-  });
+  }) : super._();
 
   final SimulationBuilder? simulation;
   final Duration duration;
@@ -437,7 +437,8 @@ class _ToggledStageState extends _SelfAnimatedState<_TogglableCue> {
 }
 
 class _ControlledCue extends Cue {
-  const _ControlledCue({super.key, required super.child, super.curve, super.debug, required this.animation});
+  const _ControlledCue({super.key, required super.child, super.curve, super.debug, required this.animation})
+    : super._();
 
   final Animation<double> animation;
 
@@ -481,7 +482,7 @@ class _IndexedStage extends Cue {
     required this.getOffset,
     required this.targetIndex,
     this.calculator,
-  });
+  }) : super._();
 
   final Listenable listenable;
   final ValueGetter<double> getOffset;

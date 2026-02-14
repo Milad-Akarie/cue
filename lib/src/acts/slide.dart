@@ -90,7 +90,7 @@ class _AxisSlideAct extends TweenActBase<double, Offset> implements SlideAct {
        super.keyframes();
 
   @override
-  Offset transform(double value) {
+  Offset transform(_, double value) {
     switch (_axis) {
       case Axis.horizontal:
         return Offset(value, 0);

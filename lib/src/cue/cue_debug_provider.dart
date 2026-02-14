@@ -38,6 +38,7 @@ class CueDebugTools extends StatefulWidget {
 
 class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
+  final _verticalOffset = ValueNotifier<double>(0.0);
 
   OverlayEntry? _entry;
   final Set<BuildContext> _attachedCallers = {};
@@ -91,11 +92,11 @@ class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProvider
           controller: _controller,
           onPlay: _startAutoPlay,
           baseDuration: widget.baseDuration,
+          verticalOffset: _verticalOffset,
         );
       },
     );
     Overlay.of(context).insert(_entry!);
-    _startAutoPlay();
     return deattachCallback;
   }
 
@@ -103,7 +104,7 @@ class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProvider
   void dispose() {
     _controller.dispose();
     _entry?.remove();
-
+    _verticalOffset.dispose();
     super.dispose();
   }
 
@@ -118,8 +119,10 @@ class _DebugOverlay extends StatefulWidget {
     required this.controller,
     required this.onPlay,
     required this.baseDuration,
+    required this.verticalOffset,
   });
 
+  final ValueNotifier<double> verticalOffset;
   final AnimationController controller;
   final void Function(bool isLooping) onPlay;
   final Duration baseDuration;
@@ -131,7 +134,6 @@ class _DebugOverlay extends StatefulWidget {
 class _DebugOverlayState extends State<_DebugOverlay> {
   final _speedIndex = ValueNotifier(0);
   final _isLooping = ValueNotifier(false);
-  final _verticalOffset = ValueNotifier<double>(0.0);
 
   static const List<int> _speedMultipliers = [1, 2, 4, 8, 16];
 
@@ -178,22 +180,21 @@ class _DebugOverlayState extends State<_DebugOverlay> {
   void dispose() {
     _speedIndex.dispose();
     _isLooping.dispose();
-    _verticalOffset.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<double>(
-      valueListenable: _verticalOffset,
+      valueListenable: widget.verticalOffset,
       builder: (context, offset, _) {
         return GestureDetector(
           onVerticalDragUpdate: (details) {
             final maxTop = MediaQuery.sizeOf(context).height - 220;
             final minTop = 0.0;
-            _verticalOffset.value += details.delta.dy.clamp(
-              minTop - _verticalOffset.value,
-              maxTop - _verticalOffset.value,
+            widget.verticalOffset.value += details.delta.dy.clamp(
+              minTop - widget.verticalOffset.value,
+              maxTop - widget.verticalOffset.value,
             );
           },
           child: TweenAnimationBuilder<double>(

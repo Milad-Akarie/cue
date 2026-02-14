@@ -40,7 +40,7 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends Act {
   final T? _to;
   final List<Keyframe<T>>? _keyframes;
 
-  R transform(T value);
+  R transform(AnimationContext context, T value);
 
   const TweenActBase({
     required T from,
@@ -67,9 +67,9 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends Act {
     final List<Phase<R>> phases;
     if (_keyframes == null) {
       assert(_from != null && _to != null, 'Begin and end values must be provided when not using keyframes');
-      phases = [Phase<R>(begin: transform(_from as T), end: transform(_to as T), weight: 100)];
+      phases = [Phase<R>(begin: transform(context, _from as T), end: transform(context, _to as T), weight: 100)];
     } else {
-      final result = Phase.normalize(_keyframes, transform);
+      final result = Phase.normalize(_keyframes, (value) => transform(context, value));
       phases = result.phases;
       if (result.timing != null) {
         context = context.copyWith(timing: result.timing);
@@ -136,7 +136,7 @@ abstract class TweenAct<T extends Object?> extends TweenActBase<T, T> {
   });
 
   @override
-  T transform(T value) => value;
+  T transform(AnimationContext context, T value) => value;
 
   const TweenAct.keyframes(
     super.keyframes, {

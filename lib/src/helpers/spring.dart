@@ -149,15 +149,18 @@ class Spring extends SpringSimulation {
   factory Spring.withDurationAndBounce({
     Duration duration = const Duration(milliseconds: 500),
     double bounce = 0,
+    bool forward = true,
   }) {
     return Spring(
       SpringDescription.withDurationAndBounce(
         duration: duration,
         bounce: bounce,
       ),
-      0.0,
-      1.0,
+      forward ? 0.0 : 1.0,
+      forward ? 1.0 : 0.0,
       0,
+      tolerance: Tolerance(distance: 0.01, velocity: 0.03),
+      snapToEnd: true,
     );
   }
 }

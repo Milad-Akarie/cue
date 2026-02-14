@@ -91,8 +91,8 @@ class FadeActorFactory extends SingleActProxy {
 
   const FadeActorFactory({
     super.key,
-    required this.from,
-    required this.to,
+    this.from = 1,
+    this.to = 0,
     required super.child,
     super.curve,
     super.timing,
@@ -126,7 +126,7 @@ class SlideActorFactory extends SingleActProxy {
   const SlideActorFactory({
     super.key,
     required Offset this.from,
-    required Offset this.to,
+    Offset this.to = Offset.zero,
     required super.child,
     super.curve,
     super.timing,
@@ -184,8 +184,8 @@ class AlignActorFactory extends SingleActProxy {
 
   const AlignActorFactory({
     super.key,
-    required this.from,
-    required this.to,
+    this.from,
+    this.to,
     required super.child,
     super.curve,
     super.timing,
@@ -302,7 +302,7 @@ class PaddingActorFactory extends SingleActProxy {
 
   const PaddingActorFactory({
     super.key,
-    required this.from,
+    this.from = EdgeInsets.zero,
     required this.to,
     required super.child,
     super.curve,
@@ -321,68 +321,6 @@ class PaddingActorFactory extends SingleActProxy {
           timing: timing,
         ),
       ],
-      child: child,
-    );
-  }
-}
-
-@internal
-class TranslateActorFactory extends SingleActProxy {
-  final Offset? from;
-  final Offset? to;
-  final double? _axisFrom;
-  final double? _axisTo;
-  final Axis? _axis;
-
-  const TranslateActorFactory({
-    super.key,
-    required Offset this.from,
-    required Offset this.to,
-    required super.child,
-    super.curve,
-    super.timing,
-    super.overflow,
-  }) : _axis = null,
-       _axisFrom = null,
-       _axisTo = null;
-
-  const TranslateActorFactory.x({
-    super.key,
-    required double from,
-    required double to,
-    required super.child,
-    super.curve,
-    super.timing,
-    super.overflow,
-  }) : _axis = Axis.horizontal,
-       _axisFrom = from,
-       _axisTo = to,
-       from = null,
-       to = null;
-
-  const TranslateActorFactory.y({
-    super.key,
-    required double from,
-    required double to,
-    required super.child,
-    super.curve,
-    super.timing,
-    super.overflow,
-  }) : _axisFrom = from,
-       _axisTo = to,
-       _axis = Axis.vertical,
-       from = null,
-       to = null;
-
-  @override
-  Widget build(BuildContext context) {
-    final Act act = switch (_axis) {
-      Axis.horizontal => TranslateAct.x(from: _axisFrom!, to: _axisTo!, curve: curve, timing: timing),
-      Axis.vertical => TranslateAct.y(from: _axisFrom!, to: _axisTo!, curve: curve, timing: timing),
-      _ => TranslateAct(from: from!, to: to!, curve: curve, timing: timing),
-    };
-    return ActorBase(
-      acts: [act],
       child: child,
     );
   }
@@ -618,4 +556,87 @@ class ColorActorFactory extends SingleActProxy {
       child: child,
     );
   }
+}
+
+@internal
+class TranslateActorFactory extends SingleActProxy {
+  final Offset? from;
+  final Offset? to;
+  final double? _axisFrom;
+  final double? _axisTo;
+  final _TranslateVariant? _variant;
+
+  const TranslateActorFactory({
+    super.key,
+    required Offset this.from,
+    Offset this.to = Offset.zero,
+    required super.child,
+    super.curve,
+    super.timing,
+    super.overflow,
+  }) : _variant = _TranslateVariant.offset,
+       _axisFrom = null,
+       _axisTo = null;
+
+  const TranslateActorFactory.x({
+    super.key,
+    required double from,
+    required double to,
+    required super.child,
+    super.curve,
+    super.timing,
+    super.overflow,
+  }) : _variant = _TranslateVariant.horizontal,
+       _axisFrom = from,
+       _axisTo = to,
+       from = null,
+       to = null;
+
+  const TranslateActorFactory.y({
+    super.key,
+    required double from,
+    required double to,
+    required super.child,
+    super.curve,
+    super.timing,
+    super.overflow,
+  }) : _axisFrom = from,
+       _axisTo = to,
+       _variant = _TranslateVariant.vertical,
+       from = null,
+       to = null;
+
+  const TranslateActorFactory.fromGlobal({
+    super.key,
+    required Offset offset,
+    required super.child,
+    super.curve,
+    super.timing,
+    super.overflow,
+  }) : _variant = _TranslateVariant.fromGlobal,
+       _axisFrom = null,
+       _axisTo = null,
+       from = offset,
+       to = null;
+
+  @override
+  Widget build(BuildContext context) {
+    final Act act = switch (_variant) {
+      _TranslateVariant.horizontal => TranslateAct.x(from: _axisFrom!, to: _axisTo!, curve: curve, timing: timing),
+      _TranslateVariant.vertical => TranslateAct.y(from: _axisFrom!, to: _axisTo!, curve: curve, timing: timing),
+      _TranslateVariant.fromGlobal => TranslateAct.fromGlobal(offset: from!, curve: curve, timing: timing),
+      _ => TranslateAct(from: from!, to: to!, curve: curve, timing: timing),
+    };
+    return ActorBase(
+      acts: [act],
+      child: child,
+    );
+  }
+}
+
+enum _TranslateVariant {
+  offset,
+  vertical,
+  horizontal,
+  fromGlobal,
 }

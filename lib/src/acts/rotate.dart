@@ -53,7 +53,7 @@ class RotateAct extends TweenAct<double> {
        _inDegrees = false;
 
   @override
-  double transform(double value) {
+  double transform(_, double value) {
     if (_inDegrees) {
       return value * math.pi / 180;
     }
@@ -116,7 +116,7 @@ class RotateLayout extends TweenAct<double> {
        _inDegrees = false;
 
   @override
-  double transform(double value) {
+  double transform(_, double value) {
     if (_inDegrees) {
       return value * math.pi / 180;
     }

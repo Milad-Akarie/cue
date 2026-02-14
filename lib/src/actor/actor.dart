@@ -50,8 +50,8 @@ abstract class Actor extends Widget {
 
   const factory Actor.fade({
     Key? key,
-    required double from,
-    required double to,
+    double from,
+    double to,
     required Widget child,
     Curve? curve,
     Timing? timing,
@@ -61,7 +61,7 @@ abstract class Actor extends Widget {
   const factory Actor.slide({
     Key? key,
     required Offset from,
-    required Offset to,
+    Offset to,
     required Widget child,
     Curve? curve,
     Timing? timing,
@@ -132,7 +132,7 @@ abstract class Actor extends Widget {
 
   const factory Actor.padding({
     Key? key,
-    required EdgeInsetsGeometry from,
+    EdgeInsetsGeometry from,
     required EdgeInsetsGeometry to,
     required Widget child,
     Curve? curve,
@@ -143,7 +143,7 @@ abstract class Actor extends Widget {
   const factory Actor.translate({
     Key? key,
     required Offset from,
-    required Offset to,
+    Offset to,
     required Widget child,
     Curve? curve,
     Timing? timing,
@@ -169,6 +169,15 @@ abstract class Actor extends Widget {
     Timing? timing,
     BoxOverflow overflow,
   }) = TranslateActorFactory.y;
+
+  const factory Actor.translateFromGlobal({
+    Key? key,
+    required Offset offset,
+    required Widget child,
+    Curve? curve,
+    Timing? timing,
+    BoxOverflow overflow,
+  }) = TranslateActorFactory.fromGlobal;
 
   const factory Actor.clipReveal({
     Key? key,
