@@ -130,13 +130,20 @@ abstract class _CueState<T extends Cue> extends State<Cue> {
   Widget build(BuildContext context) {
     if (kDebugMode && widget.debug) {
       if (CueDebugTools.isWrappedByDebugProvider(context)) {
-        return CueScope(animation: CueDebugTools.animationOf(context), child: widget.child);
+        final debugAnimation = CueDebugTools.animationOf(context);
+        if (debugAnimation != null) {
+          return CueScope(animation: debugAnimation, child: widget.child);
+        }
       } else {
         return CueDebugTools(
           global: false,
           child: Builder(
             builder: (context) {
-              return CueScope(animation: CueDebugTools.animationOf(context), child: widget.child);
+              final debugAnimation = CueDebugTools.animationOf(context);
+              if (debugAnimation != null) {
+                return CueScope(animation: debugAnimation, child: widget.child);
+              }
+              return CueScope(animation: getAnimation(context), child: widget.child);
             },
           ),
         );

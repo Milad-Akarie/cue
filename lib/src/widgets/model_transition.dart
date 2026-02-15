@@ -58,7 +58,9 @@ class _ModalTransitionState extends State<ModalTransition> {
     Animation<double> animation = _transitionAnimation;
     if (kDebugMode && widget.showDebug) {
       if (CueDebugTools.isWrappedByDebugProvider(context)) {
-        animation = CueDebugTools.animationOf(context);
+        if (CueDebugTools.animationOf(context) case var debugAnimation?) {
+          animation = debugAnimation;
+        }
       }
     }
     return Cue(
