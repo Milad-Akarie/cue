@@ -30,66 +30,107 @@ abstract class ResizeAct extends Act {
   }) = FractionalResizeAct;
 }
 
-class _ResizeAct extends TweenAct<Size?> implements ResizeAct {
+class _ResizeAct extends TweenAct<double> implements ResizeAct {
   final AlignmentGeometry? alignment;
   final Clip? clipBehavior;
   final bool allowOverflow;
+  final Size? _fromSize;
+  final Size? _toSize;
+
+  final List<Keyframe<Size?>>? _sizeKeyframes;
 
   const _ResizeAct({
-    required super.from,
-    required super.to,
+    Size? from,
+    Size? to,
     super.curve,
     super.timing,
     this.alignment,
     this.clipBehavior,
     this.allowOverflow = false,
-  });
+  }) : _fromSize = from,
+       _toSize = to,
+       _sizeKeyframes = null,
+       super(from: 0, to: 1);
 
   const _ResizeAct.keyframes(
-    super.keyframes, {
+    List<Keyframe<Size?>> keyframes, {
     super.curve,
     this.alignment,
     this.clipBehavior,
     this.allowOverflow = false,
-  }) : super.keyframes();
+  }) : _fromSize = null,
+       _toSize = null,
+       _sizeKeyframes = keyframes,
+       super.keyframes(const []);
 
-  Tween<Size?> _buildTween(Size? begin, Size? end, Size maxSize) {
-    double normalize(double? value, double max) {
-      if (value == null) return 0;
+  @override
+  Animation<double> buildAnimation(Animation<double> driver) {
+    /// The actual size tween will be built in the apply method
+    /// where we have access to the constraints
+    return driver;
+  }
+
+  Size? _normalizeSize(Size? size, Size maxSize) {
+    if (size == null) return null;
+    double normalize(double value, double max) {
       if (value.isInfinite) return max;
       return value;
     }
 
-    final effectiveBeginWidth = normalize(begin?.width, maxSize.width);
-    final effectiveBeginHeight = normalize(begin?.height, maxSize.height);
-    final effectiveEndWidth = normalize(end?.width, maxSize.width);
-    final effectiveEndHeight = normalize(end?.height, maxSize.height);
-
-    return SizeTween(
-      begin: Size(effectiveBeginWidth, effectiveBeginHeight),
-      end: Size(effectiveEndWidth, effectiveEndHeight),
+    return Size(
+      normalize(size.width, maxSize.width),
+      normalize(size.height, maxSize.height),
     );
   }
 
+  ({List<Phase<Size?>> phases, Timing? timing}) _buildPhases(Size maxSize) {
+    if (_sizeKeyframes == null) {
+      assert(_fromSize != null && _toSize != null, 'Begin and end values must be provided when not using keyframes');
+      return (
+        phases: [
+          Phase<Size?>(begin: _normalizeSize(_fromSize, maxSize), end: _normalizeSize(_toSize, maxSize), weight: 100),
+        ],
+        timing: null,
+      );
+    } else {
+      return Phase.normalize(_sizeKeyframes, (value) => _normalizeSize(value, maxSize));
+    }
+  }
+
+  Size _calculateMaxSize(List<Phase<Size?>> phases) {
+    double maxWidth = 0;
+    double maxHeight = 0;
+
+    for (final phase in phases) {
+      final begin = phase.begin ?? Size.zero;
+      final end = phase.end ?? Size.zero;
+      maxWidth = [maxWidth, begin.width, end.width].reduce((a, b) => a > b ? a : b);
+      maxHeight = [maxHeight, begin.height, end.height].reduce((a, b) => a > b ? a : b);
+    }
+    return Size(maxWidth, maxHeight);
+  }
+
+  (Animation<Size?>, Size maxSize) _buildAnimation(Animation<double> driver, Size maxConstrains) {
+    Timing? timing = this.timing;
+    final result = _buildPhases(maxConstrains);
+    if (result.timing != null) {
+      timing = result.timing;
+    }
+    final tween = TweenActBase.buildFromPhases<Size?>(result.phases, (begin, end) => SizeTween(begin: begin, end: end));
+    final effectiveCurve = timing != null
+        ? Interval(timing.start, timing.end, curve: curve ?? Curves.linear)
+        : curve ?? Curves.linear;
+    return (driver.drive<Size?>(tween.chain(CurveTween(curve: effectiveCurve))), _calculateMaxSize(result.phases));
+  }
+
   @override
-  Widget apply(AnimationContext context, Widget child) {
+  Widget apply(BuildContext context, Animation<double> animation, Widget child) {
     return LayoutBuilder(
       builder: (_, constraints) {
-        final animation = build(
-          context,
-          tweenBuilder: (begin, end) {
-            return _buildTween(begin, end, constraints.biggest);
-          },
-        );
-
-        // Calculate maxSize from the tween's begin and end values
-        final maxWidth = _getMaxDimension(_from?.width, _to?.width, constraints.biggest.width);
-        final maxHeight = _getMaxDimension(_from?.height, _to?.height, constraints.biggest.height);
-        final maxSize = Size(maxWidth, maxHeight);
-
+        final calcResult = _buildAnimation(animation, constraints.biggest);
         return _AutoAnimatedSize(
-          sizeAnimation: animation,
-          maxSize: maxSize,
+          sizeAnimation: calcResult.$1,
+          maxSize: calcResult.$2,
           alignment: alignment ?? Alignment.center,
           clipBehavior: clipBehavior ?? Clip.hardEdge,
           allowOverflow: allowOverflow,
@@ -97,18 +138,6 @@ class _ResizeAct extends TweenAct<Size?> implements ResizeAct {
         );
       },
     );
-  }
-
-  double _getMaxDimension(double? begin, double? end, double constraintMax) {
-    double normalize(double? value) {
-      if (value == null) return 0;
-      if (value.isInfinite) return constraintMax;
-      return value;
-    }
-
-    final beginVal = normalize(begin);
-    final endVal = normalize(end);
-    return beginVal > endVal ? beginVal : endVal;
   }
 }
 
@@ -136,8 +165,7 @@ class FractionalResizeAct extends TweenAct<Size> implements ResizeAct {
   final bool? allowOverflow;
 
   @override
-  Widget apply(AnimationContext context, Widget child) {
-    final animation = build(context);
+  Widget apply(BuildContext context, Animation<Size> animation, Widget child) {
     return AnimatedBuilder(
       animation: animation,
       builder: (context, _) {

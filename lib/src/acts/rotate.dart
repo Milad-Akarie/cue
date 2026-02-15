@@ -53,7 +53,7 @@ class RotateAct extends TweenAct<double> {
        _inDegrees = false;
 
   @override
-  double transform(_, double value) {
+  double transform(double value) {
     if (_inDegrees) {
       return value * math.pi / 180;
     }
@@ -64,18 +64,11 @@ class RotateAct extends TweenAct<double> {
   }
 
   @override
-  Widget apply(AnimationContext ctx, Widget child) {
-    final animation = build(ctx);
-    return ListenableBuilder(
-      listenable: animation,
+  Widget apply(BuildContext context, Animation<double> animation, Widget child) {
+    return MatrixTransition(
+      animation: animation,
+      onTransform: Matrix4.rotationZ,
       child: child,
-      builder: (context, child) {
-        return Transform.rotate(
-          angle: animation.value,
-          alignment: alignment,
-          child: child,
-        );
-      },
     );
   }
 }
@@ -116,7 +109,7 @@ class RotateLayout extends TweenAct<double> {
        _inDegrees = false;
 
   @override
-  double transform(_, double value) {
+  double transform(double value) {
     if (_inDegrees) {
       return value * math.pi / 180;
     }
@@ -127,8 +120,7 @@ class RotateLayout extends TweenAct<double> {
   }
 
   @override
-  Widget apply(AnimationContext ctx, Widget child) {
-    final animation = build(ctx);
+  Widget apply(BuildContext ctx, Animation<double> animation, Widget child) {
     return ListenableBuilder(
       listenable: animation,
       child: child,

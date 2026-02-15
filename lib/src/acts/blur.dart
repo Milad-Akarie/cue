@@ -9,10 +9,10 @@ class BlurAct extends TweenAct<double> {
   });
 
   @override
-  Widget apply(AnimationContext ctx, Widget child) {
-    final animation = build(ctx);
+  Widget apply(BuildContext context, Animation<double> animation, Widget child) {
     return AnimatedBuilder(
       animation: animation,
+      child: child,
       builder: (context, child) {
         final blurValue = animation.value;
         return ImageFiltered(
@@ -23,7 +23,6 @@ class BlurAct extends TweenAct<double> {
           child: child,
         );
       },
-      child: child,
     );
   }
 }

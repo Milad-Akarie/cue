@@ -49,9 +49,8 @@ class _AxisClipRevealAct extends TweenAct<double> implements ClipRevealAct {
        super();
 
   @override
-  Widget apply(AnimationContext context, Widget child) {
-    final animation = build(context);
-    final directionality = Directionality.of(context.buildContext);
+  Widget apply(BuildContext context, Animation<double> animation, Widget child) {
+    final directionality = Directionality.of(context);
     final effectiveAlignment = alignment.resolve(directionality);
     return AnimatedBuilder(
       animation: animation,
@@ -84,9 +83,8 @@ class _ClipRevealAct extends TweenAct<double> implements ClipRevealAct {
   }) : super(from: 0, to: 1);
 
   @override
-  Widget apply(AnimationContext context, Widget child) {
-    final animation = build(context);
-    final directionality = Directionality.of(context.buildContext);
+  Widget apply(BuildContext context, Animation<double> animation, Widget child) {
+    final directionality = Directionality.of(context);
     final effectiveAlignment = alignment?.resolve(directionality) ?? Alignment.topLeft;
     final effectiveBorderRadius = borderRadius.resolve(directionality);
     return AnimatedBuilder(

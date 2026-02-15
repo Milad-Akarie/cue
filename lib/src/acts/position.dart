@@ -11,8 +11,7 @@ class PositionAct extends TweenAct<Position> {
   const PositionAct.keyframes(super.keyframes, {super.curve}) : super.keyframes();
 
   @override
-  Widget apply(AnimationContext context, Widget child) {
-    final animation = build(context);
+  Widget apply(BuildContext context, Animation<Position> animation, Widget child) {
     return AnimatedBuilder(
       animation: animation,
       builder: (context, child) {

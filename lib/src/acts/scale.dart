@@ -18,10 +18,11 @@ class ScaleAct extends TweenAct<double> {
   const ScaleAct.keyframes(super.keyframes, {super.curve, this.alignment}) : super.keyframes();
 
   @override
-  Widget apply(AnimationContext context, Widget child) {
+  Widget apply(BuildContext context, Animation<double> animation, Widget child) {
+    final effectiveAlignment = alignment?.resolve(Directionality.maybeOf(context)) ?? Alignment.center;
     return ScaleTransition(
-      scale: build(context),
-      alignment: alignment?.resolve(context.textDirection) ?? Alignment.center,
+      scale: animation,
+      alignment: effectiveAlignment,
       child: child,
     );
   }

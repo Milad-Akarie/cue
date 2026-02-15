@@ -14,14 +14,14 @@ class DecorateAct extends TweenAct<Decoration> {
   }) : super.keyframes();
 
   @override
-  Widget apply(AnimationContext context, Widget child) {
+  Animatable<Decoration> buildSinglePhaseTween(Decoration from, Decoration to) {
+    return DecorationTween(begin: from, end: to);
+  }
+
+  @override
+  Widget apply(BuildContext context, Animation<Decoration> animation, Widget child) {
     return DecoratedBoxTransition(
-      decoration: build(
-        context,
-        tweenBuilder: (begin, end) {
-          return DecorationTween(begin: begin, end: end);
-        },
-      ),
+      decoration: animation,
       child: child,
     );
   }
@@ -38,22 +38,18 @@ class ColorAct extends TweenAct<Color> {
   const ColorAct.keyframes(super.keyframes, {super.curve}) : super.keyframes();
 
   @override
-  Widget apply(AnimationContext context, Widget child) {
-    final animation = build(
-      context,
-      tweenBuilder: (from, end) {
-        return ColorTween(begin: from, end: end) as Animatable<Color>;
-      },
-    );
+  Animatable<Color> buildSinglePhaseTween(Color from, Color to) {
+    return ColorTween(begin: from, end: to) as Animatable<Color>;
+  }
+
+  @override
+  Widget apply(BuildContext context, Animation<Color> animation, Widget child) {
     return AnimatedBuilder(
       animation: animation,
-      builder: (context, child) {
-        return ColoredBox(
-          color: animation.value,
-          child: child!,
-        );
-      },
       child: child,
+      builder: (context, child) {
+        return ColoredBox(color: animation.value, child: child!);
+      },
     );
   }
 }

@@ -12,7 +12,6 @@ abstract class Actor extends Widget {
     required Widget child,
     Curve? curve,
     Timing? timing,
-    BoxOverflow overflow,
   }) = ActorBase;
 
   const factory Actor.rotate({
@@ -23,7 +22,6 @@ abstract class Actor extends Widget {
     required Widget child,
     Curve? curve,
     Timing? timing,
-    BoxOverflow overflow,
   }) = RotateActorFactory;
 
   const factory Actor.rotateTurns({
@@ -34,7 +32,6 @@ abstract class Actor extends Widget {
     required Widget child,
     Curve? curve,
     Timing? timing,
-    BoxOverflow overflow,
   }) = RotateActorFactory.turns;
 
   const factory Actor.scale({
@@ -45,7 +42,6 @@ abstract class Actor extends Widget {
     required Widget child,
     Curve? curve,
     Timing? timing,
-    BoxOverflow overflow,
   }) = ScaleActorFactory;
 
   const factory Actor.fade({
@@ -55,7 +51,6 @@ abstract class Actor extends Widget {
     required Widget child,
     Curve? curve,
     Timing? timing,
-    BoxOverflow overflow,
   }) = FadeActorFactory;
 
   const factory Actor.slide({
@@ -65,7 +60,6 @@ abstract class Actor extends Widget {
     required Widget child,
     Curve? curve,
     Timing? timing,
-    BoxOverflow overflow,
   }) = SlideActorFactory;
 
   const factory Actor.slideX({
@@ -75,7 +69,6 @@ abstract class Actor extends Widget {
     required Widget child,
     Curve? curve,
     Timing? timing,
-    BoxOverflow overflow,
   }) = SlideActorFactory.x;
 
   const factory Actor.slideY({
@@ -85,7 +78,6 @@ abstract class Actor extends Widget {
     required Widget child,
     Curve? curve,
     Timing? timing,
-    BoxOverflow overflow,
   }) = SlideActorFactory.y;
 
   const factory Actor.align({
@@ -95,7 +87,6 @@ abstract class Actor extends Widget {
     required Widget child,
     Curve? curve,
     Timing? timing,
-    BoxOverflow overflow,
   }) = AlignActorFactory;
 
   const factory Actor.resize({
@@ -106,7 +97,6 @@ abstract class Actor extends Widget {
     required Widget child,
     Curve? curve,
     Timing? timing,
-    BoxOverflow overflow,
   }) = ResizeActorFactory;
 
   const factory Actor.resizeFractionally({
@@ -117,7 +107,6 @@ abstract class Actor extends Widget {
     required Widget child,
     Curve? curve,
     Timing? timing,
-    BoxOverflow overflow,
   }) = ResizeActorFactory.fractionally;
 
   const factory Actor.blur({
@@ -127,7 +116,6 @@ abstract class Actor extends Widget {
     required Widget child,
     Curve? curve,
     Timing? timing,
-    BoxOverflow overflow,
   }) = BlurActorFactory;
 
   const factory Actor.padding({
@@ -137,7 +125,6 @@ abstract class Actor extends Widget {
     required Widget child,
     Curve? curve,
     Timing? timing,
-    BoxOverflow overflow,
   }) = PaddingActorFactory;
 
   const factory Actor.translate({
@@ -147,7 +134,6 @@ abstract class Actor extends Widget {
     required Widget child,
     Curve? curve,
     Timing? timing,
-    BoxOverflow overflow,
   }) = TranslateActorFactory;
 
   const factory Actor.translateX({
@@ -157,7 +143,6 @@ abstract class Actor extends Widget {
     required Widget child,
     Curve? curve,
     Timing? timing,
-    BoxOverflow overflow,
   }) = TranslateActorFactory.x;
 
   const factory Actor.translateY({
@@ -167,7 +152,6 @@ abstract class Actor extends Widget {
     required Widget child,
     Curve? curve,
     Timing? timing,
-    BoxOverflow overflow,
   }) = TranslateActorFactory.y;
 
   const factory Actor.translateFromGlobal({
@@ -176,7 +160,6 @@ abstract class Actor extends Widget {
     required Widget child,
     Curve? curve,
     Timing? timing,
-    BoxOverflow overflow,
   }) = TranslateActorFactory.fromGlobal;
 
   const factory Actor.clipReveal({
@@ -187,7 +170,6 @@ abstract class Actor extends Widget {
     required Widget child,
     Curve? curve,
     Timing? timing,
-    BoxOverflow overflow,
   }) = ClipRevealActorFactory;
 
   const factory Actor.clipRevealHorizontal({
@@ -198,7 +180,6 @@ abstract class Actor extends Widget {
     required Widget child,
     Curve? curve,
     Timing? timing,
-    BoxOverflow overflow,
   }) = ClipRevealActorFactory.horizontal;
 
   const factory Actor.clipRevealVertical({
@@ -209,7 +190,6 @@ abstract class Actor extends Widget {
     required Widget child,
     Curve? curve,
     Timing? timing,
-    BoxOverflow overflow,
   }) = ClipRevealActorFactory.vertical;
 
   const factory Actor.position({
@@ -219,7 +199,6 @@ abstract class Actor extends Widget {
     required Widget child,
     Curve? curve,
     Timing? timing,
-    BoxOverflow overflow,
   }) = PositionActorFactory;
 
   const factory Actor.textStyle({
@@ -229,7 +208,6 @@ abstract class Actor extends Widget {
     required Widget child,
     Curve? curve,
     Timing? timing,
-    BoxOverflow overflow,
   }) = TextStyleActorFactory;
 
   const factory Actor.iconTheme({
@@ -239,7 +217,6 @@ abstract class Actor extends Widget {
     required Widget child,
     Curve? curve,
     Timing? timing,
-    BoxOverflow overflow,
   }) = IconThemeActorFactory;
 
   const factory Actor.decorate({
@@ -249,7 +226,6 @@ abstract class Actor extends Widget {
     required Widget child,
     Curve? curve,
     Timing? timing,
-    BoxOverflow overflow,
   }) = DecoratedBoxActorFactory;
 
   const factory Actor.color({
@@ -259,7 +235,6 @@ abstract class Actor extends Widget {
     required Widget child,
     Curve? curve,
     Timing? timing,
-    BoxOverflow overflow,
   }) = ColorActorFactory;
 
   factory Actor.lerp({

@@ -18,7 +18,6 @@ class RotateActorFactory extends SingleActProxy {
     this.alignment = Alignment.center,
     super.curve,
     super.timing,
-    super.overflow,
   }) : _rotateAsTurns = false;
 
   const RotateActorFactory.turns({
@@ -29,7 +28,6 @@ class RotateActorFactory extends SingleActProxy {
     this.alignment = Alignment.center,
     super.curve,
     super.timing,
-    super.overflow,
   }) : _rotateAsTurns = true;
 
   @override
@@ -64,7 +62,6 @@ class ScaleActorFactory extends SingleActProxy {
     this.alignment,
     super.curve,
     super.timing,
-    super.overflow,
   });
 
   @override
@@ -96,7 +93,6 @@ class FadeActorFactory extends SingleActProxy {
     required super.child,
     super.curve,
     super.timing,
-    super.overflow,
   });
 
   @override
@@ -130,7 +126,6 @@ class SlideActorFactory extends SingleActProxy {
     required super.child,
     super.curve,
     super.timing,
-    super.overflow,
   }) : _axis = null,
        _axisFrom = null,
        _axisTo = null;
@@ -142,7 +137,6 @@ class SlideActorFactory extends SingleActProxy {
     required super.child,
     super.curve,
     super.timing,
-    super.overflow,
   }) : _axis = Axis.horizontal,
        _axisFrom = from,
        _axisTo = to,
@@ -156,7 +150,6 @@ class SlideActorFactory extends SingleActProxy {
     required super.child,
     super.curve,
     super.timing,
-    super.overflow,
   }) : _axisFrom = from,
        _axisTo = to,
        _axis = Axis.vertical,
@@ -189,7 +182,6 @@ class AlignActorFactory extends SingleActProxy {
     required super.child,
     super.curve,
     super.timing,
-    super.overflow,
   });
 
   @override
@@ -224,7 +216,6 @@ class ResizeActorFactory extends SingleActProxy {
     required super.child,
     super.curve,
     super.timing,
-    super.overflow,
   }) : _resizeFractionally = false;
 
   const ResizeActorFactory.fractionally({
@@ -235,7 +226,6 @@ class ResizeActorFactory extends SingleActProxy {
     required super.child,
     super.curve,
     super.timing,
-    super.overflow,
   }) : _resizeFractionally = true;
 
   @override
@@ -276,7 +266,6 @@ class BlurActorFactory extends SingleActProxy {
     required super.child,
     super.curve,
     super.timing,
-    super.overflow,
   });
 
   @override
@@ -307,7 +296,6 @@ class PaddingActorFactory extends SingleActProxy {
     required super.child,
     super.curve,
     super.timing,
-    super.overflow,
   });
 
   @override
@@ -342,7 +330,6 @@ class ClipRevealActorFactory extends SingleActProxy {
     required super.child,
     super.curve,
     super.timing,
-    super.overflow,
   }) : _axis = null,
        _fromSize = fromSize,
        _fromAxisSize = null,
@@ -356,7 +343,6 @@ class ClipRevealActorFactory extends SingleActProxy {
     required super.child,
     super.curve,
     super.timing,
-    super.overflow,
   }) : _axis = Axis.horizontal,
        _fromAxisSize = from,
        _toAxisSize = to,
@@ -371,7 +357,6 @@ class ClipRevealActorFactory extends SingleActProxy {
     required super.child,
     super.curve,
     super.timing,
-    super.overflow,
   }) : _axis = Axis.vertical,
        _toAxisSize = to,
        _fromAxisSize = from,
@@ -423,7 +408,6 @@ class PositionActorFactory extends SingleActProxy {
     required super.child,
     super.curve,
     super.timing,
-    super.overflow,
   });
 
   @override
@@ -454,14 +438,13 @@ class TextStyleActorFactory extends SingleActProxy {
     required super.child,
     super.curve,
     super.timing,
-    super.overflow,
   });
 
   @override
   Widget build(BuildContext context) {
     return ActorBase(
       acts: [
-        Style.text(
+        TextStyleAct(
           from: from,
           to: to,
           curve: curve,
@@ -485,14 +468,13 @@ class IconThemeActorFactory extends SingleActProxy {
     required super.child,
     super.curve,
     super.timing,
-    super.overflow,
   });
 
   @override
   Widget build(BuildContext context) {
     return ActorBase(
       acts: [
-        Style.iconTheme(
+        IconThemeAct(
           from: from,
           to: to,
           curve: curve,
@@ -516,7 +498,6 @@ class DecoratedBoxActorFactory extends SingleActProxy {
     required super.child,
     super.curve,
     super.timing,
-    super.overflow,
   });
 
   @override
@@ -547,7 +528,6 @@ class ColorActorFactory extends SingleActProxy {
     required super.child,
     super.curve,
     super.timing,
-    super.overflow,
   });
 
   @override
@@ -581,7 +561,6 @@ class TranslateActorFactory extends SingleActProxy {
     required super.child,
     super.curve,
     super.timing,
-    super.overflow,
   }) : _variant = _TranslateVariant.offset,
        _axisFrom = null,
        _axisTo = null;
@@ -593,7 +572,6 @@ class TranslateActorFactory extends SingleActProxy {
     required super.child,
     super.curve,
     super.timing,
-    super.overflow,
   }) : _variant = _TranslateVariant.horizontal,
        _axisFrom = from,
        _axisTo = to,
@@ -607,7 +585,6 @@ class TranslateActorFactory extends SingleActProxy {
     required super.child,
     super.curve,
     super.timing,
-    super.overflow,
   }) : _axisFrom = from,
        _axisTo = to,
        _variant = _TranslateVariant.vertical,
@@ -620,7 +597,6 @@ class TranslateActorFactory extends SingleActProxy {
     required super.child,
     super.curve,
     super.timing,
-    super.overflow,
   }) : _variant = _TranslateVariant.fromGlobal,
        _axisFrom = null,
        _axisTo = null,

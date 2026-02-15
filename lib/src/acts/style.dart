@@ -1,23 +1,7 @@
 part of 'act.dart';
 
-abstract class Style extends Act {
-  const factory Style.text({
-    required TextStyle from,
-    required TextStyle to,
-    Curve? curve,
-    Timing? timing,
-  }) = _TextStyleAct;
-
-  const factory Style.iconTheme({
-    required IconThemeData from,
-    required IconThemeData to,
-    Curve? curve,
-    Timing? timing,
-  }) = _IconThemeAct;
-}
-
-class _TextStyleAct extends TweenAct<TextStyle> implements Style {
-  const _TextStyleAct({
+class TextStyleAct extends TweenAct<TextStyle> {
+  const TextStyleAct({
     required super.from,
     required super.to,
     super.curve,
@@ -25,19 +9,18 @@ class _TextStyleAct extends TweenAct<TextStyle> implements Style {
   });
 
   @override
-  Widget apply(AnimationContext context, Widget child) {
-    final animation = build(
-      context,
-      tweenBuilder: (from, end) {
-        return TextStyleTween(begin: from, end: end);
-      },
-    );
+  Animatable<TextStyle> buildSinglePhaseTween(TextStyle from, TextStyle to) {
+    return TextStyleTween(begin: from, end: to);
+  }
+
+  @override
+  Widget apply(BuildContext context, Animation<TextStyle> animation, Widget child) {
     return DefaultTextStyleTransition(style: animation, child: child);
   }
 }
 
-class _IconThemeAct extends TweenAct<IconThemeData> implements Style {
-  const _IconThemeAct({
+class IconThemeAct extends TweenAct<IconThemeData> {
+  const IconThemeAct({
     required super.from,
     required super.to,
     super.curve,
@@ -45,13 +28,12 @@ class _IconThemeAct extends TweenAct<IconThemeData> implements Style {
   });
 
   @override
-  Widget apply(AnimationContext context, Widget child) {
-    final animation = build(
-      context,
-      tweenBuilder: (from, end) {
-        return _IconThemeDataTween(begin: from, end: end);
-      },
-    );
+  Animatable<IconThemeData> buildSinglePhaseTween(IconThemeData from, IconThemeData to) {
+    return _IconThemeDataTween(begin: from, end: to);
+  }
+
+  @override
+  Widget apply(BuildContext context, Animation<IconThemeData> animation, Widget child) {
     return AnimatedBuilder(
       animation: animation,
       builder: (context, child) {

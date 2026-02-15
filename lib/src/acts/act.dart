@@ -15,7 +15,7 @@ part 'scale.dart';
 part 'fade.dart';
 part 'blur.dart';
 part 'align.dart';
-part 'insets.dart';
+part 'padding.dart';
 part 'style.dart';
 part 'clip_reveal.dart';
 part 'slide.dart';
@@ -32,15 +32,15 @@ abstract class Act {
     this.curve,
   });
 
-  Widget apply(AnimationContext context, Widget child);
+  Animation<Object?> buildAnimation(Animation<double> driver);
+
+  Widget build(BuildContext context, covariant Animation<Object?> animation, Widget child);
 }
 
 abstract class TweenActBase<T extends Object?, R extends Object?> extends Act {
   final T? _from;
   final T? _to;
   final List<Keyframe<T>>? _keyframes;
-
-  R transform(AnimationContext context, T value);
 
   const TweenActBase({
     required T from,
@@ -59,27 +59,43 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends Act {
        _to = null,
        super(timing: null);
 
-  Animatable<R> _defaultTweenBuilder(R from, R to) {
+  @nonVirtual
+  @override
+  Widget build(BuildContext context, covariant Animation<Object> animation, Widget child) {
+    assert(animation is Animation<R>, 'Expected animation of type Animation<$T>, but got ${animation.runtimeType}');
+    return apply(context, animation as Animation<R>, child);
+  }
+
+  Widget apply(BuildContext context, Animation<R> animation, Widget child);
+
+  R transform(T value);
+
+  Animatable<R> buildSinglePhaseTween(R from, R to) {
     return Tween<R>(begin: from, end: to);
   }
 
-  Animation<R> build(AnimationContext context, {TweenBuilder<R>? tweenBuilder}) {
+  @override
+  Animation<R> buildAnimation(Animation<double> driver) {
     final List<Phase<R>> phases;
+    Timing? timing = this.timing;
     if (_keyframes == null) {
       assert(_from != null && _to != null, 'Begin and end values must be provided when not using keyframes');
-      phases = [Phase<R>(begin: transform(context, _from as T), end: transform(context, _to as T), weight: 100)];
+      phases = [Phase<R>(begin: transform(_from as T), end: transform(_to as T), weight: 100)];
     } else {
-      final result = Phase.normalize(_keyframes, (value) => transform(context, value));
+      final result = Phase.normalize(_keyframes, (value) => transform(value));
       phases = result.phases;
       if (result.timing != null) {
-        context = context.copyWith(timing: result.timing);
+        timing = result.timing;
       }
     }
-    return TweenActBase.buildFromPhases<R>(context, phases, tweenBuilder ?? _defaultTweenBuilder);
+    final tween = TweenActBase.buildFromPhases<R>(phases, buildSinglePhaseTween);
+    final effectiveCurve = timing != null
+        ? Interval(timing.start, timing.end, curve: curve ?? Curves.linear)
+        : curve ?? Curves.linear;
+    return driver.drive<R>(tween.chain(CurveTween(curve: effectiveCurve)));
   }
 
-  static Animation<T> buildFromPhases<T extends Object?>(
-    AnimationContext context,
+  static Animatable<T> buildFromPhases<T extends Object?>(
     List<Phase<T>> phases,
     TweenBuilder<T> tweenBuilder,
   ) {
@@ -87,7 +103,7 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends Act {
     if (phases.length == 1) {
       final phase = phases.single;
       if (phase.begin == phase.end) {
-        return AlwaysStoppedAnimation<T>(phase.begin);
+        return ConstantTween<T>(phase.begin);
       }
       tween = tweenBuilder(phase.begin, phase.end);
     } else {
@@ -104,12 +120,7 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends Act {
           ),
       ]);
     }
-    final timing = context.timing;
-    final curve = context.curve;
-    final effectiveCurve = timing != null
-        ? Interval(timing.start, timing.end, curve: curve ?? Curves.linear)
-        : curve ?? Curves.linear;
-    return context.driver.drive(tween.chain(CurveTween(curve: effectiveCurve)));
+    return tween;
   }
 
   @override
@@ -136,7 +147,7 @@ abstract class TweenAct<T extends Object?> extends TweenActBase<T, T> {
   });
 
   @override
-  T transform(AnimationContext context, T value) => value;
+  T transform(T value) => value;
 
   const TweenAct.keyframes(
     super.keyframes, {

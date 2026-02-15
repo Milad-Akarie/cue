@@ -52,9 +52,9 @@ class _SlideAct extends TweenAct<Offset> implements SlideAct {
   }) : super.keyframes();
 
   @override
-  Widget apply(AnimationContext context, Widget child) {
+  Widget apply(BuildContext context, Animation<Offset> animation, Widget child) {
     return SlideTransition(
-      position: build(context),
+      position: animation,
       child: child,
     );
   }
@@ -90,7 +90,7 @@ class _AxisSlideAct extends TweenActBase<double, Offset> implements SlideAct {
        super.keyframes();
 
   @override
-  Offset transform(_, double value) {
+  Offset transform(double value) {
     switch (_axis) {
       case Axis.horizontal:
         return Offset(value, 0);
@@ -100,9 +100,9 @@ class _AxisSlideAct extends TweenActBase<double, Offset> implements SlideAct {
   }
 
   @override
-  Widget apply(AnimationContext context, Widget child) {
+  Widget apply(BuildContext context, Animation<Offset> animation, Widget child) {
     return SlideTransition(
-      position: build(context),
+      position: animation,
       child: child,
     );
   }

@@ -13,9 +13,9 @@ class FadeAct extends TweenAct<double> {
   const FadeAct.keyframes(super.keyframes, {super.curve}) : super.keyframes();
 
   @override
-  Widget apply(AnimationContext context, Widget child) {
+  Widget apply(BuildContext context, Animation<double> animation, Widget child) {
     return FadeTransition(
-      opacity: build(context),
+      opacity: animation,
       child: child,
     );
   }

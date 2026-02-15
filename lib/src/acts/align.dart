@@ -9,13 +9,15 @@ class AlignAct extends TweenAct<AlignmentGeometry?> {
   });
 
   @override
-  Widget apply(AnimationContext ctx, Widget child) {
-    final animation = build(
-      ctx,
-      tweenBuilder: (from, end) {
-        return AlignmentGeometryTween(begin: from, end: end);
-      },
-    );
+  Animatable<AlignmentGeometry?> buildSinglePhaseTween(
+    AlignmentGeometry? from,
+    AlignmentGeometry? to,
+  ) {
+    return AlignmentGeometryTween(begin: from, end: to);
+  }
+
+  @override
+  Widget apply(BuildContext context, Animation<AlignmentGeometry?> animation, Widget child) {
     return AnimatedBuilder(
       animation: animation,
       builder: (context, child) {

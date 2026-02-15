@@ -11,13 +11,12 @@ class PaddingAct extends TweenAct<EdgeInsetsGeometry> {
   const PaddingAct.keyframes(super.keyframes, {super.curve}) : super.keyframes();
 
   @override
-  Widget apply(AnimationContext context, Widget child) {
-    final animation = build(
-      context,
-      tweenBuilder: (from, end) {
-        return EdgeInsetsGeometryTween(begin: from, end: end);
-      },
-    );
+  Animatable<EdgeInsetsGeometry> buildSinglePhaseTween(EdgeInsetsGeometry from, EdgeInsetsGeometry to) {
+    return EdgeInsetsGeometryTween(begin: from, end: to);
+  }
+
+  @override
+  Widget apply(BuildContext context, Animation<EdgeInsetsGeometry> animation, Widget child) {
     return AnimatedBuilder(
       animation: animation,
       builder: (context, child) {

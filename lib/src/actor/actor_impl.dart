@@ -1,12 +1,11 @@
 part of 'actor.dart';
 
 @internal
-class ActorBase extends StatelessWidget implements Actor {
+class ActorBase extends StatefulWidget implements Actor {
   final Curve? curve;
   final Timing? timing;
   final List<Act> acts;
   final Widget child;
-  final BoxOverflow overflow;
 
   const ActorBase({
     super.key,
@@ -14,39 +13,65 @@ class ActorBase extends StatelessWidget implements Actor {
     required this.child,
     this.curve,
     this.timing,
-    this.overflow = const BoxOverflow.none(),
   });
 
   @override
-  Widget build(BuildContext context) {
-    if (acts.isEmpty) return child;
-    final scope = CueScope.of(context);
+  State<ActorBase> createState() => _ActorBaseState();
+}
 
-    Widget current = child;
+class _ActorBaseState extends State<ActorBase> {
+  final _animations = <Act, Animation<Object?>>{};
 
-    if (!overflow.isNone) {
-      final targetSize = LayoutInfoScope.of(context)?.size;
-      if (targetSize != null) {
-        current = OverflowBox(
-          maxWidth: overflow.horizontal ? targetSize.width - overflow.horizontalPadding : null,
-          maxHeight: overflow.vertical ? targetSize.height - overflow.verticalPadding : null,
-          fit: overflow.fit,
-          alignment: overflow.alignment,
-          child: current,
-        );
+  Animation<double>? _cachedDriver;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  void _setupAnimations(Animation<double> driver) {
+    _cachedDriver = driver;
+    print('Setting up animations for ${widget.acts.length} acts');
+
+    _animations.clear();
+    for (final act in widget.acts) {
+      if (!_animations.containsKey(act)) {
+        _animations[act] = act.buildAnimation(driver);
       }
     }
+  }
 
-    for (final effect in acts.reversed) {
-      current = effect.apply(
-        AnimationContext(
-          buildContext: context,
-          driver: scope.animation,
-          timing: effect.timing ?? timing,
-          curve: effect.curve ?? curve,
-        ),
-        current,
-      );
+  @override
+  void didUpdateWidget(covariant ActorBase oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!listEquals(oldWidget.acts, widget.acts) ||
+        oldWidget.curve != widget.curve ||
+        oldWidget.timing != widget.timing) {
+      _setupAnimations(CueScope.of(context).animation);
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final driver = CueScope.of(context).animation;
+    if (_cachedDriver != driver) {
+      _setupAnimations(driver);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.acts.isEmpty) return widget.child;
+    Widget current = widget.child;
+    for (final act in widget.acts.reversed) {
+      if (_animations[act] case final animation?) {
+        current = act.build(context, animation, current);
+      } else {
+        throw StateError(
+          'Animation for act $act not found. This should not happen as animations are set up in initState and didUpdateWidget.',
+        );
+      }
     }
     return current;
   }
@@ -57,14 +82,12 @@ abstract class SingleActProxy extends StatelessWidget implements Actor {
   final Widget child;
   final Curve? curve;
   final Timing? timing;
-  final BoxOverflow overflow;
 
   const SingleActProxy({
     super.key,
     required this.child,
     this.curve,
     this.timing,
-    this.overflow = const BoxOverflow.none(),
   });
 }
 
@@ -138,31 +161,27 @@ class _TweenActorState<T> extends State<TweenActor<T>> {
   }
 
   void _setupAnimation(BuildContext context) {
-    AnimationContext animationContext = AnimationContext(
-      buildContext: context,
-      driver: CueScope.of(context).animation,
-      timing: widget.timing,
-      curve: widget.curve,
-    );
-
+    final driver = CueScope.of(context).animation;
     if (widget._tween case final tween?) {
-      animation = TweenActBase.buildFromPhases<T>(
-        animationContext,
-        [Phase<T>(begin: tween.begin as T, end: tween.end as T, weight: 100)],
-        (_, _) => tween,
-      );
+      animation = tween.animate(driver);
       return;
     }
-
+    Timing? timing = widget.timing;
+    Curve? curve = widget.curve;
     final result = Phase.normalize(widget._keyframes!, (value) => value);
     if (result.timing != null) {
-      animationContext = animationContext.copyWith(timing: result.timing);
+      timing = result.timing;
     }
-    animation = TweenActBase.buildFromPhases<T>(
-      animationContext,
+
+    final seqTween = TweenActBase.buildFromPhases<T>(
       result.phases,
       widget._tweenBuilder ?? (begin, end) => Tween<T>(begin: begin, end: end),
     );
+
+    final effectiveCurve = timing != null
+        ? Interval(timing.start, timing.end, curve: curve ?? Curves.linear)
+        : curve ?? Curves.linear;
+    animation = driver.drive<T>(seqTween.chain(CurveTween(curve: effectiveCurve)));
   }
 
   @override
@@ -187,46 +206,4 @@ extension StaggeredActorExtension on Iterable<Widget> {
         ),
     ];
   }
-}
-
-class BoxOverflow {
-  final bool horizontal;
-  final bool vertical;
-  final OverflowBoxFit fit;
-  final double verticalPadding;
-  final double horizontalPadding;
-  final AlignmentGeometry alignment;
-
-  const BoxOverflow({
-    this.horizontal = true,
-    this.vertical = true,
-    this.fit = OverflowBoxFit.deferToChild,
-    this.alignment = Alignment.center,
-    this.verticalPadding = 0.0,
-    this.horizontalPadding = 0.0,
-  });
-
-  const BoxOverflow.horizontal({this.fit = OverflowBoxFit.deferToChild, this.alignment = .center, double padding = 0.0})
-    : vertical = false,
-      verticalPadding = 0.0,
-      horizontalPadding = padding,
-      horizontal = true;
-
-  const BoxOverflow.vertical({this.fit = OverflowBoxFit.deferToChild, this.alignment = .center, double padding = 0.0})
-    : horizontal = false,
-      horizontalPadding = 0.0,
-      verticalPadding = padding,
-      vertical = true;
-
-  const BoxOverflow.none()
-    : horizontal = false,
-      vertical = false,
-      fit = OverflowBoxFit.deferToChild,
-      verticalPadding = 0.0,
-      horizontalPadding = 0.0,
-      alignment = Alignment.center;
-
-  bool get isNone => !horizontal && !vertical;
-
-  bool get isAll => horizontal && vertical;
 }
