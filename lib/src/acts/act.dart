@@ -61,7 +61,7 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends Act {
 
   @nonVirtual
   @override
-  Widget build(BuildContext context, covariant Animation<Object> animation, Widget child) {
+  Widget build(BuildContext context, covariant Animation<Object?> animation, Widget child) {
     assert(animation is Animation<R>, 'Expected animation of type Animation<$T>, but got ${animation.runtimeType}');
     return apply(context, animation as Animation<R>, child);
   }

@@ -31,8 +31,7 @@ class _ActorBaseState extends State<ActorBase> {
 
   void _setupAnimations(Animation<double> driver) {
     _cachedDriver = driver;
-    print('Setting up animations for ${widget.child.runtimeType} acts');
-
+    // print('Setting up animations for ${widget.child.runtimeType} acts');
     _animations.clear();
     for (final act in widget.acts) {
       if (!_animations.containsKey(act)) {
@@ -143,10 +142,14 @@ class _LerpDoubleTweenActor extends TweenActor<double> implements Actor {
 class _TweenActorState<T> extends State<TweenActor<T>> {
   late Animation<T> animation;
 
+  Animation<double>? _cachedDriver;
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _setupAnimation(context);
+    final driver = CueScope.of(context).animation;
+    if (_cachedDriver != driver) {
+      _setupAnimation(driver);
+    }
   }
 
   @override
@@ -156,32 +159,34 @@ class _TweenActorState<T> extends State<TweenActor<T>> {
         oldWidget.curve != widget.curve ||
         oldWidget.timing != widget.timing ||
         listEquals(widget._keyframes, oldWidget._keyframes)) {
-      _setupAnimation(context);
+      _setupAnimation(CueScope.of(context).animation);
     }
   }
 
-  void _setupAnimation(BuildContext context) {
-    final driver = CueScope.of(context).animation;
-    if (widget._tween case final tween?) {
-      animation = tween.animate(driver);
-      return;
-    }
+  void _setupAnimation(Animation<double> driver) {
+    _cachedDriver = driver;
     Timing? timing = widget.timing;
     Curve? curve = widget.curve;
-    final result = Phase.normalize(widget._keyframes!, (value) => value);
-    if (result.timing != null) {
-      timing = result.timing;
+
+    Animatable<T> effectiveTween;
+    if (widget._tween case final tween?) {
+      effectiveTween = tween;
+    } else {
+      final result = Phase.normalize(widget._keyframes!, (value) => value);
+      if (result.timing != null) {
+        timing = result.timing;
+      }
+      effectiveTween = TweenActBase.buildFromPhases<T>(
+        result.phases,
+        widget._tweenBuilder ?? (begin, end) => Tween<T>(begin: begin, end: end),
+      );
     }
-
-    final seqTween = TweenActBase.buildFromPhases<T>(
-      result.phases,
-      widget._tweenBuilder ?? (begin, end) => Tween<T>(begin: begin, end: end),
-    );
-
     final effectiveCurve = timing != null
         ? Interval(timing.start, timing.end, curve: curve ?? Curves.linear)
         : curve ?? Curves.linear;
-    animation = driver.drive<T>(seqTween.chain(CurveTween(curve: effectiveCurve)));
+
+    print(effectiveCurve);
+    animation = driver.drive<T>(effectiveTween.chain(CurveTween(curve: effectiveCurve)));
   }
 
   @override
@@ -189,7 +194,11 @@ class _TweenActorState<T> extends State<TweenActor<T>> {
     return AnimatedBuilder(
       animation: animation,
       builder: (context, child) {
-        return widget.builder(context, animation.value, widget.child);
+        return widget.builder(
+          context,
+          animation.value,
+          widget.child,
+        );
       },
     );
   }

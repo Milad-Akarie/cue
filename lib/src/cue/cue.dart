@@ -3,10 +3,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 abstract class Cue extends StatefulWidget {
-  const Cue._({super.key, required this.child, this.curve = Curves.linear, this.debug = false, this.acts});
+  const Cue._({super.key, required this.child, this.curve, this.debug = false, this.acts});
 
   final bool debug;
-  final Curve curve;
+  final Curve? curve;
   final Widget child;
   final List<Act>? acts;
 
@@ -206,7 +206,7 @@ class _SelfAnimatedCue extends Cue {
 
 class _SelfAnimatedCueState extends _SelfAnimatedState<_SelfAnimatedCue> {
   @override
-  Curve get curve => widget.curve;
+  Curve? get curve => widget.curve;
 
   @override
   Duration get duration => widget.duration;
@@ -245,7 +245,7 @@ abstract class _SelfAnimatedState<T extends Cue> extends _CueState<T> with Singl
 
   Animation<double> get animation => _animation;
 
-  Curve get curve;
+  Curve? get curve;
 
   SimulationBuilder? get simulation => null;
 
@@ -257,8 +257,16 @@ abstract class _SelfAnimatedState<T extends Cue> extends _CueState<T> with Singl
   void initState() {
     super.initState();
     controller = AnimationController(vsync: this, duration: duration, reverseDuration: reverseDuration);
-    _animation = CurvedAnimation(parent: controller, curve: curve);
+    _buildAnimation();
     onControllerReady();
+  }
+
+  void _buildAnimation() {
+    if (curve case final curve?) {
+      _animation = CurvedAnimation(parent: controller, curve: curve);
+    } else {
+      _animation = controller.view;
+    }
   }
 
   @override
@@ -275,7 +283,7 @@ abstract class _SelfAnimatedState<T extends Cue> extends _CueState<T> with Singl
     }
     if (curve != oldWidget.curve) {
       controller.reset();
-      _animation = CurvedAnimation(parent: controller, curve: curve);
+      _buildAnimation();
       needsReset = true;
     }
     if (needsReset) {
@@ -361,7 +369,7 @@ class _OnHoverCue extends Cue {
 
 class _OnHoverStageState extends _SelfAnimatedState<_OnHoverCue> {
   @override
-  Curve get curve => widget.curve;
+  Curve? get curve => widget.curve;
 
   @override
   Duration get duration => widget.duration;
@@ -413,7 +421,7 @@ class _TogglableCue extends Cue {
 
 class _ToggledStageState extends _SelfAnimatedState<_TogglableCue> {
   @override
-  Curve get curve => widget.curve;
+  Curve? get curve => widget.curve;
 
   @override
   Duration get duration => widget.duration;
@@ -451,13 +459,13 @@ class _ToggledStageState extends _SelfAnimatedState<_TogglableCue> {
       if (simulation != null) {
         controller.animateWith(simulation!(true));
       } else {
-        controller.forward();
+        controller.forward(from: 0.0);
       }
     } else {
       if (simulation != null) {
         controller.animateBackWith(simulation!(false));
       } else {
-        controller.reverse(from: 1);
+        controller.reverse(from: 1.0);
       }
     }
   }
