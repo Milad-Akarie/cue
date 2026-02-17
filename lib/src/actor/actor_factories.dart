@@ -544,6 +544,7 @@ class ClipActor extends SingleEffectProxy {
 class PositionActor extends SingleEffectProxy {
   final Position from;
   final Position to;
+  final bool _relative;
 
   const PositionActor({
     super.key,
@@ -552,15 +553,25 @@ class PositionActor extends SingleEffectProxy {
     required super.child,
     super.curve,
     super.timing,
-  });
+  }) : _relative = false;
+
+  const PositionActor.relative({
+    super.key,
+    required this.from,
+    required this.to,
+    required super.child,
+    super.curve,
+    super.timing,
+  }) : _relative = true;
 
   @override
   Widget build(BuildContext context) {
     return Actor(
       effects: [
-        PositionEffect(
+        PositionEffect.internal(
           from: from,
           to: to,
+          relative: _relative,
           curve: curve,
           timing: timing,
         ),
