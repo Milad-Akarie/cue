@@ -42,7 +42,34 @@ class SizeEffect extends TweenEffect<double> {
     /// The actual size tween will be built in the RenderObject
     /// where we have access to the constraints so we can normalize sizes properly.
     /// Here we just return the driver animation
-    return driver;
+    ///
+    /// we only apply the curve and timing to the driver, which will be used in the RenderObject to build the size animation.
+    Timing? effectiveTiming = timing ?? defaultTiming;
+    if (_keyframes != null) {
+      double minStart = 0;
+      double maxEnd = 1;
+
+      for (final keyframe in _keyframes) {
+        if (keyframe.at < minStart) minStart = keyframe.at;
+        if (keyframe.at > maxEnd) maxEnd = keyframe.at;
+      }
+      if (minStart != 0 || maxEnd != 1) {
+        effectiveTiming = Timing(start: minStart, end: maxEnd);
+      }
+    }
+    final effectiveCurve = curve ?? defaultCurve ?? Curves.linear;
+    if (effectiveTiming != null) {
+      return driver.drive(
+        CurveTween(
+          curve: Interval(
+            effectiveTiming.start,
+            effectiveTiming.end,
+            curve: effectiveCurve,
+          ),
+        ),
+      );
+    }
+    return driver.drive(CurveTween(curve: effectiveCurve));
   }
 
   @override
@@ -56,8 +83,6 @@ class SizeEffect extends TweenEffect<double> {
       fromSize: _fromSize,
       toSize: _toSize,
       sizeKeyframes: _sizeKeyframes,
-      curve: curve,
-      timing: timing,
       alignment: alignment ?? Alignment.center,
       clipBehavior: clipBehavior,
       allowOverflow: allowOverflow,
@@ -106,8 +131,6 @@ class _AnimatedSize extends SingleChildRenderObjectWidget {
     required this.fromSize,
     required this.toSize,
     required this.sizeKeyframes,
-    required this.curve,
-    required this.timing,
     this.alignment = Alignment.center,
     this.clipBehavior = Clip.hardEdge,
     this.allowOverflow = true,
@@ -118,8 +141,6 @@ class _AnimatedSize extends SingleChildRenderObjectWidget {
   final Size? fromSize;
   final Size? toSize;
   final List<Keyframe<Size?>>? sizeKeyframes;
-  final Curve? curve;
-  final Timing? timing;
   final AlignmentGeometry alignment;
   final Clip clipBehavior;
   final bool allowOverflow;
@@ -131,8 +152,6 @@ class _AnimatedSize extends SingleChildRenderObjectWidget {
       fromSize: fromSize,
       toSize: toSize,
       sizeKeyframes: sizeKeyframes,
-      curve: curve,
-      timing: timing,
       alignment: alignment,
       textDirection: Directionality.maybeOf(context),
       clipBehavior: clipBehavior,
@@ -150,8 +169,6 @@ class _AnimatedSize extends SingleChildRenderObjectWidget {
       ..fromSize = fromSize
       ..toSize = toSize
       ..sizeKeyframes = sizeKeyframes
-      ..curve = curve
-      ..timing = timing
       ..alignment = alignment
       ..textDirection = Directionality.maybeOf(context)
       ..clipBehavior = clipBehavior
@@ -165,8 +182,6 @@ class _RenderAnimatedSize extends RenderAligningShiftedBox {
     required Size? fromSize,
     required Size? toSize,
     required List<Keyframe<Size?>>? sizeKeyframes,
-    required Curve? curve,
-    required Timing? timing,
     super.alignment,
     super.textDirection,
     Clip clipBehavior = Clip.hardEdge,
@@ -175,8 +190,6 @@ class _RenderAnimatedSize extends RenderAligningShiftedBox {
        _fromSize = fromSize,
        _toSize = toSize,
        _sizeKeyframes = sizeKeyframes,
-       _curve = curve,
-       _timing = timing,
        _clipBehavior = clipBehavior,
        _allowOverflow = allowOverflow;
 
@@ -264,8 +277,7 @@ class _RenderAnimatedSize extends RenderAligningShiftedBox {
     markNeedsLayout();
   }
 
-  final LayerHandle<ClipRectLayer> _clipRectLayer =
-      LayerHandle<ClipRectLayer>();
+  final LayerHandle<ClipRectLayer> _clipRectLayer = LayerHandle<ClipRectLayer>();
 
   // Cached animation and related state
   Animation<Size?>? _sizeAnimation;
@@ -346,31 +358,15 @@ class _RenderAnimatedSize extends RenderAligningShiftedBox {
     _sizeAnimation?.removeListener(_onAnimationUpdate);
 
     // Build phases with normalized sizes
-    Timing? effectiveTiming = _timing;
     final result = _buildPhases(constraintSize);
-    if (result.timing != null) {
-      effectiveTiming = result.timing;
-    }
-
     // Build the tween from phases
     final tween = TweenEffectBase.buildFromPhases<Size?>(
       result.phases,
       (begin, end) => SizeTween(begin: begin, end: end),
     );
 
-    // Apply timing and curve
-    final effectiveCurve = effectiveTiming != null
-        ? Interval(
-            effectiveTiming.start,
-            effectiveTiming.end,
-            curve: _curve ?? Curves.linear,
-          )
-        : _curve ?? Curves.linear;
-
     // Build and cache the animation
-    _sizeAnimation = _driver.drive<Size?>(
-      tween.chain(CurveTween(curve: effectiveCurve)),
-    );
+    _sizeAnimation = _driver.drive<Size?>(tween);
     _cachedMaxSize = _calculateMaxSize(result.phases);
     _lastConstraintSize = constraintSize;
 
@@ -428,8 +424,7 @@ class _RenderAnimatedSize extends RenderAligningShiftedBox {
       alignChild();
 
       // Check if child is larger than our animated size (causes overflow)
-      if (constrainedMaxSize.width > size.width ||
-          constrainedMaxSize.height > size.height) {
+      if (constrainedMaxSize.width > size.width || constrainedMaxSize.height > size.height) {
         _hasVisualOverflow = true;
       }
     } else {

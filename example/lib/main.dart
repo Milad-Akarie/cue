@@ -1,5 +1,4 @@
 import 'package:cue/cue.dart';
-import 'package:example/examples/three_dots_action.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -51,22 +50,20 @@ class _DemoPageState extends State<DemoPage> with SingleTickerProviderStateMixin
           color: Colors.red,
           child: Cue.onMount(
             debug: true,
-            child: RotateActor.flipY(
-              child: ColorActor(
-                from: Colors.blue,
-                to: Colors.green,
-                timing: .switchAt(.5),
-                child: SizedBox(
-                  width: 200,
-                  height: 100,
-                  child: Center(
-                    child: Text(
-                      'Hello Cue!',
-                      style: theme.textTheme.headlineMedium?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+            child: SizeActor.width(
+              from: 100,
+              to: 300,
+              allowOverflow: true,
+              clipBehavior: Clip.none,
+              fixedHeight: 200,
+              curve: Curves.bounceOut,
+              timing: Timing(start: .2, end: .8),
+              child: Center(
+                child: Text(
+                  'Hello Cue!',
+                  style: theme.textTheme.headlineMedium?.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),

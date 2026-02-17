@@ -257,13 +257,15 @@ class SizeActor extends SingleEffectProxy {
   final Axis? _axis;
   final double? _axisFrom;
   final double? _axisTo;
-
+  final double? _fixedCrossAxisSize;
+  final Clip clipBehavior;
   const SizeActor({
     super.key,
     required Size from,
     required Size to,
     this.alignment = Alignment.center,
     this.allowOverflow = false,
+    this.clipBehavior = Clip.hardEdge,
     required super.child,
     super.curve,
     super.timing,
@@ -271,14 +273,17 @@ class SizeActor extends SingleEffectProxy {
        _to = to,
        _axis = null,
        _axisFrom = null,
-       _axisTo = null;
+       _axisTo = null,
+       _fixedCrossAxisSize = null;
 
   const SizeActor.width({
     super.key,
     required double from,
     required double to,
+    double? fixedHeight,
     this.alignment = Alignment.center,
     this.allowOverflow = false,
+    this.clipBehavior = Clip.hardEdge,
     required super.child,
     super.curve,
     super.timing,
@@ -286,12 +291,15 @@ class SizeActor extends SingleEffectProxy {
        _axisFrom = from,
        _axisTo = to,
        _from = null,
-       _to = null;
+       _to = null,
+       _fixedCrossAxisSize = fixedHeight;
 
   const SizeActor.height({
     super.key,
     required double from,
     required double to,
+    double? fixedWidth,
+    this.clipBehavior = Clip.hardEdge,
     this.alignment = Alignment.center,
     this.allowOverflow = false,
     required super.child,
@@ -301,7 +309,8 @@ class SizeActor extends SingleEffectProxy {
        _axisFrom = from,
        _axisTo = to,
        _from = null,
-       _to = null;
+       _to = null,
+       _fixedCrossAxisSize = fixedWidth;
 
   @override
   Widget build(BuildContext context) {
@@ -309,12 +318,12 @@ class SizeActor extends SingleEffectProxy {
     Size? to = _to;
     if (_axis != null) {
       from = switch (_axis) {
-        Axis.horizontal => Size(_axisFrom!, double.infinity),
-        Axis.vertical => Size(double.infinity, _axisFrom!),
+        Axis.horizontal => Size(_axisFrom!, _fixedCrossAxisSize ?? double.infinity),
+        Axis.vertical => Size(_fixedCrossAxisSize ?? double.infinity, _axisFrom!),
       };
       to = switch (_axis) {
-        Axis.horizontal => Size(_axisTo!, double.infinity),
-        Axis.vertical => Size(double.infinity, _axisTo!),
+        Axis.horizontal => Size(_axisTo!, _fixedCrossAxisSize ?? double.infinity),
+        Axis.vertical => Size(_fixedCrossAxisSize ?? double.infinity, _axisTo!),
       };
     }
     return Actor(
@@ -325,6 +334,7 @@ class SizeActor extends SingleEffectProxy {
           alignment: alignment,
           curve: curve,
           timing: timing,
+          clipBehavior: clipBehavior,
           allowOverflow: allowOverflow,
         ),
       ],
