@@ -1,9 +1,11 @@
 export 'src/widgets/model_transition.dart';
 export 'src/cue/cue.dart';
 export 'src/core/core.dart';
+export 'src/core/cue_animation.dart';
 export 'src/core/phase.dart';
 export 'src/cue/cue_debug_provider.dart';
-export 'src/helpers/spring.dart';
+export 'src/simulation/cue_simulation.dart';
+export 'src/simulation/spring.dart';
 export 'src/acts/act.dart';
 export 'src/actor/actor.dart';
 export 'src/actor/actor_factories.dart';

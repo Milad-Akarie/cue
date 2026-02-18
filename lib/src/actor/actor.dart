@@ -21,7 +21,7 @@ class Actor extends StatefulWidget {
 }
 
 class _ActorState extends State<Actor> {
-  final _animations = <Effect, Animation<Object?>>{};
+  final _animations = <Effect, CueAnimation<Object?>>{};
 
   Animation<double>? _cachedDriver;
 
@@ -184,6 +184,7 @@ class _TweenActorState<T> extends State<TweenActor<T>> {
       effectiveTween = tween;
     } else {
       final result = Phase.normalize(widget._keyframes!, (value) => value);
+
       if (result.timing != null) {
         timing = result.timing;
       }
@@ -192,6 +193,12 @@ class _TweenActorState<T> extends State<TweenActor<T>> {
         widget._tweenBuilder ?? (begin, end) => Tween<T>(begin: begin, end: end),
       );
     }
+
+    if (timing == null && curve == null) {
+      animation = driver.drive<T>(effectiveTween);
+      return;
+    }
+
     final effectiveCurve = timing != null
         ? Interval(timing.start, timing.end, curve: curve ?? Curves.linear)
         : curve ?? Curves.linear;

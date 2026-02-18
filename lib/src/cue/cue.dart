@@ -16,6 +16,15 @@ abstract class Cue extends StatefulWidget {
   final Widget child;
   final List<Effect>? effects;
 
+  const factory Cue({
+    Key? key,
+    required Widget child,
+    Curve curve,
+    bool debug,
+    List<Effect>? effects,
+    required Animation<double> animation,
+  }) = _ControlledCue;
+
   const factory Cue.onTransition({
     Key? key,
     required Widget child,
@@ -32,7 +41,7 @@ abstract class Cue extends StatefulWidget {
     List<Effect>? effects,
     Duration duration,
     Duration? reverseDuration,
-    SimulationBuilder? simulation,
+    CueSimulation? simulation,
     Duration? delay,
     bool loop,
     bool reverseOnLoop,
@@ -45,20 +54,11 @@ abstract class Cue extends StatefulWidget {
     bool debug,
     List<Effect>? effects,
     Duration duration,
-    SimulationBuilder? simulation,
+    CueSimulation? simulation,
     Duration? reverseDuration,
     MouseCursor cursor,
     bool opaque,
   }) = _OnHoverCue;
-
-  const factory Cue({
-    Key? key,
-    required Widget child,
-    Curve curve,
-    bool debug,
-    List<Effect>? effects,
-    required Animation<double> animation,
-  }) = _ControlledCue;
 
   const factory Cue.onToggle({
     Key? key,
@@ -68,7 +68,7 @@ abstract class Cue extends StatefulWidget {
     List<Effect>? effects,
     Duration duration,
     Duration? reverseDuration,
-    SimulationBuilder? simulation,
+    CueSimulation? simulation,
     required bool toggled,
     bool skipFirstAnimation,
   }) = _TogglableCue;
@@ -205,7 +205,8 @@ class _SelfAnimatedCue extends Cue {
     this.reverseOnLoop = false,
     this.delay,
   }) : super._();
-  final SimulationBuilder? simulation;
+
+  final CueSimulation? simulation;
   final Duration duration;
   final Duration? reverseDuration;
   final Duration? delay;
@@ -213,7 +214,7 @@ class _SelfAnimatedCue extends Cue {
   final bool reverseOnLoop;
 
   @override
-  State<Cue> createState() => _SelfAnimatedCueState();
+  State<StatefulWidget> createState() => _SelfAnimatedCueState();
 }
 
 class _SelfAnimatedCueState extends _SelfAnimatedState<_SelfAnimatedCue> {
@@ -227,7 +228,7 @@ class _SelfAnimatedCueState extends _SelfAnimatedState<_SelfAnimatedCue> {
   Duration? get reverseDuration => widget.reverseDuration;
 
   @override
-  SimulationBuilder? get simulation => widget.simulation;
+  CueSimulation? get simulation => widget.simulation;
 
   @override
   void onControllerReady() async {
@@ -250,31 +251,43 @@ class _SelfAnimatedCueState extends _SelfAnimatedState<_SelfAnimatedCue> {
   }
 }
 
-abstract class _SelfAnimatedState<T extends Cue> extends _CueState<T> with SingleTickerProviderStateMixin {
-  late final AnimationController controller;
+abstract class _SelfAnimatedState<T extends _SelfAnimatedCue> extends _CueState<T> with TickerProviderStateMixin {
+  late AnimationController controller;
   Animation<double> _animation = const AlwaysStoppedAnimation(0.0);
   AnimationStatusListener? _statusListener;
 
   Animation<double> get animation => _animation;
 
-  Curve? get curve;
+  Curve? get curve => widget.curve;
 
-  SimulationBuilder? get simulation => null;
+  Duration get duration => widget.duration;
 
-  Duration get duration;
+  Duration? get reverseDuration => widget.reverseDuration;
 
-  Duration? get reverseDuration => null;
+  CueSimulation? get simulation => widget.simulation;
 
   @override
   void initState() {
     super.initState();
-    controller = AnimationController(
-      vsync: this,
-      duration: duration,
-      reverseDuration: reverseDuration,
-    );
+    _createController();
     _buildAnimation();
     onControllerReady();
+  }
+
+  void _createController() {
+    if (simulation == null) {
+      controller = AnimationController(
+        vsync: this,
+        duration: duration,
+        reverseDuration: reverseDuration,
+        debugLabel: 'Cue Controller',
+      );
+    } else {
+      controller = AnimationController.unbounded(
+        vsync: this,
+        debugLabel: 'Unbounded Cue Controller',
+      );
+    }
   }
 
   void _buildAnimation() {
@@ -286,7 +299,8 @@ abstract class _SelfAnimatedState<T extends Cue> extends _CueState<T> with Singl
   }
 
   Simulation _createSimulation(bool forward) {
-    return simulation!(
+    assert(simulation != null, 'Simulation must be provided to use simulation-based animation.');
+    return simulation!.build(
       SimulationBuildData(
         velocity: controller.velocity,
         forward: forward,
@@ -296,14 +310,14 @@ abstract class _SelfAnimatedState<T extends Cue> extends _CueState<T> with Singl
   }
 
   @override
-  void didUpdateWidget(covariant Cue oldWidget) {
+  void didUpdateWidget(covariant _SelfAnimatedCue oldWidget) {
     super.didUpdateWidget(oldWidget);
     bool needsReset = false;
-    if (duration != controller.duration) {
+    if (duration != oldWidget.duration) {
       controller.duration = duration;
       needsReset = true;
     }
-    if (reverseDuration != controller.reverseDuration) {
+    if (reverseDuration != oldWidget.reverseDuration) {
       controller.reverseDuration = reverseDuration;
       needsReset = true;
     }
@@ -312,6 +326,14 @@ abstract class _SelfAnimatedState<T extends Cue> extends _CueState<T> with Singl
       _buildAnimation();
       needsReset = true;
     }
+    if (simulation != oldWidget.simulation) {
+      controller.stop();
+      controller.dispose();
+      _createController();
+      _buildAnimation();
+      needsReset = true;
+    }
+
     if (needsReset) {
       onControllerReady();
     }
@@ -341,7 +363,7 @@ abstract class _SelfAnimatedState<T extends Cue> extends _CueState<T> with Singl
   }
 
   void _loopWithSimulation(
-    SimulationBuilder simulation, {
+    CueSimulation simulation, {
     bool reverseOnLoop = false,
   }) {
     if (_statusListener != null) {
@@ -372,23 +394,20 @@ abstract class _SelfAnimatedState<T extends Cue> extends _CueState<T> with Singl
   }
 }
 
-class _OnHoverCue extends Cue {
+class _OnHoverCue extends _SelfAnimatedCue {
   const _OnHoverCue({
     super.key,
     required super.child,
     super.curve,
     super.debug,
     super.effects,
-    this.simulation,
-    this.duration = const Duration(milliseconds: 200),
-    this.reverseDuration,
+    super.simulation,
+    super.duration = const Duration(milliseconds: 200),
+    super.reverseDuration,
     this.cursor = MouseCursor.defer,
     this.opaque = false,
-  }) : super._();
+  }) : super();
 
-  final SimulationBuilder? simulation;
-  final Duration duration;
-  final Duration? reverseDuration;
   final MouseCursor cursor;
   final bool opaque;
 
@@ -397,18 +416,6 @@ class _OnHoverCue extends Cue {
 }
 
 class _OnHoverStageState extends _SelfAnimatedState<_OnHoverCue> {
-  @override
-  Curve? get curve => widget.curve;
-
-  @override
-  Duration get duration => widget.duration;
-
-  @override
-  Duration? get reverseDuration => widget.reverseDuration;
-
-  @override
-  SimulationBuilder? get simulation => widget.simulation;
-
   @override
   Animation<double> getAnimation(BuildContext context) => animation;
 
@@ -424,23 +431,20 @@ class _OnHoverStageState extends _SelfAnimatedState<_OnHoverCue> {
   }
 }
 
-class _TogglableCue extends Cue {
+class _TogglableCue extends _SelfAnimatedCue {
   const _TogglableCue({
     super.key,
     required super.child,
     super.curve,
     super.debug,
     super.effects,
-    this.simulation,
-    this.duration = const Duration(milliseconds: 300),
-    this.reverseDuration,
+    super.simulation,
+    super.duration = const Duration(milliseconds: 300),
+    super.reverseDuration,
     required this.toggled,
     this.skipFirstAnimation = true,
-  }) : super._();
+  }) : super();
 
-  final SimulationBuilder? simulation;
-  final Duration duration;
-  final Duration? reverseDuration;
   final bool toggled;
   final bool skipFirstAnimation;
 
@@ -459,7 +463,7 @@ class _ToggledStageState extends _SelfAnimatedState<_TogglableCue> {
   Duration? get reverseDuration => widget.reverseDuration;
 
   @override
-  SimulationBuilder? get simulation => widget.simulation;
+  CueSimulation? get simulation => widget.simulation;
 
   @override
   Animation<double> getAnimation(BuildContext context) => animation;

@@ -6,36 +6,23 @@ class ScaleEffect extends TweenEffect<double> {
     super.to = 1.0,
     super.curve,
     super.timing,
+    super.reverse,
     this.alignment,
   });
 
   final AlignmentGeometry? alignment;
 
-  const ScaleEffect.up({
-    super.from = 0.0,
+  const ScaleEffect.keyframes(
+    super.keyframes, {
     super.curve,
-    super.timing,
+    super.reverseKeyframes,
     this.alignment,
-  }) : super(to: 1.0);
-
-  const ScaleEffect.down({
-    super.to = 0.0,
-    super.curve,
-    super.timing,
-    this.alignment,
-  }) : super(from: 1.0);
-
-  const ScaleEffect.keyframes(super.keyframes, {super.curve, this.alignment})
-    : super.keyframes();
+  }) : super.keyframes();
 
   @override
-  Widget apply(
-    BuildContext context,
-    Animation<double> animation,
-    Widget child,
-  ) {
-    final effectiveAlignment =
-        alignment?.resolve(Directionality.maybeOf(context)) ?? Alignment.center;
+  Widget apply(BuildContext context, Animation<double> animation, Widget child) {
+    final directionality = Directionality.maybeOf(context);
+    final effectiveAlignment = alignment?.resolve(directionality) ?? Alignment.center;
     return ScaleTransition(
       scale: animation,
       alignment: effectiveAlignment,

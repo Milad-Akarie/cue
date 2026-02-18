@@ -7,16 +7,10 @@ class ThreeDotsAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ModalTransition(
-      showDebug: true,
+      // showDebug: true,
       barrierColor: Colors.black12,
       alignment: Alignment.bottomCenter,
-      simulation: (data) {
-        return Spring.iosDefault(
-          start: data.progress,
-          end: data.end,
-          velocity: data.velocity,
-        );
-      },
+      simulation: const Spring.bouncy(),
       triggerBuilder: (context, showModal) => FloatingActionButton(
         shape: CircleBorder(),
         heroTag: null,
@@ -79,7 +73,6 @@ class ThreeDotsAction extends StatelessWidget {
                           onPressed: () {},
                           child: Actor(
                             effects: [
-                              ClipEffect(borderRadius: .circular(5), alignment: .center),
                               BlurEffect(from: 8),
                               FadeEffect(),
                             ],

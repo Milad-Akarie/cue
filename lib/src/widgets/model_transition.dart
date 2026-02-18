@@ -5,8 +5,7 @@ import 'package:flutter/material.dart';
 @optionalTypeArgs
 typedef ShowModalFunction<T extends Object> = Future<T?> Function();
 
-typedef ModalContentBuilder =
-    Widget Function(BuildContext context, Rect triggerRect);
+typedef ModalContentBuilder = Widget Function(BuildContext context, Rect triggerRect);
 
 class ModalTransition extends StatefulWidget {
   const ModalTransition({
@@ -24,14 +23,13 @@ class ModalTransition extends StatefulWidget {
 
   final Duration duration;
   final ModalContentBuilder builder;
-  final Widget Function(BuildContext context, ShowModalFunction showDialog)
-  triggerBuilder;
+  final Widget Function(BuildContext context, ShowModalFunction showDialog) triggerBuilder;
   final AlignmentGeometry? alignment;
   final bool showDebug;
   final Widget? backdrop;
   final bool barrierDismissible;
   final Color? barrierColor;
-  final SimulationBuilder? simulation;
+  final CueSimulation? simulation;
 
   @override
   State<ModalTransition> createState() => _ModalTransitionState();
@@ -80,8 +78,7 @@ class _ModalTransitionState extends State<ModalTransition> {
 
   @optionalTypeArgs
   Future<T?> _showModel<T extends Object>() {
-    final renderBox =
-        _triggerKey.currentContext?.findRenderObject() as RenderBox?;
+    final renderBox = _triggerKey.currentContext?.findRenderObject() as RenderBox?;
     final triggerOffset = renderBox?.localToGlobal(Offset.zero) ?? Offset.zero;
     final triggerRect = triggerOffset & (renderBox?.size ?? Size.zero);
     final model = _ModalRoute<T>(
@@ -91,9 +88,9 @@ class _ModalTransitionState extends State<ModalTransition> {
       transitionDuration: widget.duration,
       transitionBuilder: (context, _, _, child) => child,
       simulation: widget.simulation,
-      pageBuilder: (context, animation, _) {
+      pageBuilder: (context, _, _) {
         return _ModelContent(
-          animation: animation,
+          animation: _transitionAnimation,
           backdrop: widget.backdrop,
           alignment: widget.alignment,
           builder: (context, rect) {
@@ -204,8 +201,7 @@ class _ModalPositionDelegate extends SingleChildLayoutDelegate {
 
   @override
   bool shouldRelayout(_ModalPositionDelegate oldDelegate) {
-    return triggerRect != oldDelegate.triggerRect ||
-        alignment != oldDelegate.alignment;
+    return triggerRect != oldDelegate.triggerRect || alignment != oldDelegate.alignment;
   }
 }
 
@@ -221,12 +217,17 @@ class _ModalRoute<T extends Object> extends RawDialogRoute<T> {
     this.simulation,
   });
 
-  final SimulationBuilder? simulation;
+  final CueSimulation? simulation;
   final ValueChanged<AnimationController> onAnimationControllerReady;
 
   @override
   AnimationController createAnimationController() {
-    final ctrl = super.createAnimationController();
+    final AnimationController ctrl;
+    if (simulation == null) {
+      ctrl = super.createAnimationController();
+    } else {
+      ctrl = AnimationController.unbounded(vsync: navigator!);
+    }
     onAnimationControllerReady(ctrl);
     return ctrl;
   }
@@ -234,7 +235,7 @@ class _ModalRoute<T extends Object> extends RawDialogRoute<T> {
   @override
   Simulation? createSimulation({required bool forward}) {
     if (simulation case final simulation?) {
-      return simulation(
+      return simulation.build(
         SimulationBuildData(
           velocity: controller?.velocity,
           forward: forward,
@@ -243,5 +244,43 @@ class _ModalRoute<T extends Object> extends RawDialogRoute<T> {
       );
     }
     return super.createSimulation(forward: forward);
+  }
+
+  @override
+  Animation<double>? get animation {
+    return ClampingAnimation(super.animation as ProxyAnimation, 0.0, 1.0);
+  }
+}
+
+class ClampingAnimation extends ProxyAnimation {
+  ClampingAnimation(this.orgin, this.min, this.max);
+  final ProxyAnimation orgin;
+
+  @override
+  Animation<double> get parent => orgin.parent!;
+  final double min;
+  final double max;
+
+  @override
+  double get value => parent.value.clamp(min, max);
+
+  @override
+  void addListener(VoidCallback listener) {
+    parent.addListener(listener);
+  }
+
+  @override
+  void removeListener(VoidCallback listener) {
+    parent.removeListener(listener);
+  }
+
+  @override
+  void addStatusListener(AnimationStatusListener listener) {
+    parent.addStatusListener(listener);
+  }
+
+  @override
+  void removeStatusListener(AnimationStatusListener listener) {
+    parent.removeStatusListener(listener);
   }
 }

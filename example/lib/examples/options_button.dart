@@ -10,13 +10,7 @@ class OptionsButton extends StatelessWidget {
     return ModalTransition(
       barrierColor: Colors.transparent,
       alignment: Alignment.center,
-      simulation: (data) {
-        return Spring.smooth(
-          start: data.progress,
-          end: data.end,
-          velocity: data.velocity,
-        );
-      },
+      simulation: const Spring.smooth(),
       duration: Duration(milliseconds: 300),
       triggerBuilder: (context, showModal) {
         return ElevatedButton(

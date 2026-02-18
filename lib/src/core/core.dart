@@ -1,7 +1,3 @@
-import 'package:flutter/material.dart';
-
-typedef SimulationBuilder = Simulation Function(SimulationBuildData data);
-
 class Timing {
   final double start;
   final double end;
@@ -14,11 +10,12 @@ class Timing {
 
   const Timing.endAt(this.end) : assert(end >= 0 && end <= 1, 'end must be between 0 and 1'), start = 0.0;
   const Timing.startAt(this.start) : assert(start >= 0 && start <= 1, 'start must be between 0 and 1'), end = 1.0;
-
   const Timing.switchAt(double point)
     : assert(point >= 0 && point <= 1, 'point must be between 0 and 1'),
       start = point,
       end = point;
+
+  Timing get reversed => Timing(start: end, end: start);
 
   @override
   bool operator ==(Object other) =>
@@ -30,17 +27,4 @@ class Timing {
 
   @override
   String toString() => 'Timing(start: $start, end: $end)';
-}
-
-class SimulationBuildData {
-  final double? velocity;
-  final bool forward;
-  final double progress;
-  double get end => forward ? 1.0 : 0.0;
-
-  SimulationBuildData({
-    this.velocity,
-    required this.forward,
-    required this.progress,
-  });
 }

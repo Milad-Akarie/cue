@@ -1,5 +1,4 @@
 import 'package:cue/cue.dart';
-import 'package:example/examples/horizinally_expanding_cards.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -14,7 +13,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Cue Demo',
-      showPerformanceOverlay: true,
+      // showPerformanceOverlay: true,
       darkTheme: ThemeData.dark(),
       theme: ThemeData(
         splashFactory: InkSparkle.splashFactory,
@@ -49,7 +48,32 @@ class _DemoPageState extends State<DemoPage> with SingleTickerProviderStateMixin
       appBar: AppBar(),
       body: Padding(
         padding: const EdgeInsets.only(top: 80),
-        child: Align(alignment: .topCenter, child: HorizontallyExpandingCards()),
+        child: Center(
+          child: Cue.onToggle(
+            // debug: true,
+            // simulation: const Spring.bouncy(),
+            toggled: _toggled,
+            effects: [
+              // ScaleEffect(from: .5, to: 1, reverse: ReverseConfig(from: 1, to: .8)),
+              SizeEffect(
+                from: .square(50),
+                to: Size(.infinity, .infinity),
+                reverse: ReverseConfig(
+                  from: Size(.infinity, .infinity),
+                  to: .square(100),
+                ),
+              ),
+            ],
+            child: GestureDetector(
+              onTap: () => setState(() => _toggled = !_toggled),
+              child: Container(
+                width: 200,
+                height: 200,
+                color: Colors.blue,
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

@@ -4,11 +4,16 @@ class PaddingEffect extends TweenEffect<EdgeInsetsGeometry> {
   const PaddingEffect({
     super.from = EdgeInsets.zero,
     super.to = EdgeInsets.zero,
+    super.reverse,
     super.curve,
     super.timing,
   });
 
-  const PaddingEffect.keyframes(super.keyframes, {super.curve}) : super.keyframes();
+  const PaddingEffect.keyframes(
+    super.keyframes, {
+    super.curve,
+    super.reverseKeyframes,
+  }) : super.keyframes();
 
   @override
   Animatable<EdgeInsetsGeometry> buildSinglePhaseTween(EdgeInsetsGeometry from, EdgeInsetsGeometry to) {
