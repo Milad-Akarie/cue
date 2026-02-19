@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:cue/cue.dart';
+import 'package:cue/src/core/curves.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -32,90 +33,43 @@ abstract class Effect {
     this.curve,
   });
 
-  CueAnimation<Object?> buildAnimation(
-    Animation<double> driver, {
-    Timing? defaultTiming,
-    Curve? defaultCurve,
-  });
+  Animation<Object?> buildAnimation(Animation<double> driver, AnimationBuildData data);
 
-  Widget build(
-    BuildContext context,
-    covariant CueAnimation<Object?> animation,
-    Widget child,
-  );
-}
-
-class ReverseConfig<T> {
-  final T? from;
-  final T? to;
-  final Curve? curve;
-  final Timing? timing;
-
-  const ReverseConfig({
-    required this.from,
-    required this.to,
-    this.curve,
-    this.timing,
-  });
-
-  const ReverseConfig.hold([T? value]) : from = value, to = value, curve = null, timing = null;
-
-  bool get isHold => from == to;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ReverseConfig &&
-          runtimeType == other.runtimeType &&
-          from == other.from &&
-          to == other.to &&
-          curve == other.curve &&
-          timing == other.timing;
-
-  @override
-  int get hashCode => from.hashCode ^ to.hashCode ^ curve.hashCode ^ timing.hashCode;
+  Widget build(BuildContext context, covariant Animation<Object?> animation, Widget child);
 }
 
 abstract class TweenEffectBase<T extends Object?, R extends Object?> extends Effect {
   final T? _from;
   final T? _to;
   final List<Keyframe<T>>? _keyframes;
-  final List<Keyframe<T>>? _reverseKeyframes;
-  final ReverseConfig<T>? _reverse;
 
   const TweenEffectBase({
     required T from,
     required T to,
     super.curve,
     super.timing,
-    ReverseConfig<T>? reverse,
-  }) : _reverse = reverse,
-       _keyframes = null,
-       _reverseKeyframes = null,
+  }) : _keyframes = null,
        _from = from,
        _to = to;
 
   const TweenEffectBase.keyframes(
     List<Keyframe<T>> keyframes, {
-    List<Keyframe<T>>? reverseKeyframes,
     super.curve,
   }) : _keyframes = keyframes,
        _from = null,
-       _to = null,
-       _reverse = null,
-       _reverseKeyframes = reverseKeyframes;
+       _to = null;
 
   @nonVirtual
   @override
-  Widget build(BuildContext context, covariant CueAnimation<Object?> animation, Widget child) {
+  Widget build(BuildContext context, covariant Animation<Object?> animation, Widget child) {
     assert(
-      animation is CueAnimation<R>,
-      'Expected animation of type CueAnimation<$T>, but got ${animation.runtimeType}',
+      animation is Animation<R>,
+      'Expected animation of type Animation<$T>, but got ${animation.runtimeType}',
     );
-    return apply(context, animation as CueAnimation<R>, child);
+    return apply(context, animation as Animation<R>, child);
   }
 
-  Widget apply(BuildContext context, CueAnimation<R> animation, Widget child);
+  Widget apply(BuildContext context, Animation<R> animation, Widget child);
 
   R transform(T value);
 
@@ -123,15 +77,25 @@ abstract class TweenEffectBase<T extends Object?, R extends Object?> extends Eff
     return Tween<R>(begin: from, end: to);
   }
 
-  Animatable<R> _buildAnimatable({
+  Animatable<R> applyCurves(Animatable<R> animatable, {Curve? curve, Timing? timing, bool isBounded = false}) {
+    if (curve == null && timing == null) {
+      return animatable;
+    }
+    final effectiveCurve = timing != null
+        ? BoundedInterval(timing.start, timing.end, curve: curve ?? Curves.linear)
+        : curve ?? Curves.linear;
+    return animatable.chain(BoundedCurveTween(curve: effectiveCurve, applyBounds: isBounded));
+  }
+
+  ({Animatable<R> tween, Timing? timing}) _buildTween({
     T? from,
     T? to,
     List<Keyframe<T>>? keyframes,
-    Timing? timing,
-    Curve? curve,
+    Timing? defaultTiming,
   }) {
     final List<Phase<R>> phases;
 
+    Timing? timing = defaultTiming;
     if (keyframes == null) {
       assert(
         from != null && to != null,
@@ -147,41 +111,50 @@ abstract class TweenEffectBase<T extends Object?, R extends Object?> extends Eff
         timing = result.timing;
       }
     }
-    final tween = TweenEffectBase.buildFromPhases<R>(phases, buildSinglePhaseTween);
-    if (curve == null && timing == null) {
-      return tween;
-    }
-    final effectiveCurve = timing != null
-        ? Interval(timing.start, timing.end, curve: curve ?? Curves.linear)
-        : curve ?? Curves.linear;
-    return tween.chain(CurveTween(curve: effectiveCurve));
+    return (
+      tween: TweenEffectBase.buildFromPhases<R>(phases, buildSinglePhaseTween),
+      timing: timing,
+    );
   }
 
   @override
-  CueAnimation<R> buildAnimation(Animation<double> driver, {Timing? defaultTiming, Curve? defaultCurve}) {
-    final forwardAnimtable = _buildAnimatable(
+  Animation<R> buildAnimation(Animation<double> driver, AnimationBuildData data) {
+    final tweenRes = _buildTween(
       from: _from,
       to: _to,
       keyframes: _keyframes,
-      timing: timing ?? defaultTiming,
-      curve: curve ?? defaultCurve,
+      defaultTiming: timing ?? data.timing,
     );
 
-    Animatable<R>? reverseAnimtable;
-    if (_reverse != null || _reverseKeyframes != null) {
-      reverseAnimtable = _buildAnimatable(
-        from: _reverse?.from ?? _to,
-        to: _reverse?.to ?? _from,
-        keyframes: _reverseKeyframes,
-        timing: _reverse?.timing ?? timing ?? defaultTiming,
-        curve: _reverse?.curve ?? curve ?? defaultCurve,
+    final animatable = applyCurves(
+      tweenRes.tween,
+      curve: data.curve,
+      timing: tweenRes.timing,
+      isBounded: data.isBounded,
+    );
+
+    Animatable<R>? reverseAnimatable;
+    if (data.reverseCurve != null || data.reverseTiming != null) {
+      reverseAnimatable = applyCurves(
+        tweenRes.tween,
+        curve: data.reverseCurve,
+        timing: data.reverseTiming,
+        isBounded: data.isBounded,
       );
     }
-    return CueAnimation<R>(
-      driver: driver,
-      forward: forwardAnimtable,
-      reverse: reverseAnimtable,
-    );
+
+    return switch (data.role) {
+      ActorRole.both =>
+        reverseAnimatable == null
+            ? driver.drive(animatable)
+            : DaulAnimation(
+                parent: driver,
+                forward: animatable,
+                reverse: reverseAnimatable,
+              ),
+      ActorRole.forward => ForwardOrStoppedAnimation(driver).drive(animatable),
+      ActorRole.reverse => ReverseOrStoppedAnimation(driver).drive(animatable),
+    };
   }
 
   static Animatable<T> buildFromPhases<T extends Object?>(
@@ -196,7 +169,7 @@ abstract class TweenEffectBase<T extends Object?, R extends Object?> extends Eff
       }
       tween = tweenBuilder(phase.begin, phase.end);
     } else {
-      tween = TweenSequence<T>([
+      tween = BoundedTweenSequence<T>([
         for (final phase in phases)
           TweenSequenceItem(
             tween: phase.isAlwaysStopped
@@ -220,8 +193,6 @@ abstract class TweenEffectBase<T extends Object?, R extends Object?> extends Eff
           _from == other._from &&
           _to == other._to &&
           listEquals(_keyframes, other._keyframes) &&
-          listEquals(_reverseKeyframes, other._reverseKeyframes) &&
-          _reverse == other._reverse &&
           curve == other.curve &&
           timing == other.timing;
 
@@ -232,8 +203,6 @@ abstract class TweenEffectBase<T extends Object?, R extends Object?> extends Eff
     curve,
     timing,
     Object.hashAll(_keyframes ?? []),
-    Object.hashAll(_reverseKeyframes ?? []),
-    _reverse,
   );
 }
 
@@ -241,7 +210,6 @@ abstract class TweenEffect<T extends Object?> extends TweenEffectBase<T, T> {
   const TweenEffect({
     required super.from,
     required super.to,
-    super.reverse,
     super.curve,
     super.timing,
   });
@@ -251,7 +219,26 @@ abstract class TweenEffect<T extends Object?> extends TweenEffectBase<T, T> {
 
   const TweenEffect.keyframes(
     super.keyframes, {
-    super.reverseKeyframes,
     super.curve,
   }) : super.keyframes();
 }
+
+class AnimationBuildData {
+  final Timing? timing;
+  final Timing? reverseTiming;
+  final Curve? curve;
+  final Curve? reverseCurve;
+  final bool isBounded;
+  final ActorRole role;
+
+  const AnimationBuildData({
+    this.timing,
+    this.curve,
+    this.isBounded = true,
+    this.reverseTiming,
+    this.reverseCurve,
+    this.role = ActorRole.both,
+  });
+}
+
+enum ActorRole { forward, reverse, both }

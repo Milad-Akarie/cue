@@ -1,4 +1,4 @@
-part of 'act.dart';
+part of 'effect.dart';
 
 class SizeEffect extends TweenEffect<double> {
   final AlignmentGeometry? alignment;
@@ -6,44 +6,35 @@ class SizeEffect extends TweenEffect<double> {
   final bool allowOverflow;
   final Size? _fromSize;
   final Size? _toSize;
-  final ReverseConfig<Size>? _sizeReverse;
   final List<Keyframe<Size?>>? _sizeKeyframes;
-  final List<Keyframe<Size?>>? _reverseSizeKeyframes;
 
   const SizeEffect({
     Size? from,
     Size? to,
     super.curve,
     super.timing,
-    ReverseConfig<Size>? reverse,
     this.alignment,
     this.clipBehavior = Clip.hardEdge,
     this.allowOverflow = false,
   }) : _fromSize = from,
-       _toSize = to,
        _sizeKeyframes = null,
-       _reverseSizeKeyframes = null,
-       _sizeReverse = reverse,
+       _toSize = to,
        super(from: 0, to: 1);
 
   const SizeEffect.keyframes(
     List<Keyframe<Size?>> keyframes, {
     super.curve,
-    List<Keyframe<Size?>>? reverseKeyframes,
     this.alignment,
     this.clipBehavior = Clip.hardEdge,
     this.allowOverflow = false,
   }) : _fromSize = null,
        _toSize = null,
-       _reverseSizeKeyframes = reverseKeyframes,
        _sizeKeyframes = keyframes,
-       _sizeReverse = null,
        super.keyframes(const []);
 
-  Animatable<double> _buildAnimtable({
+  ({Animatable<double> tween, Timing? timing}) _buildSizeTween({
     List<Keyframe<Size?>>? keyframes,
-    Timing? effectiveTiming,
-    Curve? effectiveCurve,
+    Timing? timing,
   }) {
     Animatable<double> animatable = Tween(begin: 0.0, end: 1.0);
     if (keyframes != null) {
@@ -54,31 +45,15 @@ class SizeEffect extends TweenEffect<double> {
         if (keyframe.at > maxEnd) maxEnd = keyframe.at;
       }
       if (minStart != 0 || maxEnd != 1) {
-        effectiveTiming = Timing(start: minStart, end: maxEnd);
+        timing = Timing(start: minStart, end: maxEnd);
       }
     }
-    if (effectiveTiming case final timing?) {
-      animatable = animatable.chain(
-        CurveTween(
-          curve: Interval(
-            timing.start,
-            timing.end,
-            curve: effectiveCurve ?? Curves.linear,
-          ),
-        ),
-      );
-    } else if (effectiveCurve case final curve?) {
-      animatable = animatable.chain(CurveTween(curve: curve));
-    }
-    return animatable;
+
+    return (tween: animatable, timing: timing);
   }
 
   @override
-  CueAnimation<double> buildAnimation(
-    Animation<double> driver, {
-    Timing? defaultTiming,
-    Curve? defaultCurve,
-  }) {
+  Animation<double> buildAnimation(Animation<double> driver, AnimationBuildData data) {
     /// The actual size tween will be built in the RenderObject
     /// where we have access to the constraints so we can normalize sizes properly.
     /// Here we just return the driver animation
@@ -86,36 +61,47 @@ class SizeEffect extends TweenEffect<double> {
     /// we only apply the curve and timing to the driver,
     /// which will be used in the RenderObject to build the size animation.
 
-    final forwordAnimtable = _buildAnimtable(
+    final tweenRes = _buildSizeTween(
       keyframes: _sizeKeyframes,
-      effectiveTiming: timing ?? defaultTiming,
-      effectiveCurve: curve ?? defaultCurve,
+      timing: timing ?? data.timing,
+    );
+
+    final animatable = applyCurves(
+      tweenRes.tween,
+      curve: data.curve,
+      timing: tweenRes.timing,
+      isBounded: data.isBounded,
     );
 
     Animatable<double>? reverseAnimtable;
-    if (_sizeReverse != null || _reverseSizeKeyframes != null) {
-      reverseAnimtable = _buildAnimtable(
-        keyframes: _reverseSizeKeyframes,
-        effectiveTiming: _reverse?.timing ?? defaultTiming,
-        effectiveCurve: _reverse?.curve ?? defaultCurve,
+    if (data.reverseCurve != null || data.reverseTiming != null) {
+      reverseAnimtable = applyCurves(
+        tweenRes.tween,
+        curve: data.reverseCurve,
+        timing: data.reverseTiming,
+        isBounded: data.isBounded,
       );
     }
-
-    return CueAnimation<double>(
-      driver: driver,
-      forward: forwordAnimtable,
-      reverse: reverseAnimtable,
-    );
+    return switch (data.role) {
+      ActorRole.both =>
+        reverseAnimtable != null
+            ? DaulAnimation(
+                parent: driver,
+                forward: animatable,
+                reverse: reverseAnimtable,
+              )
+            : driver.drive(animatable),
+      ActorRole.forward => ForwardOrStoppedAnimation(driver).drive(animatable),
+      ActorRole.reverse => ReverseOrStoppedAnimation(driver).drive(animatable),
+    };
   }
 
   @override
-  Widget apply(BuildContext context, CueAnimation<double> animation, Widget child) {
+  Widget apply(BuildContext context, Animation<double> animation, Widget child) {
     return _AnimatedSize(
       driver: animation,
       fromSize: _fromSize,
       toSize: _toSize,
-      reverse: _sizeReverse,
-      reverseSizeKeyframes: _reverseSizeKeyframes,
       sizeKeyframes: _sizeKeyframes,
       alignment: alignment ?? Alignment.center,
       clipBehavior: clipBehavior,
@@ -134,20 +120,16 @@ class _AnimatedSize extends SingleChildRenderObjectWidget {
     this.alignment = Alignment.center,
     this.clipBehavior = Clip.hardEdge,
     this.allowOverflow = true,
-    this.reverse,
-    this.reverseSizeKeyframes,
     required super.child,
   });
 
-  final CueAnimation<double> driver;
+  final Animation<double> driver;
   final Size? fromSize;
   final Size? toSize;
   final List<Keyframe<Size?>>? sizeKeyframes;
   final AlignmentGeometry alignment;
   final Clip clipBehavior;
   final bool allowOverflow;
-  final ReverseConfig<Size>? reverse;
-  final List<Keyframe<Size?>>? reverseSizeKeyframes;
 
   @override
   _RenderAnimatedSize createRenderObject(BuildContext context) {
@@ -160,8 +142,6 @@ class _AnimatedSize extends SingleChildRenderObjectWidget {
       textDirection: Directionality.maybeOf(context),
       clipBehavior: clipBehavior,
       allowOverflow: allowOverflow,
-      reverse: reverse,
-      reverseSizeKeyframes: reverseSizeKeyframes,
     );
   }
 
@@ -178,15 +158,13 @@ class _AnimatedSize extends SingleChildRenderObjectWidget {
       ..alignment = alignment
       ..textDirection = Directionality.maybeOf(context)
       ..clipBehavior = clipBehavior
-      ..allowOverflow = allowOverflow
-      ..reverse = reverse
-      ..reverseSizeKeyframes = reverseSizeKeyframes;
+      ..allowOverflow = allowOverflow;
   }
 }
 
 class _RenderAnimatedSize extends RenderAligningShiftedBox {
   _RenderAnimatedSize({
-    required CueAnimation<double> driver,
+    required Animation<double> driver,
     required Size? fromSize,
     required Size? toSize,
     required List<Keyframe<Size?>>? sizeKeyframes,
@@ -194,22 +172,18 @@ class _RenderAnimatedSize extends RenderAligningShiftedBox {
     super.textDirection,
     Clip clipBehavior = Clip.hardEdge,
     bool allowOverflow = true,
-    ReverseConfig<Size>? reverse,
-    List<Keyframe<Size?>>? reverseSizeKeyframes,
   }) : _driver = driver,
        _fromSize = fromSize,
        _toSize = toSize,
        _sizeKeyframes = sizeKeyframes,
        _clipBehavior = clipBehavior,
-       _allowOverflow = allowOverflow,
-       _reverse = reverse,
-       _reverseSizeKeyframes = reverseSizeKeyframes;
+       _allowOverflow = allowOverflow;
 
-  CueAnimation<double> _driver;
+  Animation<double> _driver;
 
-  CueAnimation<double> get driver => _driver;
+  Animation<double> get driver => _driver;
 
-  set driver(CueAnimation<double> value) {
+  set driver(Animation<double> value) {
     if (_driver == value) return;
     _sizeAnimation?.removeListener(_onAnimationUpdate);
     _sizeAnimation = null;
@@ -224,26 +198,6 @@ class _RenderAnimatedSize extends RenderAligningShiftedBox {
   set fromSize(Size? value) {
     if (_fromSize == value) return;
     _fromSize = value;
-    _invalidateAnimationCache();
-  }
-
-  ReverseConfig<Size>? _reverse;
-
-  ReverseConfig<Size>? get reverse => _reverse;
-
-  set reverse(ReverseConfig<Size>? value) {
-    if (_reverse == value) return;
-    _reverse = value;
-    _invalidateAnimationCache();
-  }
-
-  List<Keyframe<Size?>>? _reverseSizeKeyframes;
-
-  List<Keyframe<Size?>>? get reverseSizeKeyframes => _reverseSizeKeyframes;
-
-  set reverseSizeKeyframes(List<Keyframe<Size?>>? value) {
-    if (_reverseSizeKeyframes == value) return;
-    _reverseSizeKeyframes = value;
     _invalidateAnimationCache();
   }
 
@@ -312,7 +266,7 @@ class _RenderAnimatedSize extends RenderAligningShiftedBox {
   final LayerHandle<ClipRectLayer> _clipRectLayer = LayerHandle<ClipRectLayer>();
 
   // Cached animation and related state
-  CueAnimation<Size?>? _sizeAnimation;
+  Animation<Size?>? _sizeAnimation;
   Size? _cachedMaxSize;
   Size? _lastConstraintSize;
 
@@ -394,38 +348,14 @@ class _RenderAnimatedSize extends RenderAligningShiftedBox {
     // Build phases with normalized sizes
     final phases = _buildPhases(constraintSize, keyframes: sizeKeyframes, from: fromSize, to: toSize);
     // Build the tween from phases
-    final forwardAnimtable = TweenEffectBase.buildFromPhases<Size?>(
+    final animtable = TweenEffectBase.buildFromPhases<Size?>(
       phases,
       (begin, end) => SizeTween(begin: begin, end: end),
-    ).chain(_driver.forward);
-
-    Animatable<Size?>? reverseAnimatable;
-    Size? maxReverseSize;
-    if (reverse != null || reverseSizeKeyframes != null) {
-      final reversePhases = _buildPhases(
-        constraintSize,
-        keyframes: reverseSizeKeyframes,
-        from: reverse?.from ?? toSize,
-        to: reverse?.to ?? fromSize,
-      );
-
-      reverseAnimatable = TweenEffectBase.buildFromPhases<Size?>(
-        reversePhases,
-        (begin, end) => SizeTween(begin: begin, end: end),
-      );
-      maxReverseSize = _calculateMaxSize(reversePhases);
-      if (driver.reverse case final reverseCurve?) {
-        reverseAnimatable = reverseAnimatable.chain(reverseCurve);
-      }
-    }
+    );
 
     // Build and cache the animation
-    _sizeAnimation = CueAnimation(
-      driver: driver.driver,
-      forward: forwardAnimtable,
-      reverse: reverseAnimatable,
-    );
-    _cachedMaxSize = _maxSize(_calculateMaxSize(phases), maxReverseSize);
+    _sizeAnimation = _driver.drive(animtable);
+    _cachedMaxSize = _calculateMaxSize(phases);
     _lastConstraintSize = constraintSize;
 
     // Add listener to the new animation

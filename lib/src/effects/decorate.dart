@@ -1,4 +1,4 @@
-part of 'act.dart';
+part of 'effect.dart';
 
 class DecorateEffect extends TweenEffect<Decoration> {
   const DecorateEffect({

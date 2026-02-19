@@ -1,4 +1,4 @@
-part of 'act.dart';
+part of 'effect.dart';
 
 abstract class ClipEffect extends Effect {
   const factory ClipEffect({
@@ -69,12 +69,8 @@ class _AxisClipEffect extends TweenEffect<double> implements ClipEffect {
         return ClipRect(
           child: Align(
             alignment: effectiveAlignment,
-            widthFactor: _axis == Axis.horizontal
-                ? animation.value.clamp(0, 1)
-                : null,
-            heightFactor: _axis == Axis.vertical
-                ? animation.value.clamp(0, 1)
-                : null,
+            widthFactor: _axis == Axis.horizontal ? animation.value.clamp(0, 1) : null,
+            heightFactor: _axis == Axis.vertical ? animation.value.clamp(0, 1) : null,
             child: child,
           ),
         );
@@ -112,8 +108,7 @@ class _ClipEffect extends TweenEffect<double> implements ClipEffect {
     Widget child,
   ) {
     final directionality = Directionality.of(context);
-    final effectiveAlignment =
-        alignment?.resolve(directionality) ?? Alignment.topLeft;
+    final effectiveAlignment = alignment?.resolve(directionality) ?? Alignment.topLeft;
     final effectiveBorderRadius = borderRadius?.resolve(directionality);
     return AnimatedBuilder(
       animation: animation,

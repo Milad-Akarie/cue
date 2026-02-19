@@ -7,6 +7,7 @@ class Keyframe<T extends Object?> {
   const Keyframe(this.value, {required this.at});
   const Keyframe.key(this.value, {required this.at});
   const Keyframe.begin(this.value) : at = 0.0;
+  const Keyframe.middle(this.value) : at = 0.5;
   const Keyframe.end(this.value) : at = 1.0;
 
   @override

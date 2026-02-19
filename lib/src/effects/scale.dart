@@ -1,4 +1,4 @@
-part of 'act.dart';
+part of 'effect.dart';
 
 class ScaleEffect extends TweenEffect<double> {
   const ScaleEffect({
@@ -6,7 +6,6 @@ class ScaleEffect extends TweenEffect<double> {
     super.to = 1.0,
     super.curve,
     super.timing,
-    super.reverse,
     this.alignment,
   });
 
@@ -15,7 +14,6 @@ class ScaleEffect extends TweenEffect<double> {
   const ScaleEffect.keyframes(
     super.keyframes, {
     super.curve,
-    super.reverseKeyframes,
     this.alignment,
   }) : super.keyframes();
 

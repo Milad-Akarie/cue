@@ -1,4 +1,4 @@
-part of 'act.dart';
+part of 'effect.dart';
 
 abstract class SlideEffect extends Effect {
   const factory SlideEffect({
@@ -64,8 +64,7 @@ class _SlideEffect extends TweenEffect<Offset> implements SlideEffect {
   }
 }
 
-class _AxisSlideEffect extends TweenEffectBase<double, Offset>
-    implements SlideEffect {
+class _AxisSlideEffect extends TweenEffectBase<double, Offset> implements SlideEffect {
   final Axis _axis;
 
   const _AxisSlideEffect.y({

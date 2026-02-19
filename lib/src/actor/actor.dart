@@ -4,7 +4,10 @@ import 'package:flutter/widgets.dart';
 
 class Actor extends StatefulWidget {
   final Curve? curve;
+  final Curve? reverseCurve;
   final Timing? timing;
+  final Timing? reverseTiming;
+  final ActorRole role;
   final List<Effect> effects;
   final Widget child;
 
@@ -12,8 +15,11 @@ class Actor extends StatefulWidget {
     super.key,
     required this.effects,
     required this.child,
+    this.role = ActorRole.both,
     this.curve,
+    this.reverseCurve,
     this.timing,
+    this.reverseTiming,
   });
 
   @override
@@ -21,24 +27,30 @@ class Actor extends StatefulWidget {
 }
 
 class _ActorState extends State<Actor> {
-  final _animations = <Effect, CueAnimation<Object?>>{};
+  final _animations = <Effect, Animation<Object?>>{};
 
-  Animation<double>? _cachedDriver;
+  CueScope? _cachedScope;
 
   @override
   void initState() {
     super.initState();
   }
 
-  void _setupAnimations(Animation<double> driver) {
-    _cachedDriver = driver;
+  void _setupAnimations(CueScope scope) {
+    _cachedScope = scope;
     _animations.clear();
     for (final act in widget.effects) {
       if (!_animations.containsKey(act)) {
         _animations[act] = act.buildAnimation(
-          driver,
-          defaultTiming: widget.timing,
-          defaultCurve: widget.curve,
+          scope.animation,
+          AnimationBuildData(
+            curve: widget.curve,
+            timing: widget.timing,
+            isBounded: scope.isBounded,
+            reverseCurve: widget.reverseCurve,
+            reverseTiming: widget.reverseTiming,
+            role: widget.role,
+          ),
         );
       }
     }
@@ -49,17 +61,20 @@ class _ActorState extends State<Actor> {
     super.didUpdateWidget(oldWidget);
     if (!listEquals(oldWidget.effects, widget.effects) ||
         oldWidget.curve != widget.curve ||
-        oldWidget.timing != widget.timing) {
-      _setupAnimations(CueScope.of(context).animation);
+        oldWidget.timing != widget.timing ||
+        oldWidget.reverseCurve != widget.reverseCurve ||
+        oldWidget.reverseTiming != widget.reverseTiming ||
+        oldWidget.role != widget.role) {
+      _setupAnimations(CueScope.of(context));
     }
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final driver = CueScope.of(context).animation;
-    if (_cachedDriver != driver) {
-      _setupAnimations(driver);
+    final scope = CueScope.of(context);
+    if (_cachedScope == null || scope.updateShouldNotify(_cachedScope!)) {
+      _setupAnimations(scope);
     }
   }
 
@@ -83,7 +98,10 @@ class _ActorState extends State<Actor> {
 abstract class SingleEffectProxy<T> extends StatelessWidget {
   final Widget child;
   final Curve? curve;
+  final Curve? reverseCurve;
   final Timing? timing;
+  final Timing? reverseTiming;
+  final ActorRole role;
   final List<Keyframe<T>>? keys;
 
   const SingleEffectProxy({
@@ -91,14 +109,35 @@ abstract class SingleEffectProxy<T> extends StatelessWidget {
     required this.child,
     this.curve,
     this.timing,
+    this.role = ActorRole.both,
+    this.reverseCurve,
+    this.reverseTiming,
   }) : keys = null;
 
   const SingleEffectProxy.keyFrames({
     required List<Keyframe<T>> this.keys,
     super.key,
     required this.child,
+    this.role = ActorRole.both,
+    this.reverseCurve,
+    this.reverseTiming,
     this.curve,
   }) : timing = null;
+
+  Effect get effect;
+
+  @override
+  Widget build(BuildContext context) {
+    return Actor(
+      curve: curve,
+      timing: timing,
+      reverseCurve: reverseCurve,
+      reverseTiming: reverseTiming,
+      role: role,
+      effects: [effect],
+      child: child,
+    );
+  }
 }
 
 class TweenActor<T> extends StatefulWidget {

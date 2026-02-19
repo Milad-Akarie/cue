@@ -1,4 +1,4 @@
-part of 'act.dart';
+part of 'effect.dart';
 
 class RotateEffect extends TweenEffect<double> {
   final AlignmentGeometry alignment;

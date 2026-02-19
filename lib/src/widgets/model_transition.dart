@@ -65,13 +65,10 @@ class _ModalTransitionState extends State<ModalTransition> {
     return Cue(
       key: _triggerKey,
       animation: animation,
-      child: Hero(
-        tag: 'modal_transition_',
-        child: Builder(
-          builder: (context) {
-            return widget.triggerBuilder(context, _showModel);
-          },
-        ),
+      child: Builder(
+        builder: (context) {
+          return widget.triggerBuilder(context, _showModel);
+        },
       ),
     );
   }
@@ -86,11 +83,11 @@ class _ModalTransitionState extends State<ModalTransition> {
       barrierLabel: 'ModalTransition',
       barrierColor: widget.barrierColor,
       transitionDuration: widget.duration,
-      transitionBuilder: (context, _, _, child) => child,
+      transitionBuilder: (context, anim, _, child) => child,
       simulation: widget.simulation,
-      pageBuilder: (context, _, _) {
+      pageBuilder: (context, animation, _) {
         return _ModelContent(
-          animation: _transitionAnimation,
+          animation: animation,
           backdrop: widget.backdrop,
           alignment: widget.alignment,
           builder: (context, rect) {
@@ -112,7 +109,7 @@ class _ModalTransitionState extends State<ModalTransition> {
       },
     );
 
-    return Navigator.of(context).push(model);
+    return Navigator.of(context).push<T>(model);
   }
 }
 
@@ -244,11 +241,6 @@ class _ModalRoute<T extends Object> extends RawDialogRoute<T> {
       );
     }
     return super.createSimulation(forward: forward);
-  }
-
-  @override
-  Animation<double>? get animation {
-    return ClampingAnimation(super.animation as ProxyAnimation, 0.0, 1.0);
   }
 }
 

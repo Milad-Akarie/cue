@@ -1,4 +1,4 @@
-part of 'act.dart';
+part of 'effect.dart';
 
 class BlurEffect extends TweenEffect<double> {
   const BlurEffect({

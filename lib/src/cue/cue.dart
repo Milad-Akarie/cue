@@ -22,6 +22,7 @@ abstract class Cue extends StatefulWidget {
     Curve curve,
     bool debug,
     List<Effect>? effects,
+    bool isBounded,
     required Animation<double> animation,
   }) = _ControlledCue;
 
@@ -99,6 +100,9 @@ abstract class Cue extends StatefulWidget {
 
 class _RouteTransitionStageState extends _CueState<_RouteTransitionStage> {
   @override
+  bool get isBounded => true;
+
+  @override
   Animation<double> getAnimation(BuildContext context) {
     return ModalRoute.of(context)!.animation!;
   }
@@ -109,6 +113,8 @@ abstract class _CueState<T extends Cue> extends State<Cue> {
   T get widget => super.widget as T;
 
   VoidCallback? _deattachDebugOverlay;
+
+  bool get isBounded;
 
   @override
   void initState() {
@@ -155,7 +161,11 @@ abstract class _CueState<T extends Cue> extends State<Cue> {
       if (CueDebugTools.isWrappedByDebugProvider(context)) {
         final debugAnimation = CueDebugTools.animationOf(context);
         if (debugAnimation != null) {
-          return CueScope(animation: debugAnimation, child: child);
+          return CueScope(
+            animation: debugAnimation,
+            isBounded: isBounded,
+            child: child,
+          );
         }
       } else {
         return CueDebugTools(
@@ -164,15 +174,15 @@ abstract class _CueState<T extends Cue> extends State<Cue> {
             builder: (context) {
               final debugAnimation = CueDebugTools.animationOf(context);
               if (debugAnimation != null) {
-                return CueScope(animation: debugAnimation, child: child);
+                return CueScope(animation: debugAnimation, isBounded: isBounded, child: child);
               }
-              return CueScope(animation: getAnimation(context), child: child);
+              return CueScope(animation: getAnimation(context), isBounded: isBounded, child: child);
             },
           ),
         );
       }
     }
-    return CueScope(animation: getAnimation(context), child: child);
+    return CueScope(animation: getAnimation(context), isBounded: true, child: child);
   }
 
   Animation<double> getAnimation(BuildContext context);
@@ -231,6 +241,9 @@ class _SelfAnimatedCueState extends _SelfAnimatedState<_SelfAnimatedCue> {
   CueSimulation? get simulation => widget.simulation;
 
   @override
+  bool get isBounded => widget.simulation == null;
+
+  @override
   void onControllerReady() async {
     if (widget.delay case final delay?) {
       await Future.delayed(delay);
@@ -267,6 +280,9 @@ abstract class _SelfAnimatedState<T extends _SelfAnimatedCue> extends _CueState<
   CueSimulation? get simulation => widget.simulation;
 
   @override
+  bool get isBounded => widget.simulation == null;
+
+  @override
   void initState() {
     super.initState();
     _createController();
@@ -285,6 +301,7 @@ abstract class _SelfAnimatedState<T extends _SelfAnimatedCue> extends _CueState<
     } else {
       controller = AnimationController.unbounded(
         vsync: this,
+        duration: duration,
         debugLabel: 'Unbounded Cue Controller',
       );
     }
@@ -508,6 +525,7 @@ class _ControlledCue extends Cue {
   const _ControlledCue({
     super.key,
     required super.child,
+    this.isBounded = true,
     super.effects,
     super.curve,
     super.debug,
@@ -515,6 +533,7 @@ class _ControlledCue extends Cue {
   }) : super._();
 
   final Animation<double> animation;
+  final bool isBounded;
 
   @override
   State<StatefulWidget> createState() => _ControlledCueState();
@@ -522,13 +541,22 @@ class _ControlledCue extends Cue {
 
 class _ControlledCueState extends _CueState<_ControlledCue> {
   @override
+  bool get isBounded => widget.isBounded;
+
+  @override
   Animation<double> getAnimation(_) => widget.animation;
 }
 
 class CueScope extends InheritedWidget {
-  const CueScope({super.key, required super.child, required this.animation});
+  const CueScope({
+    super.key,
+    required super.child,
+    required this.animation,
+    required this.isBounded,
+  });
 
   final Animation<double> animation;
+  final bool isBounded;
 
   static CueScope of(BuildContext context) {
     final cue = context.dependOnInheritedWidgetOfExactType<CueScope>();
@@ -538,7 +566,7 @@ class CueScope extends InheritedWidget {
 
   @override
   bool updateShouldNotify(covariant CueScope oldWidget) {
-    return animation != oldWidget.animation;
+    return animation != oldWidget.animation || isBounded != oldWidget.isBounded;
   }
 }
 
@@ -595,6 +623,9 @@ class _IndexedStage extends Cue {
 
 class _IndexedStageState extends _CueState<_IndexedStage> {
   Animation<double> _animation = AlwaysStoppedAnimation(0.0);
+
+  @override
+  bool get isBounded => true;
 
   @override
   void initState() {

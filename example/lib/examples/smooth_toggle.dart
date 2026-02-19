@@ -20,7 +20,7 @@ class _SmoothSwitchState extends State<SmoothSwitch> {
     return Cue.onToggle(
       toggled: _toggled,
       debug: true,
-      simulation: const Spring.gentle(),
+      simulation: const Spring.smooth(),
       child: GestureDetector(
         onTap: () {
           setState(() {

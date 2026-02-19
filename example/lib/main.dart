@@ -1,4 +1,6 @@
 import 'package:cue/cue.dart';
+import 'package:example/examples/options_button.dart';
+import 'package:example/examples/smooth_toggle.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -11,6 +13,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Curves.elasticIn;
     return MaterialApp(
       title: 'Cue Demo',
       // showPerformanceOverlay: true,
@@ -42,37 +45,42 @@ class _DemoPageState extends State<DemoPage> with SingleTickerProviderStateMixin
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       appBar: AppBar(),
       body: Padding(
         padding: const EdgeInsets.only(top: 80),
         child: Center(
-          child: Cue.onToggle(
-            // debug: true,
-            // simulation: const Spring.bouncy(),
-            toggled: _toggled,
-            effects: [
-              // ScaleEffect(from: .5, to: 1, reverse: ReverseConfig(from: 1, to: .8)),
-              SizeEffect(
-                from: .square(50),
-                to: Size(.infinity, .infinity),
-                reverse: ReverseConfig(
-                  from: Size(.infinity, .infinity),
-                  to: .square(100),
-                ),
-              ),
-            ],
-            child: GestureDetector(
-              onTap: () => setState(() => _toggled = !_toggled),
-              child: Container(
-                width: 200,
-                height: 200,
-                color: Colors.blue,
-              ),
-            ),
-          ),
+          child: OptionsButton(),
+          // child: Cue.onToggle(
+          //   toggled: _toggled,
+          //   // debug: true,
+          //   child: Actor(
+          //     effects: [
+          //       SizeEffect(
+          //         from: Size(100, 60),
+          //         to: Size(60, 100),
+          //       ),
+          //       DecorateEffect(
+          //         from: BoxDecoration(
+          //           color: Colors.deepPurple,
+          //           borderRadius: BorderRadius.circular(16),
+          //         ),
+          //         to: BoxDecoration(
+          //           color: Colors.deepPurple.shade200,
+          //           borderRadius: BorderRadius.circular(24),
+          //         ),
+          //       ),
+          //     ],
+          //     child: GestureDetector(
+          //       onTap: () => setState(() => _toggled = !_toggled),
+          //       child: Padding(
+          //         padding: const EdgeInsets.all(12.0),
+          //         child: const Icon(Icons.play_arrow),
+          //       ),
+          //     ),
+          //   ),
+          // ),
         ),
       ),
     );

@@ -1,4 +1,4 @@
-part of 'act.dart';
+part of 'effect.dart';
 
 abstract class TranslateEffect extends Effect {
   const factory TranslateEffect({
@@ -53,8 +53,7 @@ class _TranslateOffset extends TweenEffect<Offset> implements TranslateEffect {
     super.timing,
   });
 
-  const _TranslateOffset.keyframes(super.keyframes, {super.curve})
-    : super.keyframes();
+  const _TranslateOffset.keyframes(super.keyframes, {super.curve}) : super.keyframes();
 
   @override
   Widget apply(
@@ -70,8 +69,7 @@ class _TranslateOffset extends TweenEffect<Offset> implements TranslateEffect {
   }
 }
 
-class _AxisTranslate extends TweenEffectBase<double, Offset>
-    implements TranslateEffect {
+class _AxisTranslate extends TweenEffectBase<double, Offset> implements TranslateEffect {
   final Axis _axis;
 
   const _AxisTranslate.vertical({
@@ -88,13 +86,9 @@ class _AxisTranslate extends TweenEffectBase<double, Offset>
     super.timing,
   }) : _axis = Axis.horizontal;
 
-  const _AxisTranslate.yKeyframes(super.keyframes, {super.curve})
-    : _axis = Axis.vertical,
-      super.keyframes();
+  const _AxisTranslate.yKeyframes(super.keyframes, {super.curve}) : _axis = Axis.vertical, super.keyframes();
 
-  const _AxisTranslate.xKeyframes(super.keyframes, {super.curve})
-    : _axis = Axis.horizontal,
-      super.keyframes();
+  const _AxisTranslate.xKeyframes(super.keyframes, {super.curve}) : _axis = Axis.horizontal, super.keyframes();
 
   @override
   Offset transform(double value) {
@@ -141,8 +135,7 @@ class _TranslateTransition extends AnimatedWidget {
   }
 }
 
-class _TranslateFromGlobal extends TweenEffect<double>
-    implements TranslateEffect {
+class _TranslateFromGlobal extends TweenEffect<double> implements TranslateEffect {
   final Offset offset;
   final Offset toLocal;
   const _TranslateFromGlobal({
@@ -181,12 +174,10 @@ class _TranslateFromGlobalTransition extends StatefulWidget {
   });
 
   @override
-  State<_TranslateFromGlobalTransition> createState() =>
-      _TranslateFromGlobalTransitionState();
+  State<_TranslateFromGlobalTransition> createState() => _TranslateFromGlobalTransitionState();
 }
 
-class _TranslateFromGlobalTransitionState
-    extends State<_TranslateFromGlobalTransition> {
+class _TranslateFromGlobalTransitionState extends State<_TranslateFromGlobalTransition> {
   final _key = GlobalKey();
   Tween<Offset>? _deltaTween;
   bool _measured = false;
@@ -242,9 +233,7 @@ class _TranslateFromGlobalTransitionState
 
   @override
   Widget build(BuildContext context) {
-    final offset = _deltaTween == null
-        ? Offset.zero
-        : widget.animation.drive(_deltaTween!).value;
+    final offset = _deltaTween == null ? Offset.zero : widget.animation.drive(_deltaTween!).value;
     final isInvisible = _deltaTween == null;
     return Visibility(
       key: _key,

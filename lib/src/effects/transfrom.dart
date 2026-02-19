@@ -1,4 +1,4 @@
-part of 'act.dart';
+part of 'effect.dart';
 
 class TransformEffect extends TweenEffect<Matrix4> {
   const TransformEffect({

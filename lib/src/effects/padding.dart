@@ -1,10 +1,9 @@
-part of 'act.dart';
+part of 'effect.dart';
 
 class PaddingEffect extends TweenEffect<EdgeInsetsGeometry> {
   const PaddingEffect({
     super.from = EdgeInsets.zero,
     super.to = EdgeInsets.zero,
-    super.reverse,
     super.curve,
     super.timing,
   });
@@ -12,7 +11,6 @@ class PaddingEffect extends TweenEffect<EdgeInsetsGeometry> {
   const PaddingEffect.keyframes(
     super.keyframes, {
     super.curve,
-    super.reverseKeyframes,
   }) : super.keyframes();
 
   @override

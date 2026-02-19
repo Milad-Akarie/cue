@@ -1,5 +1,5 @@
 import 'package:cue/src/actor/actor.dart';
-import 'package:cue/src/acts/act.dart';
+import 'package:cue/src/effects/effect.dart';
 import 'package:flutter/widgets.dart';
 import 'dart:math' as math;
 
@@ -72,23 +72,14 @@ class RotateActor extends SingleEffectProxy {
        _inDegrees = true;
 
   @override
-  Widget build(BuildContext context) {
-    return Actor(
-      effects: [
-        RotateEffect.internal(
-          from: from,
-          to: to,
-          alignment: alignment,
-          asQuarterTurns: _rotateAsTurns,
-          inDegrees: _inDegrees,
-          axis: axis,
-          curve: curve,
-          timing: timing,
-        ),
-      ],
-      child: child,
-    );
-  }
+  Effect get effect => RotateEffect.internal(
+    from: from,
+    to: to,
+    alignment: alignment,
+    asQuarterTurns: _rotateAsTurns,
+    inDegrees: _inDegrees,
+    axis: axis,
+  );
 }
 
 class ScaleActor extends SingleEffectProxy {
@@ -104,23 +95,15 @@ class ScaleActor extends SingleEffectProxy {
     this.alignment,
     super.curve,
     super.timing,
+    super.role,
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Actor(
-      effects: [
-        ScaleEffect(
-          from: from,
-          to: to,
-          alignment: alignment?.resolve(Directionality.of(context)),
-          curve: curve,
-          timing: timing,
-        ),
-      ],
-      child: child,
-    );
-  }
+  Effect get effect => ScaleEffect(
+    from: from,
+    to: to,
+    alignment: alignment,
+  );
 }
 
 class FadeActor extends SingleEffectProxy {
@@ -132,24 +115,13 @@ class FadeActor extends SingleEffectProxy {
     this.from = 1,
     this.to = 0,
     required super.child,
+    super.role,
     super.curve,
     super.timing,
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Actor(
-      effects: [
-        FadeEffect(
-          from: from,
-          to: to,
-          curve: curve,
-          timing: timing,
-        ),
-      ],
-      child: child,
-    );
-  }
+  Effect get effect => FadeEffect(from: from, to: to);
 }
 
 class SlideActor extends SingleEffectProxy {
@@ -165,7 +137,10 @@ class SlideActor extends SingleEffectProxy {
     Offset this.to = Offset.zero,
     required super.child,
     super.curve,
+    super.reverseCurve,
+    super.reverseTiming,
     super.timing,
+    super.role,
   }) : _axis = null,
        _axisFrom = null,
        _axisTo = null;
@@ -175,8 +150,11 @@ class SlideActor extends SingleEffectProxy {
     required double from,
     required double to,
     required super.child,
+    super.role,
     super.curve,
     super.timing,
+    super.reverseCurve,
+    super.reverseTiming,
   }) : _axis = Axis.horizontal,
        _axisFrom = from,
        _axisTo = to,
@@ -190,6 +168,9 @@ class SlideActor extends SingleEffectProxy {
     required super.child,
     super.curve,
     super.timing,
+    super.reverseCurve,
+    super.reverseTiming,
+    super.role,
   }) : _axisFrom = from,
        _axisTo = to,
        _axis = Axis.vertical,
@@ -197,27 +178,11 @@ class SlideActor extends SingleEffectProxy {
        to = null;
 
   @override
-  Widget build(BuildContext context) {
-    final Effect effect = switch (_axis) {
-      Axis.horizontal => SlideEffect.x(
-        from: _axisFrom!,
-        to: _axisTo!,
-        curve: curve,
-        timing: timing,
-      ),
-      Axis.vertical => SlideEffect.y(
-        from: _axisFrom!,
-        to: _axisTo!,
-        curve: curve,
-        timing: timing,
-      ),
-      _ => SlideEffect(from: from!, to: to!, curve: curve, timing: timing),
-    };
-    return Actor(
-      effects: [effect],
-      child: child,
-    );
-  }
+  Effect get effect => switch (_axis) {
+    Axis.horizontal => SlideEffect.x(from: _axisFrom!, to: _axisTo!),
+    Axis.vertical => SlideEffect.y(from: _axisFrom!, to: _axisTo!),
+    _ => SlideEffect(from: from!, to: to!),
+  };
 }
 
 class AlignActor extends SingleEffectProxy {
@@ -225,28 +190,19 @@ class AlignActor extends SingleEffectProxy {
   final AlignmentGeometry? to;
 
   const AlignActor({
+    required super.child,
     super.key,
     this.from,
     this.to,
-    required super.child,
     super.curve,
     super.timing,
+    super.role,
+    super.reverseCurve,
+    super.reverseTiming,
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Actor(
-      effects: [
-        AlignEffect(
-          from: from,
-          to: to,
-          curve: curve,
-          timing: timing,
-        ),
-      ],
-      child: child,
-    );
-  }
+  Effect get effect => AlignEffect(from: from, to: to);
 }
 
 class SizeActor extends SingleEffectProxy {
@@ -259,6 +215,7 @@ class SizeActor extends SingleEffectProxy {
   final double? _axisTo;
   final double? _fixedCrossAxisSize;
   final Clip clipBehavior;
+
   const SizeActor({
     super.key,
     required Size from,
@@ -269,6 +226,9 @@ class SizeActor extends SingleEffectProxy {
     required super.child,
     super.curve,
     super.timing,
+    super.role,
+    super.reverseCurve,
+    super.reverseTiming,
   }) : _from = from,
        _to = to,
        _axis = null,
@@ -287,6 +247,9 @@ class SizeActor extends SingleEffectProxy {
     required super.child,
     super.curve,
     super.timing,
+    super.role,
+    super.reverseCurve,
+    super.reverseTiming,
   }) : _axis = Axis.horizontal,
        _axisFrom = from,
        _axisTo = to,
@@ -305,6 +268,9 @@ class SizeActor extends SingleEffectProxy {
     required super.child,
     super.curve,
     super.timing,
+    super.role,
+    super.reverseCurve,
+    super.reverseTiming,
   }) : _axis = Axis.vertical,
        _axisFrom = from,
        _axisTo = to,
@@ -313,7 +279,7 @@ class SizeActor extends SingleEffectProxy {
        _fixedCrossAxisSize = fixedWidth;
 
   @override
-  Widget build(BuildContext context) {
+  Effect get effect {
     Size? from = _from;
     Size? to = _to;
     if (_axis != null) {
@@ -326,19 +292,12 @@ class SizeActor extends SingleEffectProxy {
         Axis.vertical => Size(_fixedCrossAxisSize ?? double.infinity, _axisTo!),
       };
     }
-    return Actor(
-      effects: [
-        SizeEffect(
-          from: from,
-          to: to,
-          alignment: alignment,
-          curve: curve,
-          timing: timing,
-          clipBehavior: clipBehavior,
-          allowOverflow: allowOverflow,
-        ),
-      ],
-      child: child,
+    return SizeEffect(
+      from: from,
+      to: to,
+      alignment: alignment,
+      allowOverflow: allowOverflow,
+      clipBehavior: clipBehavior,
     );
   }
 }
@@ -359,6 +318,9 @@ class FractionalSizeActor extends SingleEffectProxy {
     required super.child,
     super.curve,
     super.timing,
+    super.role,
+    super.reverseCurve,
+    super.reverseTiming,
   }) : _from = from,
        _to = to,
        _axis = null,
@@ -373,6 +335,9 @@ class FractionalSizeActor extends SingleEffectProxy {
     required super.child,
     super.curve,
     super.timing,
+    super.role,
+    super.reverseCurve,
+    super.reverseTiming,
   }) : _axis = Axis.horizontal,
        _axisFrom = from,
        _axisTo = to,
@@ -387,6 +352,9 @@ class FractionalSizeActor extends SingleEffectProxy {
     required super.child,
     super.curve,
     super.timing,
+    super.role,
+    super.reverseCurve,
+    super.reverseTiming,
   }) : _axis = Axis.vertical,
        _axisFrom = from,
        _axisTo = to,
@@ -394,7 +362,7 @@ class FractionalSizeActor extends SingleEffectProxy {
        _to = null;
 
   @override
-  Widget build(BuildContext context) {
+  Effect get effect {
     Size from = _from ?? Size.infinite;
     Size to = _to ?? Size.infinite;
     if (_axis != null) {
@@ -407,18 +375,7 @@ class FractionalSizeActor extends SingleEffectProxy {
         Axis.vertical => Size.fromHeight(_axisTo!),
       };
     }
-    return Actor(
-      effects: [
-        FractionalSizeEffect(
-          from: from,
-          to: to,
-          alignment: alignment,
-          curve: curve,
-          timing: timing,
-        ),
-      ],
-      child: child,
-    );
+    return FractionalSizeEffect(from: from, to: to, alignment: alignment);
   }
 }
 
@@ -433,22 +390,13 @@ class BlurActor extends SingleEffectProxy {
     required super.child,
     super.curve,
     super.timing,
+    super.role,
+    super.reverseCurve,
+    super.reverseTiming,
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Actor(
-      effects: [
-        BlurEffect(
-          from: from,
-          to: to,
-          curve: curve,
-          timing: timing,
-        ),
-      ],
-      child: child,
-    );
-  }
+  Effect get effect => BlurEffect(from: from, to: to);
 }
 
 class BackdropBlurActor extends SingleEffectProxy {
@@ -464,23 +412,13 @@ class BackdropBlurActor extends SingleEffectProxy {
     required super.child,
     super.curve,
     super.timing,
+    super.role,
+    super.reverseCurve,
+    super.reverseTiming,
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Actor(
-      effects: [
-        BackdropBlurEffect(
-          from: from,
-          to: to,
-          blendMode: blendMode,
-          curve: curve,
-          timing: timing,
-        ),
-      ],
-      child: child,
-    );
-  }
+  Effect get effect => BackdropBlurEffect(from: from, to: to, blendMode: blendMode);
 }
 
 class PaddingActor extends SingleEffectProxy {
@@ -494,22 +432,13 @@ class PaddingActor extends SingleEffectProxy {
     required super.child,
     super.curve,
     super.timing,
+    super.role,
+    super.reverseCurve,
+    super.reverseTiming,
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Actor(
-      effects: [
-        PaddingEffect(
-          from: from,
-          to: to,
-          curve: curve,
-          timing: timing,
-        ),
-      ],
-      child: child,
-    );
-  }
+  Effect get effect => PaddingEffect(from: from, to: to);
 }
 
 class ClipActor extends SingleEffectProxy {
@@ -526,8 +455,11 @@ class ClipActor extends SingleEffectProxy {
     BorderRadiusGeometry this.borderRadius = BorderRadius.zero,
     this.alignment = Alignment.center,
     required super.child,
+    super.role,
     super.curve,
     super.timing,
+    super.reverseCurve,
+    super.reverseTiming,
   }) : _axis = null,
        _fromSize = fromSize,
        _fromAxisSize = null,
@@ -538,8 +470,11 @@ class ClipActor extends SingleEffectProxy {
     Size fromSize = Size.zero,
     this.alignment = Alignment.center,
     required super.child,
+    super.role,
     super.curve,
     super.timing,
+    super.reverseCurve,
+    super.reverseTiming,
   }) : _axis = null,
        _fromSize = fromSize,
        _fromAxisSize = null,
@@ -553,7 +488,10 @@ class ClipActor extends SingleEffectProxy {
     this.alignment = AlignmentDirectional.centerStart,
     required super.child,
     super.curve,
+    super.role,
     super.timing,
+    super.reverseCurve,
+    super.reverseTiming,
   }) : _axis = Axis.horizontal,
        _fromAxisSize = from,
        _toAxisSize = to,
@@ -567,7 +505,10 @@ class ClipActor extends SingleEffectProxy {
     this.alignment = AlignmentDirectional.topCenter,
     required super.child,
     super.curve,
+    super.role,
     super.timing,
+    super.reverseCurve,
+    super.reverseTiming,
   }) : _axis = Axis.vertical,
        _toAxisSize = to,
        _fromAxisSize = from,
@@ -575,42 +516,35 @@ class ClipActor extends SingleEffectProxy {
        _fromSize = null;
 
   @override
-  Widget build(BuildContext context) {
-    return Actor(
-      effects: [
-        switch (_axis) {
-          Axis.horizontal => ClipEffect.horizontal(
-            from: _fromAxisSize!,
-            to: _toAxisSize!,
-            alignment: alignment,
-            curve: curve,
-            timing: timing,
-          ),
-          Axis.vertical => ClipEffect.vertical(
-            from: _fromAxisSize!,
-            to: _toAxisSize!,
-            alignment: alignment,
-            curve: curve,
-            timing: timing,
-          ),
-          _ when borderRadius != null => ClipEffect(
-            fromSize: _fromSize!,
-            alignment: alignment,
-            borderRadius: borderRadius!,
-            curve: curve,
-            timing: timing,
-          ),
-          _ => ClipEffect.circluar(
-            fromSize: _fromSize!,
-            alignment: alignment,
-            curve: curve,
-            timing: timing,
-          ),
-        },
-      ],
-      child: child,
-    );
-  }
+  Effect get effect => switch (_axis) {
+    Axis.horizontal => ClipEffect.horizontal(
+      from: _fromAxisSize!,
+      to: _toAxisSize!,
+      alignment: alignment,
+      curve: curve,
+      timing: timing,
+    ),
+    Axis.vertical => ClipEffect.vertical(
+      from: _fromAxisSize!,
+      to: _toAxisSize!,
+      alignment: alignment,
+      curve: curve,
+      timing: timing,
+    ),
+    _ when borderRadius != null => ClipEffect(
+      fromSize: _fromSize!,
+      alignment: alignment,
+      borderRadius: borderRadius!,
+      curve: curve,
+      timing: timing,
+    ),
+    _ => ClipEffect.circluar(
+      fromSize: _fromSize!,
+      alignment: alignment,
+      curve: curve,
+      timing: timing,
+    ),
+  };
 }
 
 class PositionActor extends SingleEffectProxy<Position> {
@@ -625,6 +559,9 @@ class PositionActor extends SingleEffectProxy<Position> {
     required super.child,
     super.curve,
     super.timing,
+    super.role,
+    super.reverseCurve,
+    super.reverseTiming,
   }) : _relativeTo = null;
 
   const PositionActor.relative({
@@ -635,23 +572,19 @@ class PositionActor extends SingleEffectProxy<Position> {
     required super.child,
     super.curve,
     super.timing,
+    super.role,
+    super.reverseCurve,
+    super.reverseTiming,
   }) : _relativeTo = size;
 
   @override
-  Widget build(BuildContext context) {
-    return Actor(
-      effects: [
-        PositionEffect.internal(
-          from: from,
-          to: to,
-          relativeTo: _relativeTo,
-          curve: curve,
-          timing: timing,
-        ),
-      ],
-      child: child,
-    );
-  }
+  Effect get effect => PositionEffect.internal(
+    from: from,
+    to: to,
+    relativeTo: _relativeTo,
+    curve: curve,
+    timing: timing,
+  );
 }
 
 class TextStyleActor extends SingleEffectProxy {
@@ -665,22 +598,13 @@ class TextStyleActor extends SingleEffectProxy {
     required super.child,
     super.curve,
     super.timing,
+    super.role,
+    super.reverseCurve,
+    super.reverseTiming,
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Actor(
-      effects: [
-        TextStyleEffect(
-          from: from,
-          to: to,
-          curve: curve,
-          timing: timing,
-        ),
-      ],
-      child: child,
-    );
-  }
+  Effect get effect => TextStyleEffect(from: from, to: to);
 }
 
 class IconThemeActor extends SingleEffectProxy {
@@ -694,22 +618,13 @@ class IconThemeActor extends SingleEffectProxy {
     required super.child,
     super.curve,
     super.timing,
+    super.role,
+    super.reverseCurve,
+    super.reverseTiming,
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Actor(
-      effects: [
-        IconThemeEffect(
-          from: from,
-          to: to,
-          curve: curve,
-          timing: timing,
-        ),
-      ],
-      child: child,
-    );
-  }
+  Effect get effect => IconThemeEffect(from: from, to: to);
 }
 
 class DecorateActor extends SingleEffectProxy {
@@ -723,22 +638,13 @@ class DecorateActor extends SingleEffectProxy {
     required super.child,
     super.curve,
     super.timing,
+    super.role,
+    super.reverseCurve,
+    super.reverseTiming,
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Actor(
-      effects: [
-        DecorateEffect(
-          from: from,
-          to: to,
-          curve: curve,
-          timing: timing,
-        ),
-      ],
-      child: child,
-    );
-  }
+  Effect get effect => DecorateEffect(from: from, to: to);
 }
 
 class ColorActor extends SingleEffectProxy {
@@ -752,22 +658,13 @@ class ColorActor extends SingleEffectProxy {
     required super.child,
     super.curve,
     super.timing,
+    super.role,
+    super.reverseCurve,
+    super.reverseTiming,
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Actor(
-      effects: [
-        ColorEffect(
-          from: from,
-          to: to,
-          curve: curve,
-          timing: timing,
-        ),
-      ],
-      child: child,
-    );
-  }
+  Effect get effect => ColorEffect(from: from, to: to);
 }
 
 class TransformActor extends SingleEffectProxy {
@@ -785,24 +682,13 @@ class TransformActor extends SingleEffectProxy {
     this.origin,
     super.curve,
     super.timing,
+    super.role,
+    super.reverseCurve,
+    super.reverseTiming,
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Actor(
-      effects: [
-        TransformEffect(
-          from: from,
-          to: to,
-          alignment: alignment,
-          origin: origin,
-          curve: curve,
-          timing: timing,
-        ),
-      ],
-      child: child,
-    );
-  }
+  Effect get effect => TransformEffect(from: from, to: to, alignment: alignment, origin: origin);
 }
 
 class TranslateActor extends SingleEffectProxy {
@@ -819,6 +705,9 @@ class TranslateActor extends SingleEffectProxy {
     required super.child,
     super.curve,
     super.timing,
+    super.role,
+    super.reverseCurve,
+    super.reverseTiming,
   }) : _variant = _TranslateVariant.offset,
        _axisFrom = null,
        _axisTo = null;
@@ -830,6 +719,9 @@ class TranslateActor extends SingleEffectProxy {
     required super.child,
     super.curve,
     super.timing,
+    super.reverseCurve,
+    super.reverseTiming,
+    super.role,
   }) : _variant = _TranslateVariant.horizontal,
        _axisFrom = from,
        _axisTo = to,
@@ -843,6 +735,9 @@ class TranslateActor extends SingleEffectProxy {
     required super.child,
     super.curve,
     super.timing,
+    super.reverseCurve,
+    super.reverseTiming,
+    super.role,
   }) : _axisFrom = from,
        _axisTo = to,
        _variant = _TranslateVariant.vertical,
@@ -856,6 +751,9 @@ class TranslateActor extends SingleEffectProxy {
     required super.child,
     super.curve,
     super.timing,
+    super.reverseCurve,
+    super.reverseTiming,
+    super.role,
   }) : _variant = _TranslateVariant.fromGlobal,
        _axisFrom = null,
        _axisTo = null,
@@ -863,38 +761,12 @@ class TranslateActor extends SingleEffectProxy {
        to = toLocal;
 
   @override
-  Widget build(BuildContext context) {
-    final Effect effect = switch (_variant) {
-      _TranslateVariant.horizontal => TranslateEffect.x(
-        from: _axisFrom!,
-        to: _axisTo!,
-        curve: curve,
-        timing: timing,
-      ),
-      _TranslateVariant.vertical => TranslateEffect.y(
-        from: _axisFrom!,
-        to: _axisTo!,
-        curve: curve,
-        timing: timing,
-      ),
-      _TranslateVariant.fromGlobal => TranslateEffect.fromGlobal(
-        offset: from!,
-        toLocal: to!,
-        curve: curve,
-        timing: timing,
-      ),
-      _ => TranslateEffect(
-        from: from!,
-        to: to!,
-        curve: curve,
-        timing: timing,
-      ),
-    };
-    return Actor(
-      effects: [effect],
-      child: child,
-    );
-  }
+  Effect get effect => switch (_variant) {
+    .horizontal => TranslateEffect.x(from: _axisFrom!, to: _axisTo!),
+    .vertical => TranslateEffect.y(from: _axisFrom!, to: _axisTo!),
+    .fromGlobal => TranslateEffect.fromGlobal(offset: from!, toLocal: to!),
+    _ => TranslateEffect(from: from!, to: to!),
+  };
 }
 
 enum _TranslateVariant { offset, vertical, horizontal, fromGlobal }
