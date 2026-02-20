@@ -1,20 +1,10 @@
+import 'package:cue/cue.dart';
 import 'package:flutter/material.dart';
 
 class CueDebugTools extends StatefulWidget {
-  const CueDebugTools({
-    super.key,
-    required this.child,
-    this.global = true,
-    this.baseDuration = const Duration(milliseconds: 500),
-  });
+  const CueDebugTools({super.key, required this.child});
 
   final Widget child;
-  final bool global;
-  final Duration baseDuration;
-
-  static Widget wrap(BuildContext context, Widget? child) {
-    return CueDebugTools(child: child ?? const SizedBox.shrink());
-  }
 
   @override
   State<CueDebugTools> createState() => _CueDebugToolsState();
@@ -23,15 +13,34 @@ class CueDebugTools extends StatefulWidget {
     return context.findAncestorWidgetOfExactType<CueDebugTools>() != null;
   }
 
-  static VoidCallback? showDebugOverlay(BuildContext context) {
+  static void openOverlay(BuildContext context) {
     final provider = context.findAncestorStateOfType<_CueDebugToolsState>();
-    return provider?.showProgressControllerAsOverlay(context);
+    provider?.openOverlay(context);
   }
 
-  static Animation<double>? animationOf(BuildContext context) {
-    final scope = context.dependOnInheritedWidgetOfExactType<_DebugDataProvider>();
-    if (scope?.isMinimized == true) return null;
-    return scope?.animation ?? AlwaysStoppedAnimation(1.0);
+  static VoidCallback? attachDebugTarget(
+    BuildContext context, {
+    required String id,
+    required Duration duration,
+    Curve? curve,
+    CueSimulation? simulation,
+  }) {
+    final provider = context.findAncestorStateOfType<_CueDebugToolsState>();
+    return provider?.attachDebugTarget(
+      context,
+      id: id,
+      curve: curve,
+      duration: duration,
+      simulation: simulation,
+    );
+  }
+
+  static DebugDataProvider of(BuildContext context) {
+    final scope = context.dependOnInheritedWidgetOfExactType<DebugDataProvider>();
+    if (scope == null) {
+      throw Exception('No CueDebugTools found in context. Make sure to wrap your widget tree with CueDebugTools.');
+    }
+    return scope;
   }
 }
 
@@ -39,15 +48,18 @@ class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProvider
   late final AnimationController _controller;
   final _overlayData = ValueNotifier<_OverlayData>(
     _OverlayData(
-      speedIndex: 0,
+      speedMultiplier: 1,
       isLooping: false,
-      isMinimized: false,
+      isMinimized: true,
       verticalOffset: 0,
+      isSelectMode: false,
+      activeTargetId: null,
     ),
   );
 
   OverlayEntry? _entry;
-  final Set<BuildContext> _attachedCallers = {};
+
+  _DebugTarget? _activeTarget;
 
   @override
   void initState() {
@@ -56,14 +68,8 @@ class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProvider
       vsync: this,
       lowerBound: 0.0,
       upperBound: 1.0,
-      duration: widget.baseDuration,
+      duration: const Duration(milliseconds: 500),
     );
-
-    if (!widget.global) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        showProgressControllerAsOverlay(context);
-      });
-    }
   }
 
   void _startAutoPlay() {
@@ -78,13 +84,28 @@ class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProvider
     }
   }
 
-  VoidCallback showProgressControllerAsOverlay(BuildContext context) {
-    _attachedCallers.add(context);
+  VoidCallback attachDebugTarget(
+    BuildContext context, {
+    required String id,
+    required Duration duration,
+    Curve? curve,
+    CueSimulation? simulation,
+  }) {
+    _activeTarget = _DebugTarget(
+      id: id,
+      curve: curve,
+      simulation: simulation,
+      duration: duration,
+    );
+    _controller.duration = duration;
+
+    _overlayData.value = _overlayData.value.copyWith(
+      isMinimized: false,
+      isSelectMode: false,
+      activeTargetId: id,
+    );
     void deattachCallback() {
-      _attachedCallers.remove(context);
-      if (_attachedCallers.isEmpty) {
-        _entry?.remove();
-        _entry = null;
+      if (_activeTarget?.id == id) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           _controller.value = 0;
         });
@@ -92,18 +113,23 @@ class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProvider
     }
 
     if (_entry != null) return deattachCallback;
+    openOverlay(context);
+    return deattachCallback;
+  }
+
+  void openOverlay(BuildContext context) {
+    if (_entry != null) return;
     _entry = OverlayEntry(
       builder: (context) {
         return _DebugOverlay(
           controller: _controller,
           onPlay: _startAutoPlay,
-          baseDuration: widget.baseDuration,
           overlayData: _overlayData,
+          baseDuration: _activeTarget?.duration ?? const Duration(milliseconds: 500),
         );
       },
     );
     Overlay.of(context).insert(_entry!);
-    return deattachCallback;
   }
 
   @override
@@ -118,9 +144,11 @@ class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProvider
     return ListenableBuilder(
       listenable: _overlayData,
       builder: (context, _) {
-        return _DebugDataProvider(
+        return DebugDataProvider(
+          activeTargetId: _activeTarget?.id,
           animation: _controller.view,
           isMinimized: _overlayData.value.isMinimized,
+          isSelectMode: _overlayData.value.isSelectMode,
           child: widget.child,
         );
       },
@@ -147,8 +175,6 @@ class _DebugOverlay extends StatefulWidget {
 }
 
 class _DebugOverlayState extends State<_DebugOverlay> {
-  static const List<int> _speedMultipliers = [1, 2, 4, 8, 16];
-
   AnimationController get _controller => widget.controller;
 
   ValueNotifier<_OverlayData> get _dataNotifier => widget.overlayData;
@@ -176,20 +202,25 @@ class _DebugOverlayState extends State<_DebugOverlay> {
     widget.onPlay();
   }
 
-  void _cycleSpeed() {
-    _dataNotifier.value = _data.copyWith(
-      speedIndex: (_data.speedIndex + 1) % _speedMultipliers.length,
-    );
-    final speed = _speedMultipliers[_data.speedIndex];
-    _setSpeed(speed);
+  void _toggleSlowMode() {
+    final targetSpeed = _data.speedMultiplier == 1 ? 5 : 1;
+    _setSpeed(targetSpeed);
+  }
+
+  void _toggleSelectMode() {
+    if (!_data.isSelectMode) {
+      _controller.stop();
+      _controller.value = 0;
+    }
+    _dataNotifier.value = _data.copyWith(isSelectMode: !_data.isSelectMode);
   }
 
   void _setSpeed(int multiplier) {
+    _dataNotifier.value = _data.copyWith(speedMultiplier: multiplier);
     final wasAnimating = _controller.isAnimating;
     _controller.duration = Duration(
       microseconds: (widget.baseDuration.inMicroseconds * multiplier).round(),
     );
-
     if (wasAnimating) {
       _controller.stop();
     }
@@ -227,19 +258,18 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                 alignment: Alignment.topLeft,
                 child: SafeArea(
                   child: IconTheme(
-                    data: theme.iconTheme.copyWith(color: theme.primaryColor),
+                    data: theme.iconTheme.copyWith(color: theme.primaryColor, size: 20),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       child: Material(
                         color: theme.colorScheme.surface,
+                        animationDuration: const Duration(milliseconds: 200),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(
                             _dataNotifier.value.isMinimized ? 32 : 16,
                           ),
                           side: BorderSide(
-                            color: theme.colorScheme.onSurface.withValues(
-                              alpha: .52,
-                            ),
+                            color: theme.colorScheme.onSurface.withValues(alpha: .52),
                             width: .5,
                           ),
                         ),
@@ -254,7 +284,7 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                                 if (_data.isMinimized) {
                                   return IconButton(
                                     style: IconButton.styleFrom(
-                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                      tapTargetSize: .shrinkWrap,
                                       shape: CircleBorder(),
                                       minimumSize: .square(40),
                                     ),
@@ -262,6 +292,7 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                                     onPressed: () {
                                       _dataNotifier.value = _data.copyWith(
                                         isMinimized: false,
+                                        isSelectMode: _data.activeTargetId == null,
                                       );
                                     },
                                     padding: EdgeInsets.zero,
@@ -270,10 +301,7 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                                 }
 
                                 return Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 8,
-                                  ),
+                                  padding: const .fromLTRB(8, 4, 8, 8),
                                   child: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -286,9 +314,7 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                                                   ? Icons.pause_circle_outline_rounded
                                                   : Icons.play_circle_outline_rounded,
                                             ),
-                                            style: IconButton.styleFrom(
-                                              iconSize: 32,
-                                            ),
+                                            style: IconButton.styleFrom(iconSize: 32),
                                             onPressed: _togglePlayPause,
                                             padding: EdgeInsets.zero,
                                           ),
@@ -308,9 +334,9 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                                                 ),
                                                 SizedBox(
                                                   width: 16,
-                                                  height: 12,
+                                                  height: 14,
                                                   child: VerticalDivider(
-                                                    thickness: 2,
+                                                    thickness: 1.2,
                                                   ),
                                                 ),
                                                 Builder(
@@ -319,12 +345,9 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                                                     final fixedWidth = totalInMs.toString().length;
                                                     final currentInMs = ((widget.controller.value * totalInMs).round())
                                                         .toString()
-                                                        .padLeft(
-                                                          fixedWidth,
-                                                          '0',
-                                                        );
+                                                        .padLeft(fixedWidth, '0');
                                                     return Text(
-                                                      '${currentInMs}ms / ${totalInMs}ms',
+                                                      '${currentInMs}ms',
                                                       style: const TextStyle(
                                                         fontSize: 12,
                                                         fontFamily: 'monospace',
@@ -338,72 +361,28 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                                               ],
                                             ),
                                           ),
-                                          Builder(
-                                            builder: (context) {
-                                              final speed = _speedMultipliers[_data.speedIndex];
-                                              final speedLabel = _data.speedIndex == 0 ? '1X' : '-${speed}X';
-                                              return Row(
-                                                children: [
-                                                  InkWell(
-                                                    onTap: _cycleSpeed,
-                                                    borderRadius: BorderRadius.circular(
-                                                      32,
-                                                    ),
-                                                    child: Container(
-                                                      padding: const EdgeInsets.symmetric(
-                                                        horizontal: 8,
-                                                        vertical: 4,
-                                                      ),
-                                                      decoration: BoxDecoration(
-                                                        color:
-                                                            Theme.of(
-                                                              context,
-                                                            ).colorScheme.primary.withValues(
-                                                              alpha: .1,
-                                                            ),
-                                                        borderRadius: BorderRadius.circular(
-                                                          32,
-                                                        ),
-                                                      ),
-                                                      child: Text(
-                                                        speedLabel,
-                                                        style: const TextStyle(
-                                                          fontSize: 13,
-                                                          fontFamily: 'monospace',
-                                                          fontWeight: FontWeight.w600,
-                                                        ),
-                                                        textAlign: TextAlign.center,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  SizedBox(width: 6),
-                                                  IconButton(
-                                                    padding: EdgeInsets.zero,
-                                                    style: IconButton.styleFrom(
-                                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                                    ),
-                                                    onPressed: () {
-                                                      final slowestSpeedIndex = _speedMultipliers.length - 1;
-                                                      if (_data.speedIndex == slowestSpeedIndex) {
-                                                        _dataNotifier.value = _data.copyWith(
-                                                          speedIndex: 0,
-                                                        );
-                                                      } else {
-                                                        _dataNotifier.value = _data.copyWith(
-                                                          speedIndex: slowestSpeedIndex,
-                                                        );
-                                                      }
-                                                      _setSpeed(
-                                                        _speedMultipliers[_data.speedIndex],
-                                                      );
-                                                    },
-                                                    icon: Icon(
-                                                      Icons.slow_motion_video_outlined,
-                                                    ),
-                                                  ),
-                                                ],
-                                              );
-                                            },
+                                          IconButton(
+                                            padding: EdgeInsets.zero,
+                                            style: IconButton.styleFrom(tapTargetSize: .shrinkWrap),
+                                            constraints: const BoxConstraints(),
+                                            onPressed: _toggleSelectMode,
+                                            icon: Icon(
+                                              Icons.ads_click,
+                                              color: _data.isSelectMode
+                                                  ? Colors.blue
+                                                  : IconTheme.of(context).color?.withValues(alpha: .4),
+                                            ),
+                                          ),
+                                          IconButton(
+                                            padding: EdgeInsets.zero,
+                                            style: IconButton.styleFrom(tapTargetSize: .shrinkWrap),
+                                            onPressed: _toggleSlowMode,
+                                            icon: Icon(
+                                              Icons.alarm_rounded,
+                                              color: _data.isSlowMode
+                                                  ? Colors.blue
+                                                  : IconTheme.of(context).color?.withValues(alpha: .4),
+                                            ),
                                           ),
                                           IconButton(
                                             style: IconButton.styleFrom(
@@ -424,9 +403,9 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                                           ),
                                           SizedBox(
                                             width: 16,
-                                            height: 16,
+                                            height: 14,
                                             child: VerticalDivider(
-                                              thickness: 1,
+                                              thickness: 1.2,
                                             ),
                                           ),
                                           IconButton(
@@ -449,41 +428,27 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                                       ),
 
                                       Container(
-                                        padding: const EdgeInsets.fromLTRB(
-                                          20,
-                                          12,
-                                          20,
-                                          4,
-                                        ),
+                                        padding: const .fromLTRB(20, 12, 20, 4),
                                         decoration: BoxDecoration(
                                           color: theme.colorScheme.surfaceContainer,
-                                          borderRadius: BorderRadius.circular(
-                                            10,
-                                          ),
+                                          borderRadius: .circular(10),
                                         ),
                                         child: SliderTheme(
                                           data: SliderThemeData(
-                                            trackShape: _TimelineTickMarkShape(
-                                              start: 0,
-                                              end: 1,
-                                            ),
+                                            trackShape: _TimelineTickMarkShape(start: 0, end: 1),
                                             tickMarkShape: SliderTickMarkShape.noTickMark,
                                             inactiveTrackColor: Theme.of(
                                               context,
                                             ).colorScheme.onSurface.withValues(alpha: .6),
-                                            thumbShape: _NeedleThumb(
-                                              height: 60,
-                                            ),
+                                            thumbShape: _NeedleThumb(height: 60),
                                           ),
                                           child: Slider(
                                             padding: EdgeInsets.zero,
                                             value: widget.controller.value,
                                             activeColor: Colors.transparent,
                                             thumbColor: theme.colorScheme.primary,
-                                            overlayColor: WidgetStatePropertyAll(
-                                              Colors.transparent,
-                                            ),
-                                            onChanged: _onSliderChanged,
+                                            overlayColor: WidgetStatePropertyAll(Colors.transparent),
+                                            onChanged: _data.isSelectMode ? null : _onSliderChanged,
                                           ),
                                         ),
                                       ),
@@ -654,16 +619,20 @@ class _TimelineTickMarkShape extends SliderTrackShape {
 }
 
 class _OverlayData {
-  final int speedIndex;
+  final int speedMultiplier;
   final bool isLooping;
   final bool isMinimized;
   final double verticalOffset;
+  final bool isSelectMode;
+  final String? activeTargetId;
 
   _OverlayData({
-    required this.speedIndex,
+    required this.speedMultiplier,
     required this.isLooping,
     required this.isMinimized,
     required this.verticalOffset,
+    required this.isSelectMode,
+    required this.activeTargetId,
   });
 
   @override
@@ -671,41 +640,72 @@ class _OverlayData {
       identical(this, other) ||
       other is _OverlayData &&
           runtimeType == other.runtimeType &&
-          speedIndex == other.speedIndex &&
+          speedMultiplier == other.speedMultiplier &&
           isLooping == other.isLooping &&
           isMinimized == other.isMinimized &&
-          verticalOffset == other.verticalOffset;
+          isSelectMode == other.isSelectMode &&
+          verticalOffset == other.verticalOffset &&
+          activeTargetId == other.activeTargetId;
 
   @override
-  int get hashCode => Object.hash(speedIndex, isLooping, isMinimized, verticalOffset);
+  int get hashCode =>
+      Object.hash(speedMultiplier, isLooping, isMinimized, verticalOffset, isSelectMode, activeTargetId);
+
+  bool get isSlowMode => speedMultiplier > 1;
 
   _OverlayData copyWith({
-    int? speedIndex,
+    int? speedMultiplier,
     bool? isLooping,
     bool? isMinimized,
     double? verticalOffset,
+    bool? isSelectMode,
+    String? activeTargetId,
   }) {
     return _OverlayData(
-      speedIndex: speedIndex ?? this.speedIndex,
+      speedMultiplier: speedMultiplier ?? this.speedMultiplier,
       isLooping: isLooping ?? this.isLooping,
       isMinimized: isMinimized ?? this.isMinimized,
       verticalOffset: verticalOffset ?? this.verticalOffset,
+      isSelectMode: isSelectMode ?? this.isSelectMode,
+      activeTargetId: activeTargetId ?? this.activeTargetId,
     );
   }
 }
 
-class _DebugDataProvider extends InheritedWidget {
-  const _DebugDataProvider({
+class DebugDataProvider extends InheritedWidget {
+  const DebugDataProvider({
+    super.key,
     required this.animation,
     required this.isMinimized,
+    required this.isSelectMode,
+    required this.activeTargetId,
     required super.child,
   });
 
   final Animation<double> animation;
   final bool isMinimized;
+  final bool isSelectMode;
+  final String? activeTargetId;
 
   @override
-  bool updateShouldNotify(covariant _DebugDataProvider oldWidget) {
-    return animation != oldWidget.animation || isMinimized != oldWidget.isMinimized;
+  bool updateShouldNotify(covariant DebugDataProvider oldWidget) {
+    return animation != oldWidget.animation ||
+        isMinimized != oldWidget.isMinimized ||
+        isSelectMode != oldWidget.isSelectMode ||
+        activeTargetId != oldWidget.activeTargetId;
   }
+}
+
+class _DebugTarget {
+  final String id;
+  final Duration duration;
+  final Curve? curve;
+  final CueSimulation? simulation;
+
+  _DebugTarget({
+    required this.id,
+    required this.duration,
+    this.curve,
+    this.simulation,
+  });
 }

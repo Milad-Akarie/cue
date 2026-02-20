@@ -57,9 +57,8 @@ class _ModalTransitionState extends State<ModalTransition> {
     Animation<double> animation = _transitionAnimation;
     if (kDebugMode && widget.showDebug) {
       if (CueDebugTools.isWrappedByDebugProvider(context)) {
-        if (CueDebugTools.animationOf(context) case var debugAnimation?) {
-          animation = debugAnimation;
-        }
+        final scope = CueDebugTools.of(context);
+        animation = scope.animation;
       }
     }
     return Cue(
@@ -164,7 +163,7 @@ class _ModelContent extends StatelessWidget {
       ),
       builder: (context, debug, child) {
         return Cue(
-          debug: debug,
+          debugLabel: 'ModalTransitionContent',
           animation: animation,
           child: child!,
         );

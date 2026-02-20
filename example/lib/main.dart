@@ -1,8 +1,10 @@
 import 'package:cue/cue.dart';
 import 'package:example/examples/horizinally_expanding_cards.dart';
+import 'package:example/examples/options_button.dart';
 import 'package:example/examples/smooth_toggle.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 
 void main() {
   runApp(const MyApp());
@@ -51,7 +53,15 @@ class _DemoPageState extends State<DemoPage> with SingleTickerProviderStateMixin
       body: Padding(
         padding: const EdgeInsets.only(top: 80),
         child: Center(
-          child: SmoothSwitch(),
+          child: Column(
+            mainAxisAlignment: .center,
+            children: [
+              SmoothSwitch(),
+              SizedBox(height: 32),
+              SmoothSwitch(),
+              OptionsButton(),
+            ],
+          ),
           // child: Cue.onToggle(
           //   toggled: _toggled,
           //   // debug: true,

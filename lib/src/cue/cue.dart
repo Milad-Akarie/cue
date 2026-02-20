@@ -7,21 +7,18 @@ abstract class Cue extends StatefulWidget {
     super.key,
     required this.child,
     this.curve,
-    this.debug = false,
-    this.effects,
+    this.debugLabel,
   });
 
-  final bool debug;
+  final String? debugLabel;
   final Curve? curve;
   final Widget child;
-  final List<Effect>? effects;
 
   const factory Cue({
     Key? key,
     required Widget child,
     Curve curve,
-    bool debug,
-    List<Effect>? effects,
+    String? debugLabel,
     bool isBounded,
     required Animation<double> animation,
   }) = _ControlledCue;
@@ -30,16 +27,14 @@ abstract class Cue extends StatefulWidget {
     Key? key,
     required Widget child,
     Curve curve,
-    bool debug,
-    List<Effect>? effects,
+    String? debugLabel,
   }) = _RouteTransitionStage;
 
   const factory Cue.onMount({
     Key? key,
     required Widget child,
     Curve curve,
-    bool debug,
-    List<Effect>? effects,
+    String? debugLabel,
     Duration duration,
     Duration? reverseDuration,
     CueSimulation? simulation,
@@ -52,8 +47,7 @@ abstract class Cue extends StatefulWidget {
     Key? key,
     required Widget child,
     Curve curve,
-    bool debug,
-    List<Effect>? effects,
+    String? debugLabel,
     Duration duration,
     CueSimulation? simulation,
     Duration? reverseDuration,
@@ -65,8 +59,7 @@ abstract class Cue extends StatefulWidget {
     Key? key,
     required Widget child,
     Curve curve,
-    bool debug,
-    List<Effect>? effects,
+    String? debugLabel,
     Duration duration,
     Duration? reverseDuration,
     CueSimulation? simulation,
@@ -78,8 +71,7 @@ abstract class Cue extends StatefulWidget {
     Key? key,
     required Widget child,
     Curve curve,
-    List<Effect>? effects,
-    bool debug,
+    String? debugLabel,
     required Listenable listenable,
     required ValueGetter<double> getOffset,
     required int targetIndex,
@@ -90,8 +82,7 @@ abstract class Cue extends StatefulWidget {
     Key? key,
     required Widget child,
     Curve curve,
-    List<Effect>? effects,
-    bool debug,
+    String? debugLabel,
     required PageController controller,
     required int targetIndex,
     IndexDistanceCalculator? calculator,
@@ -116,32 +107,17 @@ abstract class _CueState<T extends Cue> extends State<Cue> {
 
   bool get isBounded;
 
-  @override
-  void initState() {
-    super.initState();
-    if (kDebugMode && widget.debug) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (CueDebugTools.isWrappedByDebugProvider(context)) {
-          _deattachDebugOverlay = CueDebugTools.showDebugOverlay(context);
-        }
-      });
-    }
-  }
+  late final _debugId = 'Cue#${widget.debugLabel ?? ''}-${identityHashCode(widget)}';
 
   @override
   void didUpdateWidget(covariant Cue oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (kDebugMode) {
-      if (widget.debug && !oldWidget.debug) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (CueDebugTools.isWrappedByDebugProvider(context)) {
-            _deattachDebugOverlay = CueDebugTools.showDebugOverlay(context);
-          }
-        });
-      } else if (!widget.debug && oldWidget.debug) {
-        _deattachDebugOverlay?.call();
-        _deattachDebugOverlay = null;
-      }
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (CueDebugTools.isWrappedByDebugProvider(context)) {
+          CueDebugTools.openOverlay(context);
+        }
+      });
     }
   }
 
@@ -153,36 +129,55 @@ abstract class _CueState<T extends Cue> extends State<Cue> {
 
   @override
   Widget build(BuildContext context) {
-    Widget child = widget.child;
-    if (widget.effects case final acts?) {
-      child = Actor(effects: acts, child: child);
-    }
-    if (kDebugMode && widget.debug) {
+    Widget child = RepaintBoundary(
+      child: CueScope(
+        animation: getAnimation(context),
+        isBounded: isBounded,
+        child: widget.child,
+      ),
+    );
+
+    if (kDebugMode) {
       if (CueDebugTools.isWrappedByDebugProvider(context)) {
-        final debugAnimation = CueDebugTools.animationOf(context);
-        if (debugAnimation != null) {
-          return CueScope(
-            animation: debugAnimation,
-            isBounded: isBounded,
-            child: child,
+        final scope = CueDebugTools.of(context);
+        print(scope.activeTargetId);
+
+        if (scope.isSelectMode) {
+          final color = scope.activeTargetId == _debugId ? Colors.blue : Colors.amber;
+          return GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () {
+              CueDebugTools.attachDebugTarget(
+                context,
+                id: _debugId,
+                duration: const Duration(seconds: 1),
+                curve: Curves.easeOut,
+                simulation: const Spring.smooth(),
+              );
+            },
+            child: IgnorePointer(
+              child: Container(
+                foregroundDecoration: BoxDecoration(
+                  color: color.withValues(alpha: .2),
+                  border: Border.all(
+                    color: color.withValues(alpha: .8),
+                  ),
+                ),
+                child: child,
+              ),
+            ),
           );
         }
-      } else {
-        return CueDebugTools(
-          global: false,
-          child: Builder(
-            builder: (context) {
-              final debugAnimation = CueDebugTools.animationOf(context);
-              if (debugAnimation != null) {
-                return CueScope(animation: debugAnimation, isBounded: isBounded, child: child);
-              }
-              return CueScope(animation: getAnimation(context), isBounded: isBounded, child: child);
-            },
-          ),
-        );
+        if (!scope.isMinimized && scope.activeTargetId == _debugId) {
+          return CueScope(
+            animation: scope.animation,
+            isBounded: isBounded,
+            child: widget.child,
+          );
+        }
       }
     }
-    return CueScope(animation: getAnimation(context), isBounded: true, child: child);
+    return child;
   }
 
   Animation<double> getAnimation(BuildContext context);
@@ -193,8 +188,7 @@ class _RouteTransitionStage extends Cue {
     super.key,
     required super.child,
     super.curve,
-    super.debug,
-    super.effects,
+    super.debugLabel,
   }) : super._();
 
   @override
@@ -206,8 +200,7 @@ class _SelfAnimatedCue extends Cue {
     super.key,
     required super.child,
     super.curve,
-    super.debug,
-    super.effects,
+    super.debugLabel,
     this.duration = const Duration(milliseconds: 300),
     this.reverseDuration,
     this.loop = false,
@@ -416,8 +409,7 @@ class _OnHoverCue extends _SelfAnimatedCue {
     super.key,
     required super.child,
     super.curve,
-    super.debug,
-    super.effects,
+    super.debugLabel,
     super.simulation,
     super.duration = const Duration(milliseconds: 200),
     super.reverseDuration,
@@ -453,8 +445,7 @@ class _TogglableCue extends _SelfAnimatedCue {
     super.key,
     required super.child,
     super.curve,
-    super.debug,
-    super.effects,
+    super.debugLabel,
     super.simulation,
     super.duration = const Duration(milliseconds: 300),
     super.reverseDuration,
@@ -526,9 +517,8 @@ class _ControlledCue extends Cue {
     super.key,
     required super.child,
     this.isBounded = true,
-    super.effects,
     super.curve,
-    super.debug,
+    super.debugLabel,
     required this.animation,
   }) : super._();
 
@@ -578,8 +568,7 @@ class _IndexedStage extends Cue {
   const _IndexedStage({
     super.key,
     super.curve,
-    super.debug,
-    super.effects,
+    super.debugLabel,
     required super.child,
     required this.listenable,
     required this.getOffset,
@@ -599,8 +588,7 @@ class _IndexedStage extends Cue {
     Key? key,
     required Widget child,
     Curve curve = Curves.linear,
-    bool debug = false,
-    List<Effect>? effects,
+    String? debugLabel,
     required PageController controller,
     required int targetIndex,
     IndexDistanceCalculator? calculator,
@@ -608,7 +596,7 @@ class _IndexedStage extends Cue {
     return _IndexedStage(
       key: key,
       curve: curve,
-      debug: debug,
+      debugLabel: debugLabel,
       listenable: controller,
       getOffset: () {
         if (!controller.hasClients) return 0.0;
