@@ -73,18 +73,30 @@ mixin IndexedCueController implements Listenable {
 
   bool get isAnimating;
 
+  double get globalOffset;
+
   double valueFor(int targetIndex) {
     if (!animateAll && isAnimating) {
-      print('target: $targetIndex, current: $currentIndex, last: $lastSettledIndex, dest: $destinationIndex');
       final isRelevant = targetIndex == lastSettledIndex || targetIndex == destinationIndex;
       if (!isRelevant) return 0.0;
+
+      // Normalize progress across the full travel distance
+      final totalDistance = (destinationIndex - lastSettledIndex).abs().toDouble();
+      if (totalDistance == 0) return calculateOffsetFor(targetIndex);
+
+      final progress = (globalOffset - lastSettledIndex).abs() / totalDistance;
+      // lastSettledIndex animates from 1.0 → 0.0, destinationIndex from 0.0 → 1.0
+      return targetIndex == destinationIndex ? progress.clamp(0.0, 1.0) : (1.0 - progress).clamp(0.0, 1.0);
     }
     return calculateOffsetFor(targetIndex);
   }
 
   Listenable get tickListneable => this;
 
-  double calculateOffsetFor(int targetIndex);
+  double calculateOffsetFor(int targetIndex) {
+    final distance = (globalOffset - targetIndex).abs();
+    return (1.0 - distance).clamp(0.0, 1.0);
+  }
 }
 
 class CuePageController extends PageController with IndexedCueController {
@@ -111,16 +123,10 @@ class CuePageController extends PageController with IndexedCueController {
   bool get isAnimating => _isAnimating;
 
   @override
-  int get currentIndex => _safeOffset.round();
+  int get currentIndex => globalOffset.round();
 
   @override
   int get lastSettledIndex => _lastSettledIndex;
-
-  @override
-  double calculateOffsetFor(int targetIndex) {
-    final distance = (_safeOffset - targetIndex).abs();
-    return (1.0 - distance).clamp(0.0, 1.0);
-  }
 
   @override
   Future<void> animateToPage(int page, {required Duration duration, required Curve curve}) {
@@ -138,11 +144,12 @@ class CuePageController extends PageController with IndexedCueController {
   @override
   int get destinationIndex {
     if (_isAnimating) return _destination;
-    final current = _safeOffset;
+    final current = globalOffset;
     return current > _lastSettledIndex ? current.ceil() : current.floor();
   }
 
-  double get _safeOffset {
+  @override
+  double get globalOffset {
     if (!hasClients) return initialPage.toDouble();
     return page ?? initialPage.toDouble();
   }
@@ -156,7 +163,7 @@ class CuePageController extends PageController with IndexedCueController {
   void _listenToSettledIndex() {
     assert(hasClients, 'Controller must be attached to a ScrollPosition to track settled index.');
     if (!position.isScrollingNotifier.value) {
-      _lastSettledIndex = _safeOffset.round();
+      _lastSettledIndex = globalOffset.round();
     }
   }
 
@@ -205,9 +212,8 @@ class CueTabController extends TabController with IndexedCueController {
   Listenable get tickListneable => animation ?? this;
 
   @override
-  double calculateOffsetFor(int targetIndex) {
-    final value = animation?.value ?? index.toDouble();
-    final distance = (value - targetIndex).abs();
-    return (1.0 - distance).clamp(0.0, 1.0);
+  double get globalOffset {
+    if (animation == null) return index.toDouble();
+    return animation!.value;
   }
 }

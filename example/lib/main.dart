@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
         splashFactory: NoSplash.splashFactory,
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: _OnChangeDemo(),
+      home: DemoPage(),
       builder: (context, child) {
         if (kDebugMode) {
           return CueDebugTools(child: child!);
@@ -65,26 +65,44 @@ class DemoPage extends StatefulWidget {
 }
 
 class _DemoPageState extends State<DemoPage> with SingleTickerProviderStateMixin {
-  late final _pageController = CueTabController(length: 5, vsync: this);
+  late final _tabsController = CueTabController(length: 5, vsync: this);
+  final _pageController = CuePageController(viewportFraction: .1);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        bottom: TabBar(
+          controller: _tabsController,
+          tabs: [
+            for (int index = 0; index < 5; index++)
+              Tab(
+                child: Text('Tab ${index + 1}'),
+              ),
+          ],
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SizedBox(
           height: 300,
-          child: Column(
+          child: PageView(
+            controller: _pageController,
             children: [
               for (int index = 0; index < 5; index++)
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(0.0),
                   child: Cue.indexed(
                     controller: _pageController,
                     targetIndex: index,
                     child: GestureDetector(
                       onTap: () {
-                        _pageController.animateTo(
+                        // _pageController.animateToPage(
+                        //   index,
+                        //   duration: Duration(milliseconds: 300),
+                        //   curve: Curves.linear,
+                        // );
+
+                        _pageController.animateToPage(
                           index,
                           duration: Duration(milliseconds: 300),
                           curve: Curves.easeInOut,
