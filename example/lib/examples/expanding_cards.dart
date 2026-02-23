@@ -42,7 +42,7 @@ class _ExpandingCardsState extends State<ExpandingCards> {
                   return Actor(
                     effects: [
                       PaddingEffect(to: const .symmetric(vertical: 12)),
-                      ScaleEffect(to: 1.01),
+                      ScaleEffect(from: 1.0, to: 1.01),
                     ],
                     child: Material(
                       clipBehavior: .hardEdge,
