@@ -1,5 +1,4 @@
 import 'package:cue/cue.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 @optionalTypeArgs
@@ -13,61 +12,49 @@ class CueModalTransition extends StatefulWidget {
     required this.triggerBuilder,
     required this.builder,
     this.duration = const Duration(milliseconds: 300),
-    this.showDebug = false,
     this.backdrop,
     this.alignment,
     this.barrierDismissible = true,
+    this.barrierLabel = 'ModalTransition',
     this.barrierColor = const Color(0x80000000),
     this.simulation,
+    this.hideTriggerOnTransition = false,
   });
 
   final Duration duration;
   final ModalContentBuilder builder;
   final Widget Function(BuildContext context, ShowModalFunction showDialog) triggerBuilder;
   final AlignmentGeometry? alignment;
-  final bool showDebug;
   final Widget? backdrop;
   final bool barrierDismissible;
   final Color? barrierColor;
   final CueSimulation? simulation;
+  final String barrierLabel;
+  final bool hideTriggerOnTransition;
 
   @override
   State<CueModalTransition> createState() => _CueModalTransitionState();
 }
 
 class _CueModalTransitionState extends State<CueModalTransition> {
-  final _triggerKey = GlobalKey();
-  late final _showDebug = ValueNotifier<bool>(widget.showDebug);
-  Animation<double> _transitionAnimation = AlwaysStoppedAnimation(0.0);
-
-  @override
-  void didUpdateWidget(covariant CueModalTransition oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (kDebugMode) {
-      if (oldWidget.showDebug != widget.showDebug) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          _showDebug.value = widget.showDebug;
-        });
-      }
-    }
-  }
+  final GlobalKey _triggerKey = GlobalKey();
+  bool _isModalOpen = false;
+  final LayerLink _link = LayerLink();
 
   @override
   Widget build(BuildContext context) {
-    Animation<double> animation = _transitionAnimation;
-    if (kDebugMode && widget.showDebug) {
-      if (CueDebugTools.isWrappedByDebugProvider(context)) {
-        final scope = CueDebugTools.of(context);
-        animation = scope.animation;
-      }
-    }
-    return Cue(
-      key: _triggerKey,
-      animation: animation,
-      child: Builder(
-        builder: (context) {
-          return widget.triggerBuilder(context, _showModel);
-        },
+    return CompositedTransformTarget(
+      link: _link,
+      child: Visibility(
+        key: _triggerKey,
+        visible: !_isModalOpen || !widget.hideTriggerOnTransition,
+        maintainAnimation: true,
+        maintainState: true,
+        maintainSize: true,
+        maintainFocusability: true,
+        maintainInteractivity: false,
+        maintainSemantics: true,
+        child: widget.triggerBuilder(context, _showModel),
       ),
     );
   }
@@ -79,35 +66,35 @@ class _CueModalTransitionState extends State<CueModalTransition> {
     final triggerRect = triggerOffset & (renderBox?.size ?? Size.zero);
     final model = _ModalRoute<T>(
       barrierDismissible: widget.barrierDismissible,
-      barrierLabel: 'ModalTransition',
+      barrierLabel: widget.barrierLabel,
       barrierColor: widget.barrierColor,
       transitionDuration: widget.duration,
       transitionBuilder: (context, anim, _, child) => child,
       simulation: widget.simulation,
+      onAnimationStatusChanged: (status) {
+        if (mounted) {
+          setState(() {
+            _isModalOpen = !status.isDismissed;
+          });
+        }
+      },
       pageBuilder: (context, animation, _) {
         return _ModelContent(
           animation: animation,
           backdrop: widget.backdrop,
           alignment: widget.alignment,
-          builder: (context, rect) {
-            return Builder(
-              builder: (ctx) {
-                return widget.builder(context, rect);
-              },
-            );
-          },
+          builder: widget.builder,
           barrierDismissible: widget.barrierDismissible,
-          showDebug: _showDebug,
           triggerRect: triggerRect,
+          link: _link,
         );
       },
-      onAnimationControllerReady: (controller) {
-        setState(() {
-          _transitionAnimation = controller.view;
-        });
-      },
     );
-
+    if (widget.hideTriggerOnTransition) {
+      setState(() {
+        _isModalOpen = true;
+      });
+    }
     return Navigator.of(context).push<T>(model);
   }
 }
@@ -119,8 +106,8 @@ class _ModelContent extends StatelessWidget {
     required this.animation,
     required this.builder,
     required this.barrierDismissible,
-    required this.showDebug,
     required this.triggerRect,
+    required this.link,
   });
 
   final Animation<double> animation;
@@ -128,13 +115,14 @@ class _ModelContent extends StatelessWidget {
   final AlignmentGeometry? alignment;
   final ModalContentBuilder builder;
   final bool barrierDismissible;
-  final ValueNotifier<bool> showDebug;
   final Rect triggerRect;
+  final LayerLink link;
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-      valueListenable: showDebug,
+    final resolvedAlignment = alignment?.resolve(Directionality.of(context));
+    return Cue(
+      animation: animation,
       child: Material(
         type: MaterialType.transparency,
         child: Stack(
@@ -148,26 +136,24 @@ class _ModelContent extends StatelessWidget {
                       )
                     : backdrop,
               ),
-            if (alignment != null)
+            if (resolvedAlignment case final alignment?)
               CustomSingleChildLayout(
                 delegate: _ModalPositionDelegate(
                   triggerRect: triggerRect,
-                  alignment: alignment!.resolve(Directionality.of(context)),
+                  alignment: alignment,
                 ),
-                child: builder(context, triggerRect),
+                child: CompositedTransformFollower(
+                  link: link,
+                  followerAnchor: alignment,
+                  targetAnchor: alignment,
+                  child: builder(context, triggerRect),
+                ),
               )
             else
               builder(context, triggerRect),
           ],
         ),
       ),
-      builder: (context, debug, child) {
-        return Cue(
-          debugLabel: 'ModalTransitionContent',
-          animation: animation,
-          child: child!,
-        );
-      },
     );
   }
 }
@@ -204,17 +190,17 @@ class _ModalPositionDelegate extends SingleChildLayoutDelegate {
 class _ModalRoute<T extends Object> extends RawDialogRoute<T> {
   _ModalRoute({
     required super.pageBuilder,
-    required this.onAnimationControllerReady,
     super.barrierDismissible,
     super.barrierLabel,
     super.barrierColor,
     super.transitionDuration,
     super.transitionBuilder,
     this.simulation,
+    required this.onAnimationStatusChanged,
   });
 
   final CueSimulation? simulation;
-  final ValueChanged<AnimationController> onAnimationControllerReady;
+  final ValueChanged<AnimationStatus> onAnimationStatusChanged;
 
   @override
   AnimationController createAnimationController() {
@@ -224,8 +210,14 @@ class _ModalRoute<T extends Object> extends RawDialogRoute<T> {
     } else {
       ctrl = AnimationController.unbounded(vsync: navigator!);
     }
-    onAnimationControllerReady(ctrl);
+    ctrl.addStatusListener(onAnimationStatusChanged);
     return ctrl;
+  }
+
+  @override
+  void dispose() {
+    controller?.removeStatusListener(onAnimationStatusChanged);
+    super.dispose();
   }
 
   @override
@@ -240,38 +232,5 @@ class _ModalRoute<T extends Object> extends RawDialogRoute<T> {
       );
     }
     return super.createSimulation(forward: forward);
-  }
-}
-
-class ClampingAnimation extends ProxyAnimation {
-  ClampingAnimation(this.orgin, this.min, this.max);
-  final ProxyAnimation orgin;
-
-  @override
-  Animation<double> get parent => orgin.parent!;
-  final double min;
-  final double max;
-
-  @override
-  double get value => parent.value.clamp(min, max);
-
-  @override
-  void addListener(VoidCallback listener) {
-    parent.addListener(listener);
-  }
-
-  @override
-  void removeListener(VoidCallback listener) {
-    parent.removeListener(listener);
-  }
-
-  @override
-  void addStatusListener(AnimationStatusListener listener) {
-    parent.addStatusListener(listener);
-  }
-
-  @override
-  void removeStatusListener(AnimationStatusListener listener) {
-    parent.removeStatusListener(listener);
   }
 }

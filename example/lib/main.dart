@@ -1,5 +1,6 @@
 import 'package:cue/cue.dart';
 import 'package:example/examples/expanding_cards.dart';
+import 'package:example/examples/three_dots_action.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -50,7 +51,7 @@ class __OnChangeDemoState extends State<_OnChangeDemo> {
       body: Center(
         child: Column(
           mainAxisAlignment: .center,
-          children: [ExpandingCards()],
+          children: [ThreeDotsAction()],
         ),
       ),
     );
