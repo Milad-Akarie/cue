@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
         splashFactory: NoSplash.splashFactory,
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: DemoPage(),
+      home: _OnChangeDemo(),
       builder: (context, child) {
         if (kDebugMode) {
           return CueDebugTools(child: child!);
@@ -68,46 +68,41 @@ class _DemoPageState extends State<DemoPage> with SingleTickerProviderStateMixin
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        // bottom: TabBar(
-        //   controller: _cueController,
-        //   tabs: [
-        //     for (int index = 0; index < 5; index++)
-        //       Tab(
-        //         child: Text('Tab ${index + 1}'),
-        //       ),
-        //   ],
-        // ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(0.0),
-        child: SizedBox(
-          child: ListView(
-            scrollDirection: Axis.vertical,
-            children: [
-              for (int index = 0; index < 20; index++)
-                Cue.onScrollVisible(
-                  key: Key('page_${index + 1}'),
-                  enabled: true,
-                  child: ScaleActor(
-                    from: .5,
-                    to: 1,
-                    child: Container(
-                      width: 200,
-                      height: 200,
-                      color: Colors.primaries[index % Colors.primaries.length].shade200,
-                      child: Center(
-                        child: Text(
-                          'Page ${index + 1}',
-                          style: Theme.of(context).textTheme.headlineMedium,
+      appBar: AppBar(),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(0.0),
+            child: SizedBox(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    child: Text('Show Sheet'),
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => Scaffold(
+                            appBar: AppBar(),
+                            body: Cue.onTransition(
+                              child: Center(
+                                child: SlideActor.y(
+                                  from: 10.0,
+                                  child: Text('Hello from the new page!'),
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
+                      );
+                    },
                   ),
-                ),
-            ],
+                ],
+              ),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

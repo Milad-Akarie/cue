@@ -45,7 +45,7 @@ class ScaleActor extends SingleEffectProxy<double> {
   const ScaleActor({
     super.key,
     required super.from,
-    required super.to,
+    super.to = 1.0,
     required super.child,
     this.alignment,
     super.curve,

@@ -91,11 +91,11 @@ mixin AnimationWithFilterMixin on Animation<double> {
   AnimationStatus get status => parent.status;
 }
 
-class DrivenAnimation<T> extends Animation<T> with AnimationLocalListenersMixin, AnimationLocalStatusListenersMixin {
+class ProgressAnimation<T> extends Animation<T> with AnimationLocalListenersMixin, AnimationLocalStatusListenersMixin {
   T _value;
   AnimationStatus _status;
 
-  DrivenAnimation({
+  ProgressAnimation({
     required T value,
     AnimationStatus status = AnimationStatus.dismissed,
   }) : _value = value,
@@ -107,7 +107,7 @@ class DrivenAnimation<T> extends Animation<T> with AnimationLocalListenersMixin,
   @override
   AnimationStatus get status => _status;
 
-  void update(T value, AnimationStatus status) {
+  void update(T value, {AnimationStatus status = AnimationStatus.forward}) {
     final valueChanged = _value != value;
     final statusChanged = _status != status;
 

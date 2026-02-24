@@ -18,7 +18,7 @@ class _IndexedCue extends Cue {
 }
 
 class _IndexedCueState extends _CueState<_IndexedCue> {
-  final _animation = DrivenAnimation(value: 0.0);
+  final _animation = ProgressAnimation(value: 0.0);
 
   @override
   bool get isBounded => true;
@@ -45,7 +45,7 @@ class _IndexedCueState extends _CueState<_IndexedCue> {
       _ => value > _animation.value ? AnimationStatus.forward : AnimationStatus.reverse,
     };
 
-    _animation.update(value, status);
+    _animation.update(value, status: status);
   }
 
   @override

@@ -12,6 +12,7 @@ part 'on_toggle_cue.dart';
 part 'on_scroll_visiable_cue.dart';
 part 'controlled_cue.dart';
 part 'cue_scope.dart';
+part 'progress_cue.dart';
 
 abstract class Cue extends StatefulWidget {
   const Cue._({
@@ -39,6 +40,7 @@ abstract class Cue extends StatefulWidget {
     required Widget child,
     Curve curve,
     String? debugLabel,
+    bool useSecondaryAnimation,
   }) = _RouteTransitionStage;
 
   const factory Cue.onMount({
@@ -98,6 +100,15 @@ abstract class Cue extends StatefulWidget {
     required IndexedCueController controller,
     required int targetIndex,
   }) = _IndexedCue;
+
+  const factory Cue.onProgress({
+    Key? key,
+    required Widget child,
+    Curve? curve,
+    String? debugLabel,
+    required Listenable notifier,
+    required ValueGetter<double> progress,
+  }) = _ProgressCue;
 
   // This only works within the nearest scrollable ancestor and is not meant to be used as a general purpose visibility detector.
   // it doesn't support nested scrollables and is not meant to be used as a general purpose visibility detector.

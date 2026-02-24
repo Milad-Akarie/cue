@@ -6,7 +6,10 @@ class _RouteTransitionStage extends Cue {
     required super.child,
     super.curve,
     super.debugLabel,
+    this.useSecondaryAnimation = false,
   }) : super._();
+
+  final bool useSecondaryAnimation;
 
   @override
   State<StatefulWidget> createState() => _RouteTransitionStageState();
@@ -18,6 +21,8 @@ class _RouteTransitionStageState extends _CueState<_RouteTransitionStage> {
 
   @override
   Animation<double> getAnimation(BuildContext context) {
-    return ModalRoute.of(context)!.animation!;
+    return widget.useSecondaryAnimation
+        ? ModalRoute.of(context)!.secondaryAnimation!
+        : ModalRoute.of(context)!.animation!;
   }
 }
