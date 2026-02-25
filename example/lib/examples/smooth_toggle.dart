@@ -19,7 +19,7 @@ class _SmoothSwitchState extends State<SmoothSwitch> {
     final thumbColor = theme.colorScheme.onSurface;
     return Cue.onToggle(
       toggled: _toggled,
-      simulation: const Spring.smooth(),
+      motion: .simulation(const Spring.smooth()),
       child: GestureDetector(
         onTap: () {
           setState(() {

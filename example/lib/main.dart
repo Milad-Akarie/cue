@@ -1,6 +1,5 @@
 import 'package:cue/cue.dart';
 import 'package:example/examples/delete_confirmation.dart';
-import 'package:example/examples/horizinally_expanding_cards.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 

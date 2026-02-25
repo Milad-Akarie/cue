@@ -44,8 +44,7 @@ class _HorizontallyExpandingCardsState extends State<HorizontallyExpandingCards>
                 for (var i = 0; i < cardsInfo.length; i++)
                   Cue.onToggle(
                     toggled: i == _expandedIndex,
-                    duration: const Duration(milliseconds: 500),
-                    simulation: const Spring.smooth(),
+                    motion: .simulation(const Spring.smooth()),
                     child: Card(
                       margin: .zero,
                       elevation: 0,
