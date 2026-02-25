@@ -19,7 +19,7 @@ class DeleteConfirmationDialog extends StatelessWidget {
         foregroundColor: theme.colorScheme.error,
         elevation: .5,
         shape: CircleBorder(),
-        child: Icon(Iconsax.trash, size: 24),
+        child: Icon(Iconsax.trash),
       ),
       builder: (context, rect) {
         return TranslateActor(
@@ -84,9 +84,7 @@ class DeleteConfirmationDialog extends StatelessWidget {
                           iconAlignment: .end,
                           icon: Actor(
                             effects: [
-                              TranslateEffect.fromGlobal(
-                                offset: rect.center - Offset(12, 12),
-                              ),
+                              TranslateEffect.fromGlobalRect(rect),
                               IconThemeEffect(
                                 from: IconThemeData(size: 24),
                                 to: IconThemeData(size: 20),

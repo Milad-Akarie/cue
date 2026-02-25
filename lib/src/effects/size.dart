@@ -457,10 +457,11 @@ class _RenderAnimatedSize extends RenderAligningShiftedBox {
       checkNSize(_fromSize);
       checkNSize(_toSize);
     }
-
-    return BoxConstraints.tightFor(
-      width: maxWidth ?? (parentConstraints.hasBoundedWidth ? parentConstraints.maxWidth : null),
-      height: maxHeight ?? (parentConstraints.hasBoundedHeight ? parentConstraints.maxHeight : null),
+    return BoxConstraints.loose(
+      Size(
+        maxWidth ?? (parentConstraints.hasBoundedWidth ? parentConstraints.maxWidth : double.infinity),
+        maxHeight ?? (parentConstraints.hasBoundedHeight ? parentConstraints.maxHeight : double.infinity),
+      ),
     );
   }
 

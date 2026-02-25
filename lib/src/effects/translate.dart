@@ -43,6 +43,14 @@ abstract class TranslateEffect extends Effect {
     Curve? curve,
     Timing? timing,
   }) = _TranslateFromGlobal;
+
+  const factory TranslateEffect.fromGlobalRect(
+    Rect rect, {
+    AlignmentGeometry alignment,
+    Offset toLocal,
+    Curve? curve,
+    Timing? timing,
+  }) = _TranslateFromGlobal.fromRect;
 }
 
 class _TranslateOffset extends TweenEffect<Offset> implements TranslateEffect {
@@ -142,24 +150,35 @@ class _TranslateTransition extends AnimatedWidget {
 }
 
 class _TranslateFromGlobal extends TweenEffect<double> implements TranslateEffect {
-  final Offset offset;
+  final Offset? offset;
+  final Rect? rect;
+  final AlignmentGeometry? alignment;
   final Offset toLocal;
   const _TranslateFromGlobal({
-    required this.offset,
+    required Offset this.offset,
     this.toLocal = Offset.zero,
     super.curve,
     super.timing,
-  }) : super(from: 0, to: 1);
+  }) : rect = null,
+       alignment = null,
+       super(from: 0, to: 1);
+
+  const _TranslateFromGlobal.fromRect(
+    this.rect, {
+    this.toLocal = Offset.zero,
+    this.alignment = Alignment.center,
+    super.curve,
+    super.timing,
+  }) : offset = null,
+       super(from: 0, to: 1);
 
   @override
-  Widget apply(
-    BuildContext context,
-    Animation<double> animation,
-    Widget child,
-  ) {
+  Widget apply(BuildContext context, Animation<double> animation, Widget child) {
     return _TranslateFromGlobalTransition(
       animation: animation,
-      global: offset,
+      globalOffset: offset,
+      globalRect: rect,
+      alignment: alignment,
       local: toLocal,
       child: child,
     );
@@ -168,16 +187,20 @@ class _TranslateFromGlobal extends TweenEffect<double> implements TranslateEffec
 
 class _TranslateFromGlobalTransition extends StatefulWidget {
   final Animation<double> animation;
-  final Offset global;
+  final Offset? globalOffset;
+  final Rect? globalRect;
+  final AlignmentGeometry? alignment;
   final Offset local;
   final Widget child;
 
   const _TranslateFromGlobalTransition({
     required this.animation,
-    required this.global,
+    required this.globalOffset,
+    required this.globalRect,
+    this.alignment,
     required this.child,
     this.local = Offset.zero,
-  });
+  }) : assert(globalOffset != null || globalRect != null);
 
   @override
   State<_TranslateFromGlobalTransition> createState() => _TranslateFromGlobalTransitionState();
@@ -214,7 +237,7 @@ class _TranslateFromGlobalTransitionState extends State<_TranslateFromGlobalTran
       oldWidget.animation.removeListener(_onAnimationUpdate);
       widget.animation.addListener(_onAnimationUpdate);
     }
-    if (oldWidget.global != widget.global) {
+    if (oldWidget.globalOffset != widget.globalOffset || oldWidget.globalRect != widget.globalRect) {
       _measured = false;
       WidgetsBinding.instance.addPostFrameCallback((_) => _measure());
     }
@@ -225,15 +248,27 @@ class _TranslateFromGlobalTransitionState extends State<_TranslateFromGlobalTran
 
     final renderBox = _key.currentContext?.findRenderObject() as RenderBox?;
     if (renderBox == null || !renderBox.hasSize) return;
-
     final targetGlobal = renderBox.localToGlobal(Offset.zero);
-    final newDelta = widget.global - targetGlobal;
 
-    if (_deltaTween?.begin != newDelta) {
-      setState(() {
-        _deltaTween = Tween(begin: newDelta, end: widget.local);
-        _measured = true;
-      });
+    if (widget.globalOffset case final global?) {
+      final newDelta = global - targetGlobal;
+      if (_deltaTween?.begin != newDelta) {
+        setState(() {
+          _deltaTween = Tween(begin: newDelta, end: widget.local);
+          _measured = true;
+        });
+      }
+    } else {
+      final rect = widget.globalRect!;
+      final alignment = widget.alignment!.resolve(Directionality.of(context));
+      final targetRect = alignment.inscribe(renderBox.size, rect);
+      final newDelta = targetRect.topLeft - targetGlobal;
+      if (_deltaTween?.begin != newDelta) {
+        setState(() {
+          _deltaTween = Tween(begin: newDelta, end: widget.local);
+          _measured = true;
+        });
+      }
     }
   }
 
@@ -260,6 +295,8 @@ class TranslateActor extends SingleEffectProxy<Offset> {
   final double? _axisTo;
   final List<Keyframe<double>>? _axisKeyframes;
   final _TranslateVariant? _variant;
+  final Rect? _rect;
+  final AlignmentGeometry? _alignment;
 
   const TranslateActor({
     super.key,
@@ -274,7 +311,9 @@ class TranslateActor extends SingleEffectProxy<Offset> {
   }) : _variant = _TranslateVariant.offset,
        _axisFrom = null,
        _axisTo = null,
-       _axisKeyframes = null;
+       _axisKeyframes = null,
+       _rect = null,
+       _alignment = null;
 
   const TranslateActor.keyframes({
     super.key,
@@ -288,6 +327,8 @@ class TranslateActor extends SingleEffectProxy<Offset> {
        _axisFrom = null,
        _axisTo = null,
        _axisKeyframes = null,
+       _rect = null,
+       _alignment = null,
        super.keyframes();
 
   const TranslateActor.x({
@@ -304,6 +345,8 @@ class TranslateActor extends SingleEffectProxy<Offset> {
        _axisFrom = from,
        _axisTo = to,
        _axisKeyframes = null,
+       _rect = null,
+       _alignment = null,
        super(from: Offset.zero, to: Offset.zero);
 
   const TranslateActor.xKeyframes({
@@ -318,6 +361,8 @@ class TranslateActor extends SingleEffectProxy<Offset> {
        _axisFrom = null,
        _axisTo = null,
        _axisKeyframes = frames,
+       _rect = null,
+       _alignment = null,
        super.keyframes(frames: const []);
 
   const TranslateActor.y({
@@ -334,6 +379,8 @@ class TranslateActor extends SingleEffectProxy<Offset> {
        _axisTo = to,
        _axisKeyframes = null,
        _variant = _TranslateVariant.vertical,
+       _rect = null,
+       _alignment = null,
        super(from: Offset.zero, to: Offset.zero);
 
   const TranslateActor.yKeyframes({
@@ -348,6 +395,8 @@ class TranslateActor extends SingleEffectProxy<Offset> {
        _axisFrom = null,
        _axisTo = null,
        _axisKeyframes = frames,
+       _rect = null,
+       _alignment = null,
        super.keyframes(frames: const []);
 
   const TranslateActor.fromGlobal({
@@ -364,7 +413,28 @@ class TranslateActor extends SingleEffectProxy<Offset> {
        _axisFrom = null,
        _axisTo = null,
        _axisKeyframes = null,
+       _rect = null,
+       _alignment = null,
        super(from: offset, to: toLocal);
+
+  const TranslateActor.fromGlobalRect({
+    super.key,
+    required Rect rect,
+    AlignmentGeometry alignment = Alignment.center,
+    Offset toLocal = Offset.zero,
+    required super.child,
+    super.curve,
+    super.timing,
+    super.reverseCurve,
+    super.reverseTiming,
+    super.role,
+  }) : _variant = _TranslateVariant.fromGlobalRect,
+       _axisFrom = null,
+       _axisTo = null,
+       _axisKeyframes = null,
+       _rect = rect,
+       _alignment = alignment,
+       super(from: Offset.zero, to: toLocal);
 
   @override
   Effect get effect => switch (_variant) {
@@ -381,8 +451,9 @@ class TranslateActor extends SingleEffectProxy<Offset> {
       keyframes: _axisKeyframes,
     ),
     .fromGlobal => TranslateEffect.fromGlobal(offset: from!, toLocal: to!),
+    .fromGlobalRect => TranslateEffect.fromGlobalRect(_rect!, alignment: _alignment!, toLocal: to!),
     _ => _TranslateOffset.internal(from: from, to: to, keyframes: frames),
   };
 }
 
-enum _TranslateVariant { offset, vertical, horizontal, fromGlobal }
+enum _TranslateVariant { offset, vertical, horizontal, fromGlobal, fromGlobalRect }
