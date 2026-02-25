@@ -106,25 +106,34 @@ class _ClipEffect extends TweenEffect<double> implements ClipEffect {
     final directionality = Directionality.of(context);
     final effectiveAlignment = alignment?.resolve(directionality) ?? Alignment.topLeft;
     final effectiveBorderRadius = borderRadius?.resolve(directionality);
-    return AnimatedBuilder(
-      animation: animation,
-      builder: (context, child) {
-        return Align(
-          alignment: effectiveAlignment,
-          widthFactor: animation.value.clamp(0, 1.0),
-          heightFactor: animation.value.clamp(0, 1.0),
-          child: ClipPath(
-            clipper: ExpandingPathClipper(
-              progress: animation.value,
-              minSize: fromSize,
-              borderRadius: effectiveBorderRadius,
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final toSize = constraints.biggest;
+        final minWidthFactor = fromSize.width / toSize.width;
+        final minHeightFactor = fromSize.height / toSize.height;
+        return AnimatedBuilder(
+          animation: animation,
+          builder: (context, child) {
+            final clampedValue = animation.value.clamp(0.0, 1.0);
+            return Align(
               alignment: effectiveAlignment,
-            ),
-            child: child,
-          ),
+              widthFactor: clampedValue.clamp(minWidthFactor, 1),
+              heightFactor: clampedValue.clamp(minHeightFactor, 1),
+              child: ClipPath(
+                clipper: ExpandingPathClipper(
+                  progress: clampedValue,
+                  minSize: fromSize,
+                  borderRadius: effectiveBorderRadius,
+                  alignment: effectiveAlignment,
+                ),
+                child: child,
+              ),
+            );
+          },
+          child: child,
         );
       },
-      child: child,
     );
   }
 }

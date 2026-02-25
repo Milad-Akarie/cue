@@ -2,8 +2,8 @@ part of 'effect.dart';
 
 class PhyscialModalEffect extends TweenEffect<ModalProps> {
   const PhyscialModalEffect({
-    required super.from,
-    required super.to,
+    super.from = const ModalProps(),
+    super.to = const ModalProps(),
     super.curve,
     super.timing,
     this.clipBehavior = Clip.none,
@@ -95,8 +95,8 @@ class _ModalPropsTween extends Tween<ModalProps> {
 class PhyscialModalActor extends SingleEffectProxy<ModalProps> {
   const PhyscialModalActor({
     super.key,
-    required super.from,
-    required super.to,
+    super.from = const ModalProps(),
+    super.to = const ModalProps(),
     required super.child,
     super.curve,
     super.timing,
