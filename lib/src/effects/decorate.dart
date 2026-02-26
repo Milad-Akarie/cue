@@ -23,7 +23,7 @@ class DecoratationEffect extends TweenEffect<Decoration> {
   }) : super.internal();
 
   @override
-  Animatable<Decoration> buildSinglePhaseTween(Decoration from, Decoration to) {
+  Animatable<Decoration> buildSinglePhaseAnimtable(Decoration from, Decoration to) {
     return DecorationTween(begin: from, end: to);
   }
 
@@ -63,7 +63,7 @@ class ColorEffect extends TweenEffect<Color?> {
   }) : super.internal();
 
   @override
-  Animatable<Color?> buildSinglePhaseTween(Color? from, Color? to) {
+  Animatable<Color?> buildSinglePhaseAnimtable(Color? from, Color? to) {
     return ColorTween(begin: from, end: to);
   }
 

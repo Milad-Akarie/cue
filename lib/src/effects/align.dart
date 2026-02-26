@@ -22,7 +22,7 @@ class AlignEffect extends TweenEffect<AlignmentGeometry?> {
   }) : super.internal();
 
   @override
-  Animatable<AlignmentGeometry?> buildSinglePhaseTween(
+  Animatable<AlignmentGeometry?> buildSinglePhaseAnimtable(
     AlignmentGeometry? from,
     AlignmentGeometry? to,
   ) {

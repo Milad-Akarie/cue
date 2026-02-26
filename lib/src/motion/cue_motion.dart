@@ -44,7 +44,7 @@ class CueAnimationController extends AnimationController {
       SimulationBuildData(
         velocity: velocity,
         forward: forward,
-        progress: value,
+        progress: value.clamp(0.0, 1.0),
       ),
     );
   }

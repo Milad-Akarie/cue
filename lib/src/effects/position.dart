@@ -37,7 +37,7 @@ class PositionEffect extends TweenEffect<Position> {
        super.keyframes();
 
   @override
-  Animatable<Position> buildSinglePhaseTween(Position from, Position to) {
+  Animatable<Position> buildSinglePhaseAnimtable(Position from, Position to) {
     return _PositionTween(begin: from, end: to);
   }
 

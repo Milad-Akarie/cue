@@ -79,7 +79,7 @@ class _TranslateOffset extends TweenEffect<Offset> implements TranslateEffect {
 
   @override
   Widget apply(BuildContext context, Animation<Offset> animation, Widget child) {
-    return _TranslateTransition(
+    return TranslateTransition(
       offset: animation,
       transformHitTests: true,
       child: child,
@@ -128,7 +128,7 @@ class _AxisTranslate extends TweenEffectBase<double, Offset> implements Translat
 
   @override
   Widget apply(BuildContext context, Animation<Offset> animation, Widget child) {
-    return _TranslateTransition(
+    return TranslateTransition(
       offset: animation,
       transformHitTests: true,
       child: child,
@@ -136,12 +136,13 @@ class _AxisTranslate extends TweenEffectBase<double, Offset> implements Translat
   }
 }
 
-class _TranslateTransition extends AnimatedWidget {
+class TranslateTransition extends AnimatedWidget {
   final Widget child;
   final Animation<Offset> offset;
   final bool transformHitTests;
 
-  const _TranslateTransition({
+  const TranslateTransition({
+    super.key,
     required this.child,
     required this.offset,
     this.transformHitTests = true,
@@ -574,7 +575,7 @@ class _TranslateFromGlobalTranstionState extends State<_TranslateFromGlobalTrans
       maintainState: true,
       maintainAnimation: true,
       maintainSize: true,
-      child: _TranslateTransition(
+      child: TranslateTransition(
         offset: offsetTween.animate(animation),
         child: widget.child,
       ),

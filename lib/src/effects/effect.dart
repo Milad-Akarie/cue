@@ -24,6 +24,8 @@ part 'slide.dart';
 part 'position.dart';
 part 'transfrom.dart';
 part 'physcial_modal.dart';
+part 'paint.dart';
+part 'path_motion.dart';
 
 typedef TweenBuilder<T> = Animatable<T> Function(T from, T to);
 
@@ -39,6 +41,16 @@ abstract class Effect {
   Animation<Object?> buildAnimation(Animation<double> driver, AnimationBuildData data);
 
   Widget build(BuildContext context, covariant Animation<Object?> animation, Widget child);
+
+  Animatable<R> applyCurves<R>(Animatable<R> animatable, {Curve? curve, Timing? timing, bool isBounded = false}) {
+    if (curve == null && timing == null) {
+      return animatable;
+    }
+    final effectiveCurve = timing != null
+        ? BoundedInterval(timing.start, timing.end, curve: curve ?? Curves.linear)
+        : curve ?? Curves.linear;
+    return animatable.chain(BoundedCurveTween(curve: effectiveCurve, applyBounds: isBounded));
+  }
 }
 
 abstract class TweenEffectBase<T extends Object?, R extends Object?> extends Effect {
@@ -87,18 +99,8 @@ abstract class TweenEffectBase<T extends Object?, R extends Object?> extends Eff
 
   R transform(T value);
 
-  Animatable<R> buildSinglePhaseTween(R from, R to) {
+  Animatable<R> buildSinglePhaseAnimtable(R from, R to) {
     return Tween<R>(begin: from, end: to);
-  }
-
-  Animatable<R> applyCurves(Animatable<R> animatable, {Curve? curve, Timing? timing, bool isBounded = false}) {
-    if (curve == null && timing == null) {
-      return animatable;
-    }
-    final effectiveCurve = timing != null
-        ? BoundedInterval(timing.start, timing.end, curve: curve ?? Curves.linear)
-        : curve ?? Curves.linear;
-    return animatable.chain(BoundedCurveTween(curve: effectiveCurve, applyBounds: isBounded));
   }
 
   ({Animatable<R> tween, Timing? timing}) _buildTween({
@@ -127,7 +129,7 @@ abstract class TweenEffectBase<T extends Object?, R extends Object?> extends Eff
       }
     }
     return (
-      tween: TweenEffectBase.buildFromPhases<R>(phases, buildSinglePhaseTween),
+      tween: TweenEffectBase.buildFromPhases<R>(phases, buildSinglePhaseAnimtable),
       timing: timing,
     );
   }
@@ -156,7 +158,7 @@ abstract class TweenEffectBase<T extends Object?, R extends Object?> extends Eff
 
     Animatable<R>? reverseAnimatable;
     if (data.reverseCurve != null || data.reverseTiming != null) {
-      reverseAnimatable = applyCurves(
+      reverseAnimatable = applyCurves<R>(
         tween,
         curve: data.reverseCurve,
         timing: data.reverseTiming,

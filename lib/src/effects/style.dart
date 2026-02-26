@@ -23,7 +23,7 @@ class TextStyleEffect extends TweenEffect<TextStyle> {
   }) : super.internal();
 
   @override
-  Animatable<TextStyle> buildSinglePhaseTween(TextStyle from, TextStyle to) {
+  Animatable<TextStyle> buildSinglePhaseAnimtable(TextStyle from, TextStyle to) {
     return TextStyleTween(begin: from, end: to);
   }
 
@@ -56,7 +56,7 @@ class IconThemeEffect extends TweenEffect<IconThemeData> {
   }) : super.internal();
 
   @override
-  Animatable<IconThemeData> buildSinglePhaseTween(
+  Animatable<IconThemeData> buildSinglePhaseAnimtable(
     IconThemeData from,
     IconThemeData to,
   ) {

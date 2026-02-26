@@ -32,7 +32,7 @@ class TransformEffect extends TweenEffect<Matrix4> {
   }) : super.internal();
 
   @override
-  Animatable<Matrix4> buildSinglePhaseTween(Matrix4 from, Matrix4 to) {
+  Animatable<Matrix4> buildSinglePhaseAnimtable(Matrix4 from, Matrix4 to) {
     return Matrix4Tween(begin: from, end: to);
   }
 

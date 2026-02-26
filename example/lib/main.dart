@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cue/cue.dart';
 import 'package:example/examples/delete_confirmation.dart';
 import 'package:example/examples/three_dots_action.dart';
@@ -42,6 +44,7 @@ class _OnChangeDemo extends StatefulWidget {
 
 class __OnChangeDemoState extends State<_OnChangeDemo> {
   int _notificationsCount = 0;
+  bool _checked = false;
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -53,8 +56,32 @@ class __OnChangeDemoState extends State<_OnChangeDemo> {
           width: double.infinity,
           child: Column(
             mainAxisAlignment: .center,
-            crossAxisAlignment: .end,
-            children: [ThreeDotsAction()],
+            crossAxisAlignment: .center,
+            children: [
+              Cue.onToggle(
+                toggled: _checked,
+                motion: .simulation(Spring.smooth()),
+                child: ColoredBox(
+                  color: Colors.blue,
+                  child: InkWell(
+                    onTap: () => setState(() => _checked = !_checked),
+                    child: Actor(
+                      effects: [
+                        PathMotionEffect.circular(radius: 100, alignment: .topLeft, center: Offset(-100, 0)),
+                      ],
+                      child: Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(32),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
