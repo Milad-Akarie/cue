@@ -28,7 +28,7 @@ class _ExpandingCardsState extends State<ExpandingCards> {
           for (var i = 0; i < _cardIfno.length; i++)
             Cue.onToggle(
               toggled: _expandedIndex == i,
-              simulation: Spring.smooth(damping: 23),
+              motion: .simulation(Spring.smooth(damping: 23)),
               child: Builder(
                 builder: (context) {
                   final isLast = i == _cardIfno.length - 1;

@@ -61,7 +61,7 @@ class _BottomBarState extends State<BottomBar> {
                               },
                               child: Cue.onToggle(
                                 toggled: _activeTab == i,
-                                simulation: Spring.smooth(damping: 30),
+                                motion: .simulation(Spring.smooth(damping: 30)),
                                 child: Actor(
                                   effects: [
                                     SizeEffect(
