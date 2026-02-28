@@ -73,24 +73,18 @@ class _SmoothSwitchState extends State<SmoothSwitch> {
                 Row(
                   children: [
                     Expanded(
-                      child: DecorationActor(
-                        from: BoxDecoration(color: trackColor, shape: .circle),
-                        to: BoxDecoration(color: thumbColor, shape: .circle),
+                      child: DecoratedBoxActor(
+                        shape: .circle,
+                        color: .from(trackColor, to: thumbColor),
                         timing: .endAt(.5),
                         child: SizedBox.square(dimension: width * .16),
                       ),
                     ),
                     Expanded(
                       child: Center(
-                        child: DecorationActor(
-                          from: BoxDecoration(
-                            color: thumbColor,
-                            borderRadius: .circular(width * .2),
-                          ),
-                          to: BoxDecoration(
-                            color: trackColor,
-                            borderRadius: .circular(width * .2),
-                          ),
+                        child: DecoratedBoxActor(
+                          color: .from(trackColor, to: thumbColor),
+                          borderRadius: .fixed(.circular(width * .2)),
                           timing: .startAt(.5),
                           child: SizedBox(width: width * .08, height: width * .22),
                         ),

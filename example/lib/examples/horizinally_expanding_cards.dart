@@ -94,7 +94,7 @@ class _HorizontallyExpandingCardsState extends State<HorizontallyExpandingCards>
                                   Flexible(
                                     child: Actor(
                                       effects: [
-                                        FadeEffect(),
+                                        OpacityEffect(),
                                         ClipEffect.vertical(from: .3),
                                       ],
                                       child: Padding(

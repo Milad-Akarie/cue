@@ -82,10 +82,10 @@ class _ExpandingCardsState extends State<ExpandingCards> {
                               ),
                               Actor(
                                 effects: [
-                                  FadeEffect(),
+                                  OpacityEffect(),
                                   ClipEffect.vertical(),
                                   BlurEffect(from: 8),
-                                  SlideEffect.y(from: .5),
+                                  SlideEffect.fromY(.5),
                                 ],
                                 child: Padding(
                                   padding: const .only(left: 8, right: 8, bottom: 12),

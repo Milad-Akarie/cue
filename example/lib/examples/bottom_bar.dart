@@ -76,9 +76,9 @@ class _BottomBarState extends State<BottomBar> {
                                       Icon(_tabs[i].icon, color: Colors.white),
                                       Actor(
                                         effects: [
-                                          FadeEffect(from: 0, to: 1),
+                                          OpacityEffect(from: 0, to: 1),
                                           ClipEffect.horizontal(alignment: .centerRight),
-                                          ScaleEffect(from: .7),
+                                          ScaleEffect.from(.7),
                                         ],
                                         child: Padding(
                                           padding: const EdgeInsets.symmetric(horizontal: 8.0),

@@ -6,5 +6,7 @@ export 'src/core/phase.dart';
 export 'src/cue/cue_debug_provider.dart';
 export 'src/motion/simulation/cue_simulation.dart';
 export 'src/motion/simulation/spring.dart';
-export 'src/effects/effect.dart';
+export 'src/effects/base/effect.dart';
 export 'src/actor/actor.dart';
+export 'src/actor/actor_group.dart';
+export 'src/effects/base/animated_prop.dart';

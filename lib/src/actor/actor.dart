@@ -1,4 +1,5 @@
 import 'package:cue/cue.dart';
+import 'package:cue/src/effects/base/utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
@@ -43,7 +44,8 @@ class ActorState extends State<Actor> {
       if (!_animations.containsKey(act)) {
         _animations[act] = act.buildAnimation(
           scope.animation,
-          AnimationBuildData(
+          ActorContext(
+            textDirection: Directionality.of(context),
             curve: widget.curve,
             timing: widget.timing,
             isBounded: scope.isBounded,
@@ -238,7 +240,7 @@ class _TweenActorState<T> extends State<TweenActor<T>> {
       if (result.timing != null) {
         timing = result.timing;
       }
-      effectiveTween = TweenEffectBase.buildFromPhases<T>(
+      effectiveTween = buildFromPhases<T>(
         result.phases,
         widget._tweenBuilder ?? (begin, end) => Tween<T>(begin: begin, end: end),
       );

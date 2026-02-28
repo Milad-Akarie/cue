@@ -1,4 +1,4 @@
-part of 'effect.dart';
+part of 'base/effect.dart';
 
 abstract class ClipEffect extends Effect {
   const factory ClipEffect({

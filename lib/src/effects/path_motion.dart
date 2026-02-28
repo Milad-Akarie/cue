@@ -1,4 +1,4 @@
-part of 'effect.dart';
+part of 'base/effect.dart';
 
 class PathMotionEffect extends Effect {
   final Path path;
@@ -39,7 +39,7 @@ class PathMotionEffect extends Effect {
          );
 
   @override
-  Animation<Matrix4> buildAnimation(Animation<double> driver, AnimationBuildData data) {
+  Animation<Matrix4> buildAnimation(Animation<double> driver, ActorContext data) {
     final metrics = path.computeMetrics().toList();
     if (metrics.isEmpty) {
       throw Exception('Path must have one metric');

@@ -47,7 +47,7 @@ class DeleteConfirmationDialog extends StatelessWidget {
                         Actor(
                           effects: [
                             BlurEffect(from: 10),
-                            FadeEffect(),
+                            OpacityEffect(),
                           ],
                           child: Padding(
                             padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),

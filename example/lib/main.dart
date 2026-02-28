@@ -50,6 +50,7 @@ class __OnChangeDemoState extends State<_OnChangeDemo> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    BoxDecoration;
     return Scaffold(
       backgroundColor: theme.colorScheme.surfaceContainer,
       appBar: AppBar(),
@@ -58,7 +59,7 @@ class __OnChangeDemoState extends State<_OnChangeDemo> {
         child: Center(
           child: Cue.onToggle(
             toggled: _checked,
-            motion: .simulation(Spring.bouncy(damping: 16)),
+            // motion: .simulation(Spring.bouncy(damping: 16)),
             child: InkWell(
               borderRadius: BorderRadius.circular(32),
               onTap: () {
@@ -68,54 +69,9 @@ class __OnChangeDemoState extends State<_OnChangeDemo> {
               },
               child: SizedBox.square(
                 dimension: 44,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(32),
-                  child: Stack(
-                    clipBehavior: Clip.antiAlias,
-                    children: [
-                      SlideActor.y(
-                        from: 0,
-                        to: 1,
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(32),
-                            color: Colors.white,
-                          ),
-                          child: Center(
-                            child: SizedBox.square(
-                              dimension: 20,
-                              child: DecoratedBox(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(32),
-                                  color: Colors.red,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      SlideActor.y(
-                        from: -1,
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(32),
-                            color: Colors.red,
-                          ),
-                          child: Center(
-                            child: SizedBox.square(
-                              dimension: 20,
-                              child: DecoratedBox(
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                child: DecoratedBoxActor(
+                  color: .fixed(Colors.red),
+                  borderRadius: .from(.circular(0), to: .circular(32)),
                 ),
               ),
             ),

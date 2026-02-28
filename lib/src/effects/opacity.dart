@@ -1,19 +1,20 @@
-part of 'effect.dart';
+part of 'base/effect.dart';
 
-class FadeEffect extends TweenEffect<double> {
-  const FadeEffect({
+class OpacityEffect extends TweenEffect<double> {
+  const OpacityEffect({
     super.from = 0.0,
     super.to = 1.0,
     super.curve,
     super.timing,
   });
 
-  const FadeEffect.out({super.from = 1.0, super.curve, super.timing}) : super(to: 0);
+  const OpacityEffect.fadeIn({super.from = 0.0, super.curve, super.timing}) : super(to: 1.0);
+  const OpacityEffect.fadeOut({super.to = 0.0, super.curve, super.timing}) : super(from: 1.0);
 
-  const FadeEffect.keyframes(super.keyframes, {super.curve}) : super.keyframes();
+  const OpacityEffect.keyframes(super.keyframes, {super.curve}) : super.keyframes();
 
   @internal
-  const FadeEffect.internal({
+  const OpacityEffect.internal({
     super.from,
     super.to,
     super.keyframes,
@@ -47,7 +48,7 @@ class FadeActor extends SingleEffectBase<double> {
   }) : super.keyframes();
 
   @override
-  Effect get effect => FadeEffect.internal(
+  Effect get effect => OpacityEffect.internal(
     from: from,
     to: to,
     keyframes: frames,

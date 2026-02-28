@@ -1,4 +1,4 @@
-part of 'effect.dart';
+part of 'base/effect.dart';
 
 class SizeEffect extends TweenEffect<double> {
   final AlignmentGeometry? alignment;
@@ -18,6 +18,18 @@ class SizeEffect extends TweenEffect<double> {
     this.allowOverflow = false,
   }) : _fromSize = from,
        _toSize = to,
+       _sizeKeyframes = null,
+       super(from: 0, to: 1);
+
+  const SizeEffect.from(
+    this._fromSize, {
+    NSize? to,
+    super.curve,
+    super.timing,
+    this.alignment,
+    this.clipBehavior = Clip.hardEdge,
+    this.allowOverflow = false,
+  }) : _toSize = to,
        _sizeKeyframes = null,
        super(from: 0, to: 1);
 
@@ -68,7 +80,7 @@ class SizeEffect extends TweenEffect<double> {
   }
 
   @override
-  Animation<double> buildAnimation(Animation<double> driver, AnimationBuildData data) {
+  Animation<double> buildAnimation(Animation<double> driver, ActorContext data) {
     /// The actual size tween will be built in the RenderObject
     /// where we have access to the constraints so we can normalize sizes properly.
     /// Here we just return the driver animation
@@ -378,7 +390,7 @@ class _RenderAnimatedSize extends RenderAligningShiftedBox {
       to: toSize,
     );
     // Build the tween from phases
-    final animtable = TweenEffectBase.buildFromPhases<Size?>(
+    final animtable = buildFromPhases<Size?>(
       phases,
       (begin, end) => SizeTween(begin: begin, end: end),
     );
@@ -646,10 +658,12 @@ class NSize {
   /// `double.infinity` means use the maximum available height constraint.
   final double? height;
 
-  const NSize([this.width, this.height]);
+  const NSize({this.width, this.height});
 
   /// Both axes follow the child's natural size (no constraint on either axis).
   static const NSize childSize = NSize();
+  static const NSize infinity = NSize(width: double.infinity, height: double.infinity);
+  static const NSize zero = NSize(width: 0, height: 0);
 
   /// Creates an [NSize] from a Flutter [Size] (no nulls).
   NSize.fromSize(Size size) : width = size.width, height = size.height;

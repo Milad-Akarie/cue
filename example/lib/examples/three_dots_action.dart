@@ -40,7 +40,7 @@ class ThreeDotsAction extends StatelessWidget {
                 child: Actor(
                   effects: [
                     BlurEffect(from: 6),
-                    FadeEffect(),
+                    OpacityEffect(),
                     TranslateEffect.y(from: rect.height / 3),
                   ],
                   child: const Icon(Icons.keyboard_arrow_down),
@@ -72,7 +72,7 @@ class ThreeDotsAction extends StatelessWidget {
                           child: Actor(
                             effects: [
                               BlurEffect(from: 8),
-                              FadeEffect(),
+                              OpacityEffect(),
                             ],
                             child: Icon(icon, color: Colors.white, size: 24),
                           ),

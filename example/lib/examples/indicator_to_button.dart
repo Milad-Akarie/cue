@@ -72,12 +72,12 @@ class _IndicatorToButtonState extends State<IndicatorToButton> {
                             effects: [
                               SizeEffect(
                                 from: .square(10),
-                                to: isLast ? .fromHeight(44) : NSize(38, 10),
+                                to: isLast ? .fromHeight(44) : NSize(width: 38, height: 10),
                                 allowOverflow: isLast,
                               ),
                               if (isLast) ...[
-                                ScaleEffect(from: 0),
-                                SlideEffect(from: Offset(-1, 0)),
+                                ScaleEffect.from(0),
+                                SlideEffect.fromX(-1),
                               ],
                             ],
                             child: isLast

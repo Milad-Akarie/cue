@@ -1,4 +1,4 @@
-part of 'effect.dart';
+part of 'base/effect.dart';
 
 class PaintEffect extends TweenEffect<double> {
   final EffectPainter painter;

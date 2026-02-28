@@ -1,4 +1,4 @@
-part of 'effect.dart';
+part of 'base/effect.dart';
 
 class PositionEffect extends TweenEffect<Position> {
   final Size? _relativeTo;

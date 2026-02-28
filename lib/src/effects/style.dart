@@ -1,4 +1,4 @@
-part of 'effect.dart';
+part of 'base/effect.dart';
 
 class TextStyleEffect extends TweenEffect<TextStyle> {
   const TextStyleEffect({

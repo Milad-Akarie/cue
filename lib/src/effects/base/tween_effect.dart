@@ -1,57 +1,7 @@
-import 'dart:math' as math;
-import 'dart:ui';
-
 import 'package:cue/cue.dart';
-import 'package:cue/src/core/curves.dart';
+import 'package:cue/src/effects/base/utils.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-
-part 'size.dart';
-part 'fractional_size.dart';
-part 'translate.dart';
-part 'decorate.dart';
-part 'rotate.dart';
-part 'rotate_layout.dart';
-part 'scale.dart';
-part 'fade.dart';
-part 'blur.dart';
-part 'align.dart';
-part 'padding.dart';
-part 'style.dart';
-part 'clip_reveal.dart';
-part 'slide.dart';
-part 'position.dart';
-part 'transfrom.dart';
-part 'physcial_modal.dart';
-part 'paint.dart';
-part 'path_motion.dart';
-
-typedef TweenBuilder<T> = Animatable<T> Function(T from, T to);
-
-abstract class Effect {
-  final Timing? timing;
-  final Curve? curve;
-
-  const Effect({
-    this.timing,
-    this.curve,
-  });
-
-  Animation<Object?> buildAnimation(Animation<double> driver, AnimationBuildData data);
-
-  Widget build(BuildContext context, covariant Animation<Object?> animation, Widget child);
-
-  Animatable<R> applyCurves<R>(Animatable<R> animatable, {Curve? curve, Timing? timing, bool isBounded = false}) {
-    if (curve == null && timing == null) {
-      return animatable;
-    }
-    final effectiveCurve = timing != null
-        ? BoundedInterval(timing.start, timing.end, curve: curve ?? Curves.linear)
-        : curve ?? Curves.linear;
-    return animatable.chain(BoundedCurveTween(curve: effectiveCurve, applyBounds: isBounded));
-  }
-}
+import 'package:flutter/widgets.dart';
 
 abstract class TweenEffectBase<T extends Object?, R extends Object?> extends Effect {
   final T? _from;
@@ -118,29 +68,33 @@ abstract class TweenEffectBase<T extends Object?, R extends Object?> extends Eff
         'Begin and end values must be provided when not using keyframes',
       );
       phases = [
-        Phase<R>(begin: transform(from as T), end: transform(to as T), weight: 100),
+        Phase<R>(
+          begin: transform(from as T),
+          end: transform(to as T),
+          weight: 100,
+        ),
       ];
     } else {
       assert(keyframes.isNotEmpty, 'Keyframes list cannot be empty');
-      final result = Phase.normalize(keyframes, (value) => transform(value));
+      final result = Phase.normalize(keyframes, transform);
       phases = result.phases;
       if (result.timing != null) {
         timing = result.timing;
       }
     }
     return (
-      tween: TweenEffectBase.buildFromPhases<R>(phases, buildSinglePhaseAnimtable),
+      tween: buildFromPhases<R>(phases, buildSinglePhaseAnimtable),
       timing: timing,
     );
   }
 
   @override
-  Animation<R> buildAnimation(Animation<double> driver, AnimationBuildData data) {
+  Animation<R> buildAnimation(Animation<double> driver, ActorContext context) {
     final tweenRes = _buildTween(
       from: _from,
       to: _to,
       keyframes: _keyframes,
-      defaultTiming: timing ?? data.timing,
+      defaultTiming: timing ?? context.timing,
     );
 
     final tween = tweenRes.tween;
@@ -151,22 +105,22 @@ abstract class TweenEffectBase<T extends Object?, R extends Object?> extends Eff
 
     final animatable = applyCurves(
       tween,
-      curve: data.curve,
+      curve: context.curve,
       timing: tweenRes.timing,
-      isBounded: data.isBounded,
+      isBounded: context.isBounded,
     );
 
     Animatable<R>? reverseAnimatable;
-    if (data.reverseCurve != null || data.reverseTiming != null) {
+    if (context.reverseCurve != null || context.reverseTiming != null) {
       reverseAnimatable = applyCurves<R>(
         tween,
-        curve: data.reverseCurve,
-        timing: data.reverseTiming,
-        isBounded: data.isBounded,
+        curve: context.reverseCurve,
+        timing: context.reverseTiming,
+        isBounded: context.isBounded,
       );
     }
 
-    return switch (data.role) {
+    return switch (context.role) {
       ActorRole.both =>
         reverseAnimatable == null
             ? driver.drive(animatable)
@@ -178,43 +132,6 @@ abstract class TweenEffectBase<T extends Object?, R extends Object?> extends Eff
       ActorRole.forward => ForwardOrStoppedAnimation(driver).drive(animatable),
       ActorRole.reverse => ReverseOrStoppedAnimation(driver).drive(animatable),
     };
-  }
-
-  static Animatable<T> buildFromPhases<T extends Object?>(
-    List<Phase<T>> phases,
-    TweenBuilder<T> tweenBuilder,
-  ) {
-    assert(phases.isNotEmpty);
-
-    Animatable<T> tween;
-    if (phases.length == 1) {
-      final phase = phases.single;
-      if (phase.isAlwaysStopped) {
-        return ConstantTween<T>(phase.begin);
-      }
-      tween = tweenBuilder(phase.begin, phase.end);
-    } else {
-      final allSame = phases.every((phase) {
-        return phase.begin == phases.first.begin && phase.begin == phase.end;
-      });
-
-      if (allSame) {
-        return ConstantTween<T>(phases.first.begin);
-      }
-      tween = BoundedTweenSequence<T>([
-        for (final phase in phases)
-          TweenSequenceItem(
-            tween: phase.isAlwaysStopped
-                ? ConstantTween<T>(phase.begin)
-                : tweenBuilder(
-                    phase.begin,
-                    phase.end,
-                  ),
-            weight: phase.weight,
-          ),
-      ]);
-    }
-    return tween;
   }
 
   @override
@@ -263,23 +180,3 @@ abstract class TweenEffect<T extends Object?> extends TweenEffectBase<T, T> {
     super.timing,
   }) : super.internal();
 }
-
-class AnimationBuildData {
-  final Timing? timing;
-  final Timing? reverseTiming;
-  final Curve? curve;
-  final Curve? reverseCurve;
-  final bool isBounded;
-  final ActorRole role;
-
-  const AnimationBuildData({
-    this.timing,
-    this.curve,
-    this.isBounded = true,
-    this.reverseTiming,
-    this.reverseCurve,
-    this.role = ActorRole.both,
-  });
-}
-
-enum ActorRole { forward, reverse, both }

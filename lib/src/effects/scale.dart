@@ -1,15 +1,23 @@
-part of 'effect.dart';
+part of 'base/effect.dart';
 
 class ScaleEffect extends TweenEffect<double> {
+  final AlignmentGeometry? alignment;
+
   const ScaleEffect({
-    super.from = 0.0,
-    super.to = 1.0,
+    required super.from,
+    required super.to,
     super.curve,
     super.timing,
     this.alignment,
   });
 
-  final AlignmentGeometry? alignment;
+  const ScaleEffect.from(
+    double from, {
+    super.to = 1.0,
+    super.curve,
+    super.timing,
+    this.alignment,
+  }) : super(from: from);
 
   const ScaleEffect.keyframes(
     super.keyframes, {

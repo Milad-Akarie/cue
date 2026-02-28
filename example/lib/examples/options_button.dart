@@ -61,10 +61,10 @@ class OptionsButton extends StatelessWidget {
                     ),
                     Actor(
                       effects: [
-                        FadeEffect(),
-                        ScaleEffect(from: .2),
+                        OpacityEffect(),
+                        ScaleEffect.from(.2),
                         BlurEffect(from: 10),
-                        SlideEffect.y(from: 1),
+                        SlideEffect.fromY(1),
                       ],
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -92,7 +92,7 @@ class OptionsButton extends StatelessWidget {
                               ].staggerEffects(
                                 (int index) => [
                                   TranslateEffect.y(from: 10 * (index + 1)),
-                                  ScaleEffect(from: index * -.1),
+                                  ScaleEffect.from(index * -.1),
                                 ],
                               ),
                         ),
