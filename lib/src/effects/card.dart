@@ -52,6 +52,7 @@ class CardEffect extends MulitTweenEffect<CardProps> {
       surfaceTintColor: surfaceTintColor?.asAnimtable(ctx),
       borderRadius: borderRadius?.asAnimtable(ctx),
       shape: shape?.asAnimtable(ctx),
+      margin: margin?.asAnimtable(ctx),
     );
   }
 
