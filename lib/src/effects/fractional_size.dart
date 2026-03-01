@@ -9,6 +9,14 @@ class FractionalSizeEffect extends TweenEffect<Size> {
     this.alignment = Alignment.center,
   });
 
+  const FractionalSizeEffect.tween({
+    required super.from,
+    required super.to,
+    super.curve,
+    super.timing,
+    this.alignment = Alignment.center,
+  });
+
   const FractionalSizeEffect.keyframes(
     super.keyframes, {
     super.curve,

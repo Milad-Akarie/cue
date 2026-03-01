@@ -8,6 +8,13 @@ class PaddingEffect extends TweenEffect<EdgeInsetsGeometry> {
     super.timing,
   });
 
+  const PaddingEffect.tween({
+    super.from = EdgeInsets.zero,
+    super.to = EdgeInsets.zero,
+    super.curve,
+    super.timing,
+  });
+
   const PaddingEffect.keyframes(
     super.keyframes, {
     super.curve,

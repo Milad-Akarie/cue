@@ -8,6 +8,13 @@ class AlignEffect extends TweenEffectBase<AlignmentGeometry?, Alignment?> {
     super.timing,
   });
 
+  const AlignEffect.tween({
+    required super.from,
+    super.to,
+    super.curve,
+    super.timing,
+  });
+
   const AlignEffect.keyframes(
     super.keyframes, {
     super.curve,

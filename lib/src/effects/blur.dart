@@ -10,6 +10,28 @@ class BlurEffect extends TweenEffect<double> {
 
   const BlurEffect.keyframes(super.keyframes, {super.curve}) : super.keyframes();
 
+  const BlurEffect.tween({
+    super.from = 0.0,
+    super.to = 0.0,
+    super.curve,
+    super.timing,
+  });
+
+  const BlurEffect.focus({
+    super.from = 10.0,
+    super.to = 0.0,
+    super.curve,
+    super.timing,
+  });
+
+  const BlurEffect.unfocus({
+    super.from = 0.0,
+    super.to = 10.0,
+    super.curve,
+    super.timing,
+  });
+
+  @internal
   const BlurEffect.internal({
     super.from,
     super.to,

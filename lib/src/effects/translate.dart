@@ -8,34 +8,41 @@ abstract class TranslateEffect extends Effect {
     Timing? timing,
   }) = _TranslateOffset;
 
+  const factory TranslateEffect.tween({
+    required Offset from,
+    required Offset to,
+    Curve? curve,
+    Timing? timing,
+  }) = _TranslateOffset;
+
   const factory TranslateEffect.keyframes(
     List<Keyframe<Offset>> keyframes, {
     Curve? curve,
   }) = _TranslateOffset.keyframes;
 
-  const factory TranslateEffect.x({
+  const factory TranslateEffect.tweenX({
     double from,
     double to,
     Curve? curve,
     Timing? timing,
   }) = _AxisTranslate.horizontal;
 
-  const factory TranslateEffect.xKeyframes(
+  const factory TranslateEffect.keyframesX(
     List<Keyframe<double>> keyframes, {
     Curve? curve,
-  }) = _AxisTranslate.xKeyframes;
+  }) = _AxisTranslate.keyframesX;
 
-  const factory TranslateEffect.y({
+  const factory TranslateEffect.tweenY({
     double from,
     double to,
     Curve? curve,
     Timing? timing,
   }) = _AxisTranslate.vertical;
 
-  const factory TranslateEffect.yKeyframes(
+  const factory TranslateEffect.keyframesY(
     List<Keyframe<double>> keyframes, {
     Curve? curve,
-  }) = _AxisTranslate.yKeyframes;
+  }) = _AxisTranslate.keyframesY;
 
   const factory TranslateEffect.fromGlobal({
     required Offset offset,
@@ -112,9 +119,9 @@ class _AxisTranslate extends TweenEffectBase<double, Offset> implements Translat
   }) : _axis = axis,
        super.internal();
 
-  const _AxisTranslate.yKeyframes(super.keyframes, {super.curve}) : _axis = Axis.vertical, super.keyframes();
+  const _AxisTranslate.keyframesY(super.keyframes, {super.curve}) : _axis = Axis.vertical, super.keyframes();
 
-  const _AxisTranslate.xKeyframes(super.keyframes, {super.curve}) : _axis = Axis.horizontal, super.keyframes();
+  const _AxisTranslate.keyframesX(super.keyframes, {super.curve}) : _axis = Axis.horizontal, super.keyframes();
 
   @override
   Offset transform(_, double value) {

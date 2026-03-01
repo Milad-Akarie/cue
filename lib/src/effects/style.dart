@@ -8,6 +8,13 @@ class TextStyleEffect extends TweenEffect<TextStyle> {
     super.timing,
   });
 
+  const TextStyleEffect.tween({
+    required super.from,
+    required super.to,
+    super.curve,
+    super.timing,
+  });
+
   const TextStyleEffect.keyframes(
     super.keyframes, {
     super.curve,
@@ -41,6 +48,12 @@ class IconThemeEffect extends TweenEffect<IconThemeData> {
     super.timing,
   });
 
+  const IconThemeEffect.tween({
+    required super.from,
+    required super.to,
+    super.curve,
+    super.timing,
+  });
   const IconThemeEffect.keyframes(
     super.keyframes, {
     super.curve,

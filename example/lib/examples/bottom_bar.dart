@@ -63,23 +63,19 @@ class _BottomBarState extends State<BottomBar> {
                                 toggled: _activeTab == i,
                                 motion: .simulation(Spring.smooth(damping: 30)),
                                 child: Actor(
-                                  effects: [
-                                    SizeEffect(
-                                      from: .fromWidth(collapsedWidth),
-                                      to: .fromWidth(expandedWidth),
-                                    ),
-                                    ColorEffect(from: Colors.white60, to: Colors.black), // color filte
-                                  ],
+                                  size: .tween(
+                                    from: .fromWidth(collapsedWidth),
+                                    to: .fromWidth(expandedWidth),
+                                  ),
+                                  colorTint: .tween(from: Colors.white60, to: Colors.black),
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Icon(_tabs[i].icon, color: Colors.white),
                                       Actor(
-                                        effects: [
-                                          OpacityEffect(from: 0, to: 1),
-                                          ClipEffect.horizontal(alignment: .centerRight),
-                                          ScaleEffect.from(.7),
-                                        ],
+                                        opacity: .fadeIn(),
+                                        clip: .horizontal(alignment: .centerRight),
+                                        scale: .zoomIn(from: .7),
                                         child: Padding(
                                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
                                           child: Flexible(

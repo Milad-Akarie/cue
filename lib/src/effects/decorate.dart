@@ -125,7 +125,7 @@ class DecoratedBoxActor extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Actor(
+    return RawActor(
       curve: curve,
       timing: timing,
       reverseCurve: reverseCurve,

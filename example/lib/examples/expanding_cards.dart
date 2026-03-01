@@ -40,10 +40,8 @@ class _ExpandingCardsState extends State<ExpandingCards> {
                   final fromBottomRadius = isActive || isLast || isPrevious ? 24.0 : 0.0;
 
                   return Actor(
-                    effects: [
-                      PaddingEffect(to: const .symmetric(vertical: 12)),
-                      ScaleEffect(from: 1.0, to: 1.01),
-                    ],
+                    padding: .tween(to: const .symmetric(vertical: 12)),
+                    scale: .tween(from: 1.0, to: 1.01),
                     child: Material(
                       clipBehavior: .hardEdge,
                       color: theme.colorScheme.surfaceContainer,
@@ -81,12 +79,10 @@ class _ExpandingCardsState extends State<ExpandingCards> {
                                 ],
                               ),
                               Actor(
-                                effects: [
-                                  OpacityEffect(),
-                                  ClipEffect.vertical(),
-                                  BlurEffect(from: 8),
-                                  SlideEffect.fromY(.5),
-                                ],
+                                opacity: .fadeOut(),
+                                clip: .vertical(),
+                                blur: .focus(from: 8),
+                                slide: .tweenY(from: .5),
                                 child: Padding(
                                   padding: const .only(left: 8, right: 8, bottom: 12),
                                   child: Text(

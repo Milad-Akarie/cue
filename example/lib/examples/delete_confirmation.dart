@@ -44,7 +44,7 @@ class DeleteConfirmationDialog extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Actor(
+                        RawActor(
                           effects: [
                             BlurEffect(from: 10),
                             OpacityEffect(),
@@ -82,7 +82,7 @@ class DeleteConfirmationDialog extends StatelessWidget {
                           ),
                           label: Text('Delete Item'),
                           iconAlignment: .end,
-                          icon: Actor(
+                          icon: RawActor(
                             effects: [
                               TranslateEffect.fromGlobalRect(rect),
                               IconThemeEffect(

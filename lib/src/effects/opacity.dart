@@ -8,8 +8,15 @@ class OpacityEffect extends TweenEffect<double> {
     super.timing,
   });
 
-  const OpacityEffect.fadeIn({super.from = 0.0, super.curve, super.timing}) : super(to: 1.0);
-  const OpacityEffect.fadeOut({super.to = 0.0, super.curve, super.timing}) : super(from: 1.0);
+  const OpacityEffect.fadeIn({super.from = 0.0, super.to = 1.0, super.curve, super.timing});
+  const OpacityEffect.fadeOut({super.from = 1.0, super.to = 0.0, super.curve, super.timing});
+
+  const OpacityEffect.tween({
+    required super.from,
+    required super.to,
+    super.curve,
+    super.timing,
+  });
 
   const OpacityEffect.keyframes(super.keyframes, {super.curve}) : super.keyframes();
 

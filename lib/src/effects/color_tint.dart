@@ -1,7 +1,7 @@
 part of 'base/effect.dart';
 
-class ColorEffect extends TweenEffect<Color?> {
-  const ColorEffect({
+class ColorTintEffect extends TweenEffect<Color?> {
+  const ColorTintEffect({
     required super.from,
     required super.to,
     super.curve,
@@ -10,14 +10,23 @@ class ColorEffect extends TweenEffect<Color?> {
   });
 
   final BlendMode blendMode;
-  const ColorEffect.keyframes(
+
+  const ColorTintEffect.tween({
+    required super.from,
+    required super.to,
+    super.curve,
+    super.timing,
+    this.blendMode = BlendMode.srcIn,
+  });
+
+  const ColorTintEffect.keyframes(
     super.keyframes, {
     super.curve,
     this.blendMode = BlendMode.srcIn,
   }) : super.keyframes();
 
   @internal
-  const ColorEffect.internal({
+  const ColorTintEffect.internal({
     super.from,
     super.to,
     super.keyframes,
@@ -73,5 +82,5 @@ class ColorTintActor extends SingleEffectBase<Color?> {
   }) : super.keyframes();
 
   @override
-  Effect get effect => ColorEffect.internal(from: from, to: to, keyframes: frames);
+  Effect get effect => ColorTintEffect.internal(from: from, to: to, keyframes: frames);
 }

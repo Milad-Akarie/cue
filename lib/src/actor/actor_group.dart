@@ -1,8 +1,8 @@
 import 'package:cue/cue.dart';
 import 'package:flutter/material.dart';
 
-class ActorGroup extends StatelessWidget {
-  const ActorGroup({
+class Actor extends StatelessWidget {
+  const Actor({
     super.key,
     this.role = ActorRole.both,
     this.curve,
@@ -13,6 +13,8 @@ class ActorGroup extends StatelessWidget {
     this.opacity,
     this.clip,
     this.translate,
+    this.colorTint,
+    this.decoration,
     this.slide,
     this.rotate,
     this.align,
@@ -29,6 +31,8 @@ class ActorGroup extends StatelessWidget {
   final Curve? reverseCurve;
   final Timing? reverseTiming;
 
+  final ColorTintEffect? colorTint;
+  final DecoratedBoxEffect? decoration;
   final ScaleEffect? scale;
   final OpacityEffect? opacity;
   final ClipEffect? clip;
@@ -45,7 +49,7 @@ class ActorGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Actor(
+    return RawActor(
       role: role,
       curve: curve,
       timing: timing,
@@ -60,6 +64,8 @@ class ActorGroup extends StatelessWidget {
         ?translate,
         ?scale,
         ?rotate,
+        ?colorTint,
+        ?decoration,
         ?opacity,
         ?blur,
         ?textStyle,

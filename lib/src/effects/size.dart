@@ -21,8 +21,20 @@ class SizeEffect extends TweenEffect<double> {
        _sizeKeyframes = null,
        super(from: 0, to: 1);
 
-  const SizeEffect.from(
-    this._fromSize, {
+  const SizeEffect.reveal({
+    NSize from = NSize.zero,
+    super.curve,
+    super.timing,
+    this.alignment,
+    this.clipBehavior = Clip.hardEdge,
+    this.allowOverflow = true,
+  }) : _fromSize = from,
+       _toSize = NSize.childSize,
+       _sizeKeyframes = null,
+       super(from: 0, to: 1);
+
+  const SizeEffect.tween({
+    NSize? from,
     NSize? to,
     super.curve,
     super.timing,
@@ -30,6 +42,7 @@ class SizeEffect extends TweenEffect<double> {
     this.clipBehavior = Clip.hardEdge,
     this.allowOverflow = false,
   }) : _toSize = to,
+       _fromSize = from,
        _sizeKeyframes = null,
        super(from: 0, to: 1);
 

@@ -218,8 +218,8 @@ class _CardPropsProxyTween extends Animatable<CardProps> {
 /// A convenience widget that animates card-like surface properties using
 /// [CardEffect].
 ///
-/// Wraps an [Actor] with a single [CardEffect]. For composing multiple effects,
-/// use [Actor] directly with [CardEffect] in the effects list.
+/// Wraps an [RawActor] with a single [CardEffect]. For composing multiple effects,
+/// use [RawActor] directly with [CardEffect] in the effects list.
 class CardActor extends StatelessWidget {
   final ColorProp? color;
   final ColorProp? shadowColor;
@@ -262,7 +262,7 @@ class CardActor extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Actor(
+    return RawActor(
       curve: curve,
       timing: timing,
       reverseCurve: reverseCurve,

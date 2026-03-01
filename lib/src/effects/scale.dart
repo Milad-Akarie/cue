@@ -11,13 +11,29 @@ class ScaleEffect extends TweenEffect<double> {
     this.alignment,
   });
 
-  const ScaleEffect.from(
-    double from, {
+  const ScaleEffect.tween({
+    required super.from,
+    required super.to,
+    super.curve,
+    super.timing,
+    this.alignment,
+  });
+
+  const ScaleEffect.zoomIn({
+    super.from = 0.0,
     super.to = 1.0,
     super.curve,
     super.timing,
     this.alignment,
-  }) : super(from: from);
+  });
+
+  const ScaleEffect.zoomOut({
+    super.from = 1.0,
+    super.to = 0.0,
+    super.curve,
+    super.timing,
+    this.alignment,
+  });
 
   const ScaleEffect.keyframes(
     super.keyframes, {

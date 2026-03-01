@@ -50,6 +50,15 @@ class RotateEffect extends TweenEffect<double> {
     this.unit = RotateUnit.radians,
   }) : super.keyframes();
 
+  const RotateEffect.radians({
+    super.from = 0,
+    super.to = 0,
+    super.curve,
+    super.timing,
+    this.axis = RotateAxis.z,
+    this.alignment = Alignment.center,
+  }) : unit = RotateUnit.radians;
+
   const RotateEffect.degrees({
     super.from = 0,
     super.to = 0,

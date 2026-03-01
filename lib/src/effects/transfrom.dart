@@ -13,6 +13,15 @@ class TransformEffect extends TweenEffect<Matrix4> {
   final AlignmentGeometry? alignment;
   final Offset? origin;
 
+  const TransformEffect.tween({
+    required super.from,
+    required super.to,
+    super.curve,
+    super.timing,
+    this.alignment,
+    this.origin,
+  });
+
   const TransformEffect.keyframes(
     super.keyframes, {
     super.curve,

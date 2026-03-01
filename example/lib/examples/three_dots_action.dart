@@ -38,11 +38,9 @@ class ThreeDotsAction extends StatelessWidget {
                 shape: CircleBorder(),
                 onPressed: () => Navigator.of(context).pop(),
                 child: Actor(
-                  effects: [
-                    BlurEffect(from: 6),
-                    OpacityEffect(),
-                    TranslateEffect.y(from: rect.height / 3),
-                  ],
+                  blur: .focus(from: 6),
+                  opacity: .fadeIn(),
+                  slide: .tweenY(from: rect.height / 3),
                   child: const Icon(Icons.keyboard_arrow_down),
                 ),
               ),
@@ -58,10 +56,8 @@ class ThreeDotsAction extends StatelessWidget {
                       Icons.translate,
                     ])
                       Actor(
-                        effects: [
-                          PaddingEffect(from: .all(1), to: .only(bottom: 10.0)),
-                          SizeEffect(from: .square(5), to: .square(44)),
-                        ],
+                        padding: .tween(from: .all(1), to: .only(bottom: 10.0)),
+                        size: .tween(from: .square(5), to: .square(44)),
                         child: FloatingActionButton(
                           mini: true,
                           backgroundColor: Colors.black,
@@ -70,10 +66,8 @@ class ThreeDotsAction extends StatelessWidget {
                           heroTag: null,
                           onPressed: () {},
                           child: Actor(
-                            effects: [
-                              BlurEffect(from: 8),
-                              OpacityEffect(),
-                            ],
+                            blur: .focus(from: 8),
+                            opacity: .fadeIn(),
                             child: Icon(icon, color: Colors.white, size: 24),
                           ),
                         ),

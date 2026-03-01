@@ -39,7 +39,7 @@ class _NotificationBellState extends State<NotificationBell> {
                 Positioned(
                   top: -7,
                   right: 2,
-                  child: Actor(
+                  child: RawActor(
                     effects: [
                       PathMotionEffect.arc(
                         radius: 5,

@@ -8,41 +8,61 @@ abstract class SlideEffect extends Effect {
     Timing? timing,
   }) = _SlideEffect;
 
-  const factory SlideEffect.from(
-    Offset from, {
+  const factory SlideEffect.tween({
+    required Offset from,
     Offset to,
     Curve? curve,
     Timing? timing,
-  }) = _SlideEffect.from;
+  }) = _SlideEffect.tween;
+
+  const factory SlideEffect.fromBottom({
+    Curve? curve,
+    Timing? timing,
+  }) = _SlideEffect.fromBottom;
+
+  const factory SlideEffect.fromTop({
+    Curve? curve,
+    Timing? timing,
+  }) = _SlideEffect.fromTop;
+
+  const factory SlideEffect.fromLeading({
+    Curve? curve,
+    Timing? timing,
+  }) = _SlideEffect.fromLeading;
+
+  const factory SlideEffect.fromTrailing({
+    Curve? curve,
+    Timing? timing,
+  }) = _SlideEffect.fromTrailing;
 
   const factory SlideEffect.keyframes(
     List<Keyframe<Offset>> keyframes, {
     Curve? curve,
   }) = _SlideEffect.keyframes;
 
-  const factory SlideEffect.fromY(
-    double from, {
+  const factory SlideEffect.tweenY({
+    required double from,
     double to,
     Curve? curve,
     Timing? timing,
-  }) = _AxisSlideEffect.fromY;
+  }) = _AxisSlideEffect.tweenY;
 
-  const factory SlideEffect.yKeyframes(
+  const factory SlideEffect.keyframesY(
     List<Keyframe<double>> keyframes, {
     Curve? curve,
-  }) = _AxisSlideEffect.yKeyframes;
+  }) = _AxisSlideEffect.keyframesY;
 
-  const factory SlideEffect.fromX(
-    double from, {
+  const factory SlideEffect.tweenX({
+    required double from,
     double to,
     Curve? curve,
     Timing? timing,
-  }) = _AxisSlideEffect.fromX;
+  }) = _AxisSlideEffect.tweenX;
 
-  const factory SlideEffect.xKeyframes(
+  const factory SlideEffect.keyframesX(
     List<Keyframe<double>> keyframes, {
     Curve? curve,
-  }) = _AxisSlideEffect.xKeyframes;
+  }) = _AxisSlideEffect.keyframesX;
 }
 
 class _SlideEffect extends TweenEffect<Offset> implements SlideEffect {
@@ -53,12 +73,44 @@ class _SlideEffect extends TweenEffect<Offset> implements SlideEffect {
     super.timing,
   });
 
-  const _SlideEffect.from(
-    Offset from, {
+  const _SlideEffect.tween({
+    required super.from,
     super.to = Offset.zero,
     super.curve,
     super.timing,
-  }) : super(from: from);
+  });
+
+  const _SlideEffect.fromBottom({
+    super.curve,
+    super.timing,
+  }) : super(
+         from: const Offset(0, 1),
+         to: Offset.zero,
+       );
+
+  const _SlideEffect.fromTop({
+    super.curve,
+    super.timing,
+  }) : super(
+         from: const Offset(0, -1),
+         to: Offset.zero,
+       );
+
+  const _SlideEffect.fromLeading({
+    super.curve,
+    super.timing,
+  }) : super(
+         from: const Offset(-1, 0),
+         to: Offset.zero,
+       );
+
+  const _SlideEffect.fromTrailing({
+    super.curve,
+    super.timing,
+  }) : super(
+         from: const Offset(1, 0),
+         to: Offset.zero,
+       );
 
   const _SlideEffect.keyframes(
     super.keyframes, {
@@ -80,32 +132,30 @@ class _SlideEffect extends TweenEffect<Offset> implements SlideEffect {
 class _AxisSlideEffect extends TweenEffectBase<double, Offset> implements SlideEffect {
   final Axis _axis;
 
-  const _AxisSlideEffect.yKeyframes(
+  const _AxisSlideEffect.tweenX({
+    required super.from,
+    super.to = 0,
+    super.curve,
+    super.timing,
+  }) : _axis = Axis.horizontal;
+
+  const _AxisSlideEffect.tweenY({
+    required super.from,
+    super.to = 0,
+    super.curve,
+    super.timing,
+  }) : _axis = Axis.vertical;
+
+  const _AxisSlideEffect.keyframesX(
     super.keyframes, {
     super.curve,
-  }) : _axis = Axis.vertical,
+  }) : _axis = Axis.horizontal,
        super.keyframes();
 
-  const _AxisSlideEffect.fromX(
-    double from, {
-    super.to = 0,
-    super.curve,
-    super.timing,
-  }) : _axis = Axis.horizontal,
-       super(from: from);
-
-  const _AxisSlideEffect.fromY(
-    double from, {
-    super.to = 0,
-    super.curve,
-    super.timing,
-  }) : _axis = Axis.vertical,
-       super(from: from);
-
-  const _AxisSlideEffect.xKeyframes(
+  const _AxisSlideEffect.keyframesY(
     super.keyframes, {
     super.curve,
-  }) : _axis = Axis.horizontal,
+  }) : _axis = Axis.vertical,
        super.keyframes();
 
   const _AxisSlideEffect.internal({

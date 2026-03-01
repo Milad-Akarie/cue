@@ -3,7 +3,7 @@ import 'package:cue/src/effects/base/utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
-class Actor extends StatefulWidget {
+class RawActor extends StatefulWidget {
   final Curve? curve;
   final Curve? reverseCurve;
   final Timing? timing;
@@ -12,7 +12,7 @@ class Actor extends StatefulWidget {
   final List<Effect> effects;
   final Widget child;
 
-  const Actor({
+  const RawActor({
     super.key,
     required this.effects,
     required this.child,
@@ -24,10 +24,10 @@ class Actor extends StatefulWidget {
   });
 
   @override
-  State<Actor> createState() => ActorState();
+  State<RawActor> createState() => RawActorState();
 }
 
-class ActorState extends State<Actor> {
+class RawActorState extends State<RawActor> {
   final _animations = <Effect, Animation<Object?>>{};
 
   CueScope? _cachedScope;
@@ -59,7 +59,7 @@ class ActorState extends State<Actor> {
   }
 
   @override
-  void didUpdateWidget(covariant Actor oldWidget) {
+  void didUpdateWidget(covariant RawActor oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (!listEquals(oldWidget.effects, widget.effects) ||
         oldWidget.curve != widget.curve ||
@@ -141,7 +141,7 @@ abstract class SingleEffectBase<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Actor(
+    return RawActor(
       curve: curve,
       timing: timing,
       reverseCurve: reverseCurve,
@@ -272,25 +272,5 @@ class _TweenActorState<T> extends State<TweenActor<T>> {
         );
       },
     );
-  }
-}
-
-extension StaggeredActorExtension on Iterable<Widget> {
-  List<Widget> staggerEffects(
-    List<Effect> Function(int index) effects, {
-    Curve? curve,
-    ActorRole role = ActorRole.both,
-    Curve? reverseCurve,
-  }) {
-    return [
-      for (var i = 0; i < length; i++)
-        Actor(
-          curve: curve,
-          role: role,
-          reverseCurve: reverseCurve,
-          effects: effects(i),
-          child: elementAt(i),
-        ),
-    ];
   }
 }
