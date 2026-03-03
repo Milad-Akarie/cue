@@ -20,6 +20,9 @@ class _IndexedCueState extends _CueState<_IndexedCue> {
   final _animation = ProgressAnimation(value: 0.0);
 
   @override
+  String get debugName => 'IndexedCue';
+
+  @override
   bool get isBounded => true;
 
   Listenable get listenable => widget.controller.tickListenable;

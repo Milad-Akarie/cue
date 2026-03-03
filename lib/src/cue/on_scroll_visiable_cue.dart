@@ -21,6 +21,9 @@ class _OnVisibleCueState extends SelfAnimatedState<_OnScrollVisibleCue> {
   bool? _wasVisible;
 
   @override
+  String get debugName => 'OnScrollVisibleCue';
+
+  @override
   void onControllerReady() {
     // Assume visible on mount so the widget renders at its final state
     // until the VisibilityDetector fires and corrects if needed.

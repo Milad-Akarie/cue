@@ -1,5 +1,4 @@
 import 'package:cue/cue.dart';
-import 'package:example/examples/bottom_bar.dart';
 import 'package:example/examples/expanding_cards.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -59,25 +58,30 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
           child: Column(
             mainAxisAlignment: .center,
             children: [
-              BottomBar(),
-
-              // Cue.onChange(
-              //   value: offset,
-              //   fromCurrentValue: true,
-              //   motion: .simulation(Spring.wobbly()),
-              //   child: DecoratedBoxActor(
-              //     color: .tween(from: Colors.redAccent, to: Colors.accents[offset.toInt() % Colors.accents.length]),
-              //     child: Container(
-              //       width: 100,
-              //       height: 44,
-              //       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              //       decoration: BoxDecoration(
-              //         // color: theme.colorScheme.primary,
-              //         borderRadius: BorderRadius.circular(100),
-              //       ),
-              //     ),
-              //   ),
-              // ),
+              Cue.onChange(
+                value: offset,
+                fromCurrentValue: true,
+                child: DecoratedBoxActor(
+                  color: .tween(from: Colors.redAccent, to: Colors.accents[offset.toInt() % Colors.accents.length]),
+                  child: Container(
+                    width: 100,
+                    height: 44,
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary,
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                  ),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    offset = offset + 1;
+                  });
+                },
+                child: Text('Slide'),
+              ),
             ],
           ),
         ),

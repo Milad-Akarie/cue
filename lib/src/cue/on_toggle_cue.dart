@@ -22,6 +22,9 @@ class _ToggledStageState extends SelfAnimatedState<_TogglableCue> {
   Animation<double> getAnimation(BuildContext context) => animation;
 
   @override
+  String get debugName => 'ToggledCue';
+
+  @override
   void initState() {
     super.initState();
     if (widget.skipFirstAnimation) {

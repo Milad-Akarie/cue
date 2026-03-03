@@ -71,7 +71,7 @@ class _IndicatorToButtonState extends State<IndicatorToButton> {
                           child: Actor(
                             size: .tween(
                               from: .square(10),
-                              to: isLast ? .fromHeight(44) : NSize(width: 38, height: 10),
+                              to: isLast ? .height(44) : NSize(w: 38, h: 10),
                             ),
                             scale: isLast ? .zoomIn() : null,
                             slide: isLast ? .tweenX(from: -1) : null,

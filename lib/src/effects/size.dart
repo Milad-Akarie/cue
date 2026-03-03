@@ -333,8 +333,8 @@ class _RenderAnimatedSize extends RenderAligningShiftedBox {
     }
 
     return Size(
-      resolveAxis(nsize.width, maxConstraint.width, childSize.width),
-      resolveAxis(nsize.height, maxConstraint.height, childSize.height),
+      resolveAxis(nsize.w, maxConstraint.width, childSize.width),
+      resolveAxis(nsize.h, maxConstraint.height, childSize.height),
     );
   }
 
@@ -437,7 +437,7 @@ class _RenderAnimatedSize extends RenderAligningShiftedBox {
   /// Returns whether any axis in any [NSize] value (across from/to/keyframes)
   /// is `null`, meaning the child's natural size is needed for that axis.
   bool get _needsChildNaturalSize {
-    bool hasNull(NSize? ns) => ns != null && (ns.width == null || ns.height == null);
+    bool hasNull(NSize? ns) => ns != null && (ns.w == null || ns.h == null);
     if (_sizeKeyframes != null) {
       return _sizeKeyframes!.any((kf) => hasNull(kf.value));
     }
@@ -456,17 +456,17 @@ class _RenderAnimatedSize extends RenderAligningShiftedBox {
 
     void checkNSize(NSize? ns) {
       if (ns == null) return;
-      if (ns.width != null) {
-        if (maxWidth == null || ns.width! > maxWidth!) {
-          maxWidth = ns.width;
+      if (ns.w != null) {
+        if (maxWidth == null || ns.w! > maxWidth!) {
+          maxWidth = ns.w;
         }
       } else {
         // If any value is null, we need the child's natural size for that axis, so loosen it completely
         maxWidth = null;
       }
-      if (ns.height != null) {
-        if (maxHeight == null || ns.height! > maxHeight!) {
-          maxHeight = ns.height;
+      if (ns.h != null) {
+        if (maxHeight == null || ns.h! > maxHeight!) {
+          maxHeight = ns.h;
         }
       } else {
         // If any value is null, we need the child's natural size for that axis, so loosen it completely
@@ -665,39 +665,38 @@ class SizeActor extends SingleEffectBase<NSize> {
 class NSize {
   /// The width. `null` means use the child's natural width.
   /// `double.infinity` means use the maximum available width constraint.
-  final double? width;
+  final double? w;
 
   /// The height. `null` means use the child's natural height.
   /// `double.infinity` means use the maximum available height constraint.
-  final double? height;
+  final double? h;
 
-  const NSize({this.width, this.height});
+  const NSize({this.w, this.h});
 
   /// Both axes follow the child's natural size (no constraint on either axis).
   static const NSize childSize = NSize();
-  static const NSize infinity = NSize(width: double.infinity, height: double.infinity);
-  static const NSize zero = NSize(width: 0, height: 0);
+  static const NSize infinity = NSize(w: double.infinity, h: double.infinity);
+  static const NSize zero = NSize(w: 0, h: 0);
 
   /// Creates an [NSize] from a Flutter [Size] (no nulls).
-  NSize.fromSize(Size size) : width = size.width, height = size.height;
+  NSize.size(Size size) : w = size.width, h = size.height;
 
   /// Both axes set to [size] (square).
-  const NSize.square(double size) : width = size, height = size;
+  const NSize.square(double size) : w = size, h = size;
 
-  /// Fixed [width], child's natural height
-  const NSize.fromWidth(double this.width) : height = null;
+  /// Fixed [w], child's natural height
+  const NSize.width(double this.w) : h = null;
 
-  /// Fixed [height], child's natural width
-  const NSize.fromHeight(double this.height) : width = null;
+  /// Fixed [h], child's natural width
+  const NSize.height(double this.h) : w = null;
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is NSize && runtimeType == other.runtimeType && width == other.width && height == other.height;
+      identical(this, other) || other is NSize && runtimeType == other.runtimeType && w == other.w && h == other.h;
 
   @override
-  int get hashCode => Object.hash(width, height);
+  int get hashCode => Object.hash(w, h);
 
   @override
-  String toString() => 'NSize(width: $width, height: $height)';
+  String toString() => 'NSize(width: $w, height: $h)';
 }

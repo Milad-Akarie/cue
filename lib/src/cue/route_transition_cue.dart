@@ -19,6 +19,9 @@ class _RouteTransitionStageState extends _CueState<_RouteTransitionStage> {
   bool get isBounded => true;
 
   @override
+  String get debugName => 'RouteTransitionCue';
+
+  @override
   Animation<double> getAnimation(BuildContext context) {
     return widget.useSecondaryAnimation
         ? ModalRoute.of(context)!.secondaryAnimation!

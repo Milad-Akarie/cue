@@ -24,6 +24,9 @@ class _OnChangeCueState extends SelfAnimatedState<_OnChangeCue> {
   final EventNotifier<bool> willReanimateNotifier = EventNotifier();
 
   @override
+  String get debugName => 'OnChangeCue';
+
+  @override
   bool get reanimateFromCurrent => widget.fromCurrentValue;
 
   @override

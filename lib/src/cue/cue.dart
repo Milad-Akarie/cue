@@ -120,7 +120,9 @@ abstract class _CueState<T extends Cue> extends State<Cue> {
 
   bool get reanimateFromCurrent => false;
 
-  late final _debugId = 'Cue#${widget.debugLabel ?? ''}-${identityHashCode(widget)}';
+  String get debugName;
+
+  late final _debugId = '$debugName-${widget.debugLabel ?? ''}${identityHashCode(widget)}';
 
   @override
   void didUpdateWidget(covariant Cue oldWidget) {
@@ -128,7 +130,13 @@ abstract class _CueState<T extends Cue> extends State<Cue> {
     if (kDebugMode) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (CueDebugTools.isWrappedByDebugProvider(context)) {
-          CueDebugTools.openOverlay(context);
+          CueDebugTools.attachDebugTarget(
+            context,
+            id: _debugId,
+            duration: const Duration(seconds: 1),
+            curve: Curves.easeOut,
+            simulation: const Spring.smooth(),
+          );
         }
       });
     }
@@ -137,7 +145,6 @@ abstract class _CueState<T extends Cue> extends State<Cue> {
   @override
   void dispose() {
     _deattachDebugOverlay?.call();
-
     super.dispose();
   }
 
@@ -158,25 +165,16 @@ abstract class _CueState<T extends Cue> extends State<Cue> {
     if (kDebugMode) {
       if (CueDebugTools.isWrappedByDebugProvider(context)) {
         final scope = CueDebugTools.of(context);
-        if (scope.isSelectMode) {
-          final color = scope.activeTargetId == _debugId ? Colors.blue : Colors.amber;
+        if (scope.isSelectMode && scope.highlightedTargetId == _debugId) {
           return GestureDetector(
             behavior: HitTestBehavior.opaque,
-            onTap: () {
-              CueDebugTools.attachDebugTarget(
-                context,
-                id: _debugId,
-                duration: const Duration(seconds: 1),
-                curve: Curves.easeOut,
-                simulation: const Spring.smooth(),
-              );
-            },
             child: IgnorePointer(
-              child: Container(
-                foregroundDecoration: BoxDecoration(
-                  color: color.withValues(alpha: .2),
+              child: DecoratedBox(
+                position: DecorationPosition.foreground,
+                decoration: BoxDecoration(
+                  color: Colors.amber.withValues(alpha: .2),
                   border: Border.all(
-                    color: color.withValues(alpha: .8),
+                    color: Colors.amber.withValues(alpha: .8),
                   ),
                 ),
                 child: child,

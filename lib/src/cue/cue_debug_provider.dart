@@ -1,4 +1,5 @@
 import 'package:cue/cue.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class CueDebugTools extends StatefulWidget {
@@ -26,6 +27,7 @@ class CueDebugTools extends StatefulWidget {
     CueSimulation? simulation,
   }) {
     final provider = context.findAncestorStateOfType<_CueDebugToolsState>();
+    provider?.openOverlay(context);
     return provider?.attachDebugTarget(
       context,
       id: id,
@@ -54,12 +56,12 @@ class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProvider
       verticalOffset: 0,
       isSelectMode: false,
       activeTargetId: null,
+      highlightedTargetId: null,
+      targets: const {},
     ),
   );
 
   OverlayEntry? _entry;
-
-  _DebugTarget? _activeTarget;
 
   @override
   void initState() {
@@ -91,12 +93,20 @@ class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProvider
     Curve? curve,
     CueSimulation? simulation,
   }) {
-    _activeTarget = _DebugTarget(
+    final target = _DebugTarget(
       id: id,
       curve: curve,
       simulation: simulation,
       duration: duration,
     );
+    _overlayData.value = _overlayData.value.copyWith(
+      targets: {
+        ..._overlayData.value.targets,
+        id: target,
+      },
+      activeTargetId: _overlayData.value.activeTargetId ?? id,
+    );
+
     _controller.duration = duration;
 
     _overlayData.value = _overlayData.value.copyWith(
@@ -105,11 +115,12 @@ class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProvider
       activeTargetId: id,
     );
     void deattachCallback() {
-      if (_activeTarget?.id == id) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          _controller.value = 0;
-        });
-      }
+      final updatedTargets = Map<String, _DebugTarget>.from(_overlayData.value.targets)..remove(id);
+      _overlayData.value = _overlayData.value.copyWith(targets: updatedTargets);
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _controller.value = 0;
+      });
     }
 
     if (_entry != null) return deattachCallback;
@@ -125,7 +136,7 @@ class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProvider
           controller: _controller,
           onPlay: _startAutoPlay,
           overlayData: _overlayData,
-          baseDuration: _activeTarget?.duration ?? const Duration(milliseconds: 500),
+          baseDuration: const Duration(milliseconds: 500),
         );
       },
     );
@@ -145,7 +156,8 @@ class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProvider
       listenable: _overlayData,
       builder: (context, _) {
         return DebugDataProvider(
-          activeTargetId: _activeTarget?.id,
+          highlightedTargetId: _overlayData.value.highlightedTargetId,
+          activeTargetId: _overlayData.value.activeTargetId,
           animation: _controller.view,
           isMinimized: _overlayData.value.isMinimized,
           isSelectMode: _overlayData.value.isSelectMode,
@@ -205,14 +217,6 @@ class _DebugOverlayState extends State<_DebugOverlay> {
   void _toggleSlowMode() {
     final targetSpeed = _data.speedMultiplier == 1 ? 5 : 1;
     _setSpeed(targetSpeed);
-  }
-
-  void _toggleSelectMode() {
-    if (!_data.isSelectMode) {
-      _controller.stop();
-      _controller.value = 0;
-    }
-    _dataNotifier.value = _data.copyWith(isSelectMode: !_data.isSelectMode);
   }
 
   void _setSpeed(int multiplier) {
@@ -365,7 +369,122 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                                             padding: EdgeInsets.zero,
                                             style: IconButton.styleFrom(tapTargetSize: .shrinkWrap),
                                             constraints: const BoxConstraints(),
-                                            onPressed: _toggleSelectMode,
+                                            onPressed: _data.isSelectMode
+                                                ? null
+                                                : () async {
+                                                    _dataNotifier.value = _data.copyWith(isSelectMode: true);
+                                                    final RenderBox button = context.findRenderObject() as RenderBox;
+                                                    final Offset position = button.localToGlobal(Offset.zero);
+                                                    final rect = position & button.size;
+                                                    showGeneralDialog(
+                                                      context: context,
+                                                      barrierDismissible: true,
+                                                      barrierLabel: 'Select Target',
+                                                      barrierColor: Colors.black.withValues(alpha: 0.05),
+                                                      pageBuilder: (context, animation, secondaryAnimation) {
+                                                        return Material(
+                                                          color: Colors.transparent,
+                                                          child: Align(
+                                                            alignment: Alignment.topLeft,
+                                                            child: Transform.translate(
+                                                              offset: Offset(rect.right - 220, rect.bottom + 8),
+                                                              child: Container(
+                                                                width: 220,
+                                                                constraints: BoxConstraints(
+                                                                  maxHeight: 400,
+                                                                ),
+                                                                decoration: BoxDecoration(
+                                                                  color: theme.colorScheme.surface,
+                                                                  borderRadius: BorderRadius.circular(16),
+                                                                ),
+                                                                child: ListenableBuilder(
+                                                                  listenable: _dataNotifier,
+                                                                  builder: (context, _) {
+                                                                    return Column(
+                                                                      mainAxisSize: MainAxisSize.min,
+                                                                      children: [
+                                                                        ListView(
+                                                                          padding: EdgeInsets.only(top: 8, bottom: 8),
+                                                                          shrinkWrap: true,
+                                                                          children: [
+                                                                            for (final target in _data.targets.values)
+                                                                              GestureDetector(
+                                                                                child: Container(
+                                                                                  alignment: Alignment.centerLeft,
+                                                                                  color:
+                                                                                      _data.highlightedTargetId ==
+                                                                                          target.id
+                                                                                      ? Colors.orange.withValues(
+                                                                                          alpha: .1,
+                                                                                        )
+                                                                                      : null,
+                                                                                  padding: const EdgeInsets.symmetric(
+                                                                                    horizontal: 12,
+                                                                                    vertical: 4,
+                                                                                  ),
+                                                                                  child: Text(
+                                                                                    target.id,
+                                                                                    style: TextStyle(fontSize: 13),
+                                                                                    maxLines: 1,
+                                                                                    overflow: TextOverflow.ellipsis,
+                                                                                  ),
+                                                                                ),
+                                                                                onTap: () {
+                                                                                  final isHighlighted =
+                                                                                      _data.highlightedTargetId ==
+                                                                                      target.id;
+                                                                                  if (isHighlighted) {
+                                                                                    _dataNotifier.value = _data
+                                                                                        .copyWith(
+                                                                                          activeTargetId: target.id,
+                                                                                          isSelectMode: false,
+                                                                                          highlightedTargetId: null,
+                                                                                        );
+                                                                                    Navigator.of(context).pop();
+                                                                                  } else {
+                                                                                    _dataNotifier.value = _data
+                                                                                        .copyWith(
+                                                                                          highlightedTargetId:
+                                                                                              target.id,
+                                                                                        );
+                                                                                  }
+                                                                                },
+                                                                              ),
+                                                                          ],
+                                                                        ),
+                                                                        OutlinedButton(
+                                                                          onPressed: () {
+                                                                            if (_data.highlightedTargetId != null) {
+                                                                              _dataNotifier.value = _data.copyWith(
+                                                                                activeTargetId:
+                                                                                    _data.highlightedTargetId,
+                                                                                isSelectMode: false,
+                                                                                highlightedTargetId: null,
+                                                                              );
+                                                                            }
+                                                                            Navigator.of(context).pop();
+                                                                          },
+                                                                          style: OutlinedButton.styleFrom(
+                                                                            tapTargetSize: .shrinkWrap,
+                                                                            minimumSize: Size(180, 32),
+                                                                          ),
+                                                                          child: Text('Done'),
+                                                                        ),
+                                                                        SizedBox(height: 12),
+                                                                      ],
+                                                                    );
+                                                                  },
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        );
+                                                      },
+                                                    ).whenComplete(
+                                                      () => _dataNotifier.value = _data.copyWith(isSelectMode: false),
+                                                    );
+                                                  },
+
                                             icon: Icon(
                                               Icons.ads_click,
                                               color: _data.isSelectMode
@@ -625,6 +744,8 @@ class _OverlayData {
   final double verticalOffset;
   final bool isSelectMode;
   final String? activeTargetId;
+  final String? highlightedTargetId;
+  final Map<String, _DebugTarget> targets;
 
   _OverlayData({
     required this.speedMultiplier,
@@ -633,6 +754,8 @@ class _OverlayData {
     required this.verticalOffset,
     required this.isSelectMode,
     required this.activeTargetId,
+    required this.targets,
+    required this.highlightedTargetId,
   });
 
   @override
@@ -645,11 +768,21 @@ class _OverlayData {
           isMinimized == other.isMinimized &&
           isSelectMode == other.isSelectMode &&
           verticalOffset == other.verticalOffset &&
-          activeTargetId == other.activeTargetId;
+          activeTargetId == other.activeTargetId &&
+          mapEquals(targets, other.targets) &&
+          highlightedTargetId == other.highlightedTargetId;
 
   @override
-  int get hashCode =>
-      Object.hash(speedMultiplier, isLooping, isMinimized, verticalOffset, isSelectMode, activeTargetId);
+  int get hashCode => Object.hash(
+    speedMultiplier,
+    isLooping,
+    isMinimized,
+    verticalOffset,
+    isSelectMode,
+    activeTargetId,
+    highlightedTargetId,
+    Object.hashAll(targets.values),
+  );
 
   bool get isSlowMode => speedMultiplier > 1;
 
@@ -660,6 +793,8 @@ class _OverlayData {
     double? verticalOffset,
     bool? isSelectMode,
     String? activeTargetId,
+    String? highlightedTargetId,
+    Map<String, _DebugTarget>? targets,
   }) {
     return _OverlayData(
       speedMultiplier: speedMultiplier ?? this.speedMultiplier,
@@ -667,7 +802,9 @@ class _OverlayData {
       isMinimized: isMinimized ?? this.isMinimized,
       verticalOffset: verticalOffset ?? this.verticalOffset,
       isSelectMode: isSelectMode ?? this.isSelectMode,
+      highlightedTargetId: highlightedTargetId ?? this.highlightedTargetId,
       activeTargetId: activeTargetId ?? this.activeTargetId,
+      targets: targets ?? this.targets,
     );
   }
 }
@@ -679,6 +816,7 @@ class DebugDataProvider extends InheritedWidget {
     required this.isMinimized,
     required this.isSelectMode,
     required this.activeTargetId,
+    required this.highlightedTargetId,
     required super.child,
   });
 
@@ -686,13 +824,15 @@ class DebugDataProvider extends InheritedWidget {
   final bool isMinimized;
   final bool isSelectMode;
   final String? activeTargetId;
+  final String? highlightedTargetId;
 
   @override
   bool updateShouldNotify(covariant DebugDataProvider oldWidget) {
     return animation != oldWidget.animation ||
         isMinimized != oldWidget.isMinimized ||
         isSelectMode != oldWidget.isSelectMode ||
-        activeTargetId != oldWidget.activeTargetId;
+        activeTargetId != oldWidget.activeTargetId ||
+        highlightedTargetId != oldWidget.highlightedTargetId;
   }
 }
 

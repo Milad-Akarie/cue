@@ -69,8 +69,8 @@ class _BottomBarState extends State<BottomBar> {
                                 motion: .simulation(Spring.smooth(damping: 30)),
                                 child: Actor(
                                   size: .tween(
-                                    from: .fromWidth(collapsedWidth),
-                                    to: .fromWidth(expandedWidth),
+                                    from: .width(collapsedWidth),
+                                    to: .width(expandedWidth),
                                   ),
                                   colorTint: .tween(from: Colors.white60, to: Colors.black),
                                   child: Row(
@@ -83,12 +83,10 @@ class _BottomBarState extends State<BottomBar> {
                                         scale: .zoomIn(from: .7),
                                         child: Padding(
                                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                          child: Flexible(
-                                            child: Text(
-                                              _tabs[i].label,
-                                              maxLines: 1,
-                                              overflow: TextOverflow.fade,
-                                            ),
+                                          child: Text(
+                                            _tabs[i].label,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.fade,
                                           ),
                                         ),
                                       ),

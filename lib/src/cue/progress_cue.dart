@@ -20,6 +20,9 @@ class _ProgressCueState extends _CueState<_ProgressCue> {
   final _animation = ProgressAnimation(value: 0.0);
 
   @override
+  String get debugName => 'ProgressCue';
+
+  @override
   bool get isBounded => true;
 
   @override

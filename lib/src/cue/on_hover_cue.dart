@@ -19,6 +19,9 @@ class _OnHoverCue extends SelfAnimatedCue {
 
 class _OnHoverStageState extends SelfAnimatedState<_OnHoverCue> {
   @override
+  String get debugName => 'OnHoverCue';
+
+  @override
   Widget build(BuildContext context) {
     return MouseRegion(
       cursor: widget.cursor,

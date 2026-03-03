@@ -31,8 +31,8 @@ class DeleteConfirmationDialog extends StatelessWidget {
             elevation: 1,
             shadowColor: Colors.black.withValues(alpha: .3),
             child: SizeActor(
-              from: .fromSize(rect.size),
-              to: .fromWidth(220),
+              from: .size(rect.size),
+              to: .width(220),
               allowOverflow: true,
               child: SlideActor.y(
                 from: 0.4,

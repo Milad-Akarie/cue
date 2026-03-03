@@ -22,6 +22,9 @@ class SelfAnimatedCue extends Cue {
 
 class SelfAnimatedCueState extends SelfAnimatedState<SelfAnimatedCue> {
   @override
+  String get debugName => 'SelfAnimatedCue';
+
+  @override
   void onControllerReady() async {
     if (widget.delay case final delay?) {
       await Future.delayed(delay);
