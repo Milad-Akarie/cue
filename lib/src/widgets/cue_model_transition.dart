@@ -85,6 +85,7 @@ class _CueModalTransitionState extends State<CueModalTransition> {
           builder: widget.builder,
           barrierDismissible: widget.barrierDismissible,
           triggerRect: triggerRect,
+          isBounded: widget.motion.isTimed,
           link: _link,
         );
       },
@@ -107,9 +108,11 @@ class _ModelContent extends StatelessWidget {
     required this.barrierDismissible,
     required this.triggerRect,
     required this.link,
+    required this.isBounded,
   });
 
   final Animation<double> animation;
+  final bool isBounded;
   final Widget? backdrop;
   final AlignmentGeometry? alignment;
   final ModalContentBuilder builder;
@@ -122,6 +125,7 @@ class _ModelContent extends StatelessWidget {
     final resolvedAlignment = alignment?.resolve(Directionality.of(context));
     return Cue(
       animation: animation,
+      isBounded: isBounded,
       child: Material(
         type: MaterialType.transparency,
         child: Stack(

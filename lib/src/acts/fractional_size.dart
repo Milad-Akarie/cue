@@ -1,38 +1,78 @@
 part of 'base/act.dart';
 
-class FractionalSizeAct extends TweenAct<Size> {
-  const FractionalSizeAct({
-    super.from = Size.zero,
-    super.to = Size.zero,
+class FractionalResizeAct extends MulitTweenAct<FractionaSizeProps> {
+  final DoubleProp? widthFactor;
+  final DoubleProp? heightFactor;
+  final AlignmentProp alignment;
+
+  const FractionalResizeAct({
     super.curve,
     super.timing,
     super.reverseCurve,
     super.reverseTiming,
-    this.alignment = Alignment.center,
+    this.widthFactor,
+    this.heightFactor,
+    this.alignment = const AlignmentProp.fixed(Alignment.center),
   });
 
-  const FractionalSizeAct.keyframes(
-    super.keyframes, {
-    super.curve,
-    super.reverseCurve,
-    this.alignment = Alignment.center,
-  }) : super.keyframes();
-
-  final AlignmentGeometry alignment;
-
   @override
-  Widget apply(BuildContext context, Animation<Size> animation, Widget child) {
+  Widget apply(BuildContext context, Animation<FractionaSizeProps> animation, Widget child) {
     return AnimatedBuilder(
       animation: animation,
       child: child,
       builder: (context, child) {
+        final props = animation.value;
         return FractionallySizedBox(
-          widthFactor: animation.value.width,
-          heightFactor: animation.value.height,
-          alignment: alignment,
+          widthFactor: props.widthFactor,
+          heightFactor: props.heightFactor,
+          alignment: props.alignment ?? Alignment.center,
           child: child,
         );
       },
+    );
+  }
+
+  @override
+  Animatable<FractionaSizeProps> buildTween(ActContext context) {
+    final iFrom = context.implicitFrom as FractionaSizeProps?;
+    ActContext withFrom(Object? from) {
+      return context.copyWith(implicitFrom: from);
+    }
+
+    return _FractionalSizeTween(
+      widthFactor: widthFactor?.asAnimtable(withFrom(iFrom?.widthFactor)),
+      heightFactor: heightFactor?.asAnimtable(withFrom(iFrom?.heightFactor)),
+      alignment: alignment.asAnimtable(withFrom(iFrom?.alignment)),
+    );
+  }
+}
+
+@internal
+class FractionaSizeProps {
+  final double? widthFactor;
+  final double? heightFactor;
+  final Alignment? alignment;
+
+  FractionaSizeProps(this.widthFactor, this.heightFactor, this.alignment);
+}
+
+class _FractionalSizeTween extends Animatable<FractionaSizeProps> {
+  final Animatable<double>? widthFactor;
+  final Animatable<double>? heightFactor;
+  final Animatable<Alignment?> alignment;
+
+  _FractionalSizeTween({
+    this.widthFactor,
+    this.heightFactor,
+    required this.alignment,
+  });
+
+  @override
+  FractionaSizeProps transform(double t) {
+    return FractionaSizeProps(
+      widthFactor?.transform(t),
+      heightFactor?.transform(t),
+      alignment.transform(t),
     );
   }
 }

@@ -74,6 +74,14 @@ abstract class Act {
     bool allowOverflow,
   }) = ResizeAct;
 
+  const factory Act.fractionalResize({
+    DoubleProp? widthFactor,
+    DoubleProp? heightFactor,
+    AlignmentProp alignment,
+    Curve? curve,
+    Timing? timing,
+  }) = FractionalResizeAct;
+
   const factory Act.translate({
     required Offset from,
     Offset to,

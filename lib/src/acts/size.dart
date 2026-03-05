@@ -71,7 +71,7 @@ class ResizeAct extends TweenAct<double> {
 
     final animatable = applyCurves(
       tweenRes.tween,
-      curve: context.curve,
+      curve: curve ?? context.curve,
       timing: tweenRes.timing ?? timing ?? context.timing,
       isBounded: context.isBounded,
     );
@@ -293,7 +293,10 @@ class _RenderAnimatedSize extends RenderAligningShiftedBox {
   Size _resolveSize(NSize nsize, Size maxConstraint, Size childSize) {
     double resolveAxis(double? value, double max, double child) {
       if (value == null) return child;
-      if (value.isInfinite) return max;
+      if (value.isInfinite) {
+        assert(max.isFinite, 'Max constraint must be finite when using infinity for axis');
+        return max;
+      }
       return value;
     }
 
@@ -459,12 +462,10 @@ class _RenderAnimatedSize extends RenderAligningShiftedBox {
   void performLayout() {
     _hasVisualOverflow = false;
 
-    final BoxConstraints constraints = this.constraints;
     if (child == null) {
       size = constraints.smallest;
       return;
     }
-
     // Pass 1 (conditional): Measure the child's natural size on axes that have
     // null NSize values. Only loosen the axes that need child-size resolution;
     // keep the parent constraint on axes that are always specified so the child
@@ -486,19 +487,19 @@ class _RenderAnimatedSize extends RenderAligningShiftedBox {
 
     if (_allowOverflow) {
       // Layout child at maxSize (allowing it to be at its biggest size)
+
       final constrainedMaxSize = constraints.constrain(maxSize);
+      // Get the animated size from the animation
+      final animatedSize = sizeAnimation?.value ?? constrainedMaxSize;
 
       // Only re-layout child if the constrained max size differs from the
       // measurement layout (or if we skipped the measurement pass).
-      if (!needsMeasure || constrainedMaxSize != childNaturalSize) {
+      if (!needsMeasure || constrainedMaxSize != childNaturalSize || true) {
         child!.layout(
           BoxConstraints.tight(constrainedMaxSize),
           parentUsesSize: true,
         );
       }
-
-      // Get the animated size from the animation
-      final animatedSize = sizeAnimation?.value ?? constrainedMaxSize;
 
       // Our size is the animated size, constrained by parent
       size = constraints.constrain(animatedSize);

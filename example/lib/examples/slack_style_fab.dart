@@ -52,98 +52,91 @@ class SlackStyleFab extends StatelessWidget {
           child: Actor(
             act: .resize(
               from: .size(rect.size),
-              allowOverflow: true,
+              to: .width(300),
               alignment: .bottomRight,
             ),
-            child: FractionallySizedBox(
-              widthFactor: .8,
-              child: Padding(
-                padding: .symmetric(horizontal: 16, vertical: 12),
-                child: Column(
-                  mainAxisSize: .min,
-                  crossAxisAlignment: .end,
-                  spacing: 4,
-                  children: [
-                    Actor(
-                      act: .compose([
-                        .slide(from: Offset(.8, .8)),
-                        .fadeIn(timing: .startAt(.5)),
-                        .focus(),
-                      ]),
-                      child: ListTile(
-                        contentPadding: EdgeInsets.symmetric(horizontal: 8),
-                        visualDensity: VisualDensity(vertical: -4),
-                        leading: Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: theme.primaryColor,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Icon(
-                            Iconsax.headphone,
-                            color: theme.colorScheme.onPrimary,
-                          ),
+            child: Actor(
+              act: .padding(to: .symmetric(horizontal: 16, vertical: 12)),
+              child: Column(
+                mainAxisSize: .min,
+                crossAxisAlignment: .end,
+                spacing: 4,
+                children: [
+                  Actor(
+                    act: .compose([
+                      .slide(from: Offset(.8, .8)),
+                      .fadeIn(timing: .startAt(.5)),
+                      .focus(),
+                    ]),
+                    child: ListTile(
+                      contentPadding: EdgeInsets.symmetric(horizontal: 8),
+                      visualDensity: VisualDensity(vertical: -4),
+                      leading: Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: theme.primaryColor,
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        title: Text('Huddle', style: theme.textTheme.titleMedium?.copyWith(height: 1.2)),
-                        subtitle: Text('Start an audio or video chat', style: theme.textTheme.bodySmall),
-                      ),
-                    ),
-                    Actor(
-                      act: .translate(from: Offset(16, 12)),
-                      child: TextButton(
-                        onPressed: () {},
-                        style: TextButton.styleFrom(
-                          padding: EdgeInsets.zero,
-                          backgroundColor: theme.colorScheme.primary,
-                          foregroundColor: theme.colorScheme.onPrimary,
-                          minimumSize: .zero,
-                        ),
-                        child: Actor(
-                          act: .resize(
-                            from: .size(rect.size),
-                            to: NSize(w: .infinity, h: 44),
-                            allowOverflow: true,
-                          ),
-                          child: Row(
-                            mainAxisSize: .min,
-                            mainAxisAlignment: .center,
-                            children: [
-                              Actor(
-                                act: .compose([
-                                  .focus(),
-                                  .fadeIn(),
-                                  .clipWidth(timing: .endAt(.8)),
-                                ]),
-                                child: Row(
-                                  mainAxisSize: .min,
-                                  mainAxisAlignment: .center,
-                                  children: [
-                                    Icon(Iconsax.edit),
-                                    SizedBox(width: 8),
-                                    Text('Message'),
-                                  ],
-                                ),
-                              ),
-                              Actor(
-                                act: .compose(
-                                  [
-                                    .unfocus(),
-                                    .fadeOut(),
-                                    .slideX(to: -2, from: 0),
-                                    .rotate(to: 90),
-                                  ],
-                                  timing: .startAt(.2),
-                                ),
-                                child: Icon(Icons.add, size: 24),
-                              ),
-                            ],
-                          ),
+                        child: Icon(
+                          Iconsax.headphone,
+                          color: theme.colorScheme.onPrimary,
                         ),
                       ),
+                      title: Text('Huddle', style: theme.textTheme.titleMedium?.copyWith(height: 1.2)),
+                      subtitle: Text('Start an audio or video chat', style: theme.textTheme.bodySmall),
                     ),
-                  ],
-                ),
+                  ),
+                  TextButton(
+                    onPressed: () {},
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                      backgroundColor: theme.colorScheme.primary,
+                      foregroundColor: theme.colorScheme.onPrimary,
+                      minimumSize: .zero,
+                    ),
+                    child: Actor(
+                      act: .resize(
+                        from: .size(rect.size),
+                        to: NSize(w: .infinity, h: 44),
+                      ),
+                      child: Row(
+                        mainAxisSize: .min,
+                        mainAxisAlignment: .center,
+                        children: [
+                          Actor(
+                            act: .compose([
+                              .focus(),
+                              .fadeIn(),
+                              .clipWidth(timing: .endAt(.8)),
+                            ]),
+                            child: Row(
+                              mainAxisSize: .min,
+                              mainAxisAlignment: .center,
+                              children: [
+                                Icon(Iconsax.edit),
+                                SizedBox(width: 8),
+                                Text('Message'),
+                              ],
+                            ),
+                          ),
+                          Actor(
+                            act: .compose(
+                              [
+                                .unfocus(),
+                                .fadeOut(),
+                                .slideX(to: -2, from: 0),
+                                .rotate(to: 90),
+                              ],
+                              timing: .startAt(.2),
+                            ),
+                            child: Icon(Icons.add, size: 24),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

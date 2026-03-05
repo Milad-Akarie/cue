@@ -138,9 +138,6 @@ class ColorProp extends AnimatableProp<Color?> {
 
   @override
   Animatable<Color?> createSingleTween(Color? from, Color? to) {
-    if (isConstant) {
-      return ConstantTween<Color?>(from);
-    }
     return ColorTween(begin: from, end: to);
   }
 }
@@ -163,10 +160,29 @@ class BorderRadiusProp extends AnimatablePropBase<BorderRadiusGeometry?, BorderR
 
   @override
   Animatable<BorderRadius?> createSingleTween(BorderRadius? from, BorderRadius? to) {
-    if (isConstant) {
-      return ConstantTween<BorderRadius?>(from);
-    }
     return BorderRadiusTween(begin: from, end: to);
+  }
+}
+
+class AlignmentProp extends AnimatablePropBase<AlignmentGeometry?, Alignment?> {
+  const AlignmentProp.tween({
+    required AlignmentGeometry super.from,
+    required AlignmentGeometry super.to,
+    super.timing,
+    super.curve,
+  }) : super.tween();
+
+  const AlignmentProp.fixed(AlignmentGeometry super.value) : super.fixed();
+  const AlignmentProp.keyframes(List<Keyframe<AlignmentGeometry>> super.keyframes, {super.curve}) : super.keyframes();
+
+  @override
+  Alignment? transform(ActContext context, AlignmentGeometry? value) {
+    return value?.resolve(context.textDirection);
+  }
+
+  @override
+  Animatable<Alignment?> createSingleTween(Alignment? from, Alignment? to) {
+    return AlignmentTween(begin: from, end: to);
   }
 }
 
@@ -178,9 +194,6 @@ class DecorationImageProp extends AnimatableProp<DecorationImage?> {
 
   @override
   Animatable<DecorationImage?> createSingleTween(DecorationImage? from, DecorationImage? to) {
-    if (isConstant) {
-      return ConstantTween<DecorationImage?>(from);
-    }
     return _LerpFnTween<DecorationImage?>(from, to, DecorationImage.lerp);
   }
 }
@@ -193,9 +206,6 @@ class BoxBorderProp extends AnimatableProp<BoxBorder?> {
 
   @override
   Animatable<BoxBorder?> createSingleTween(BoxBorder? from, BoxBorder? to) {
-    if (isConstant) {
-      return ConstantTween<BoxBorder?>(from);
-    }
     return _LerpFnTween<BoxBorder?>(from, to, BoxBorder.lerp);
   }
 }
@@ -208,9 +218,6 @@ class BoxShadowProp extends AnimatableProp<List<BoxShadow>?> {
 
   @override
   Animatable<List<BoxShadow>?> createSingleTween(List<BoxShadow>? from, List<BoxShadow>? to) {
-    if (isConstant) {
-      return ConstantTween<List<BoxShadow>?>(from);
-    }
     return _LerpFnTween<List<BoxShadow>?>(from, to, BoxShadow.lerpList);
   }
 }
@@ -223,9 +230,6 @@ class GradientProp extends AnimatableProp<Gradient?> {
 
   @override
   Animatable<Gradient?> createSingleTween(Gradient? from, Gradient? to) {
-    if (isConstant) {
-      return ConstantTween<Gradient?>(from);
-    }
     return _LerpFnTween<Gradient?>(from, to, Gradient.lerp);
   }
 }
@@ -245,7 +249,6 @@ class ShapeBorderProp extends AnimatableProp<ShapeBorder?> {
 
   @override
   Animatable<ShapeBorder?> createSingleTween(ShapeBorder? from, ShapeBorder? to) {
-    if (isConstant) return ConstantTween<ShapeBorder?>(from);
     return ShapeBorderTween(begin: from, end: to);
   }
 }
@@ -263,9 +266,6 @@ class EdgeInsetsProp extends AnimatablePropBase<EdgeInsetsGeometry?, EdgeInsets?
 
   @override
   Animatable<EdgeInsets?> createSingleTween(EdgeInsets? from, EdgeInsets? to) {
-    if (isConstant) {
-      return ConstantTween<EdgeInsets?>(from);
-    }
     return EdgeInsetsTween(begin: from, end: to);
   }
 }
