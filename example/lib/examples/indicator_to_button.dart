@@ -31,17 +31,20 @@ class _IndicatorToButtonState extends State<IndicatorToButton> {
               return Cue.indexed(
                 index: index,
                 controller: _cuePageController,
-                child: Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  elevation: .2,
-                  shape: RoundedSuperellipseBorder(
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [],
+                child: Actor(
+                  act: .zoomIn(from: .8),
+                  child: Card(
+                    margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    elevation: .2,
+                    shape: RoundedSuperellipseBorder(
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [],
+                      ),
                     ),
                   ),
                 ),

@@ -65,26 +65,6 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               SlackStyleFab(),
-              // Cue.onChange(
-              //   value: scale,
-              //   fromCurrentValue: true,
-              //   child: Actor(
-              //     act: .slideX(to: scale),
-              //     child: Container(
-              //       width: 100,
-              //       height: 50,
-              //       color: Colors.red,
-              //     ),
-              //   ),
-              // ),
-              // ElevatedButton(
-              //   onPressed: () {
-              //     setState(() {
-              //       scale = scale + .3;
-              //     });
-              //   },
-              //   child: Text('Slide'),
-              // ),
             ],
           ),
         ),

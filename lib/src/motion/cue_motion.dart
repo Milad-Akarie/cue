@@ -108,11 +108,13 @@ class CueAnimationController extends AnimationController {
   @override
   TickerFuture repeat({double? min, double? max, bool reverse = false, int? count, Duration? period}) {
     if (_motion.isTimed) {
+      assert(min == null || (min >= _lowerBound && min <= _upperBound));
+      assert(max == null || (max >= _lowerBound && max <= _upperBound));
       return super.repeat(
         reverse: reverse,
         count: count,
-        min: min?.clamp(_lowerBound, _upperBound) ?? _lowerBound,
-        max: max?.clamp(_lowerBound, _upperBound) ?? _upperBound,
+        min: min ?? _lowerBound,
+        max: max ?? _upperBound,
         period: period,
       );
     } else {

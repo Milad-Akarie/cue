@@ -1,4 +1,5 @@
 import 'package:cue/cue.dart';
+import 'package:cue/src/core/curves.dart';
 import 'package:cue/src/motion/cue_motion.dart';
 import 'package:flutter/material.dart';
 
@@ -199,6 +200,9 @@ class _ModalRoute<T extends Object> extends RawDialogRoute<T> {
 
   final CueMotion motion;
   final AnimationStatusListener onAnimationStatusChanged;
+
+  @override
+  Curve get barrierCurve => BoundedCurve(curve: Curves.easeIn);
 
   @override
   Duration get transitionDuration => switch (motion) {

@@ -20,7 +20,7 @@ class SlackStyleFab extends StatelessWidget {
           barrierColor: Colors.black87,
           hideTriggerOnTransition: true,
           barrierDismissible: true,
-          motion: const .simulation(Spring.smooth()),
+          motion: const .simulation(Spring.wobbly()),
           triggerBuilder: (context, showModal2) {
             return GestureDetector(
               onLongPress: showModal2,
@@ -91,56 +91,53 @@ class SlackStyleFab extends StatelessWidget {
                     ),
                     Actor(
                       act: .translate(from: Offset(16, 12)),
-                      child: OverflowBox(
-                        fit: .deferToChild,
-                        child: TextButton(
-                          onPressed: () {},
-                          style: TextButton.styleFrom(
-                            padding: EdgeInsets.zero,
-                            backgroundColor: theme.colorScheme.primary,
-                            foregroundColor: theme.colorScheme.onPrimary,
-                            minimumSize: .zero,
+                      child: TextButton(
+                        onPressed: () {},
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.zero,
+                          backgroundColor: theme.colorScheme.primary,
+                          foregroundColor: theme.colorScheme.onPrimary,
+                          minimumSize: .zero,
+                        ),
+                        child: Actor(
+                          act: .resize(
+                            from: .size(rect.size),
+                            to: NSize(w: .infinity, h: 44),
+                            allowOverflow: true,
                           ),
-                          child: Actor(
-                            act: .resize(
-                              from: .size(rect.size),
-                              to: NSize(w: .infinity, h: 44),
-                              allowOverflow: true,
-                            ),
-                            child: Row(
-                              mainAxisSize: .min,
-                              mainAxisAlignment: .center,
-                              children: [
-                                Actor(
-                                  act: .compose([
-                                    .focus(),
-                                    .fadeIn(),
-                                    .clipWidth(timing: .endAt(.8)),
-                                  ]),
-                                  child: Row(
-                                    mainAxisSize: .min,
-                                    mainAxisAlignment: .center,
-                                    children: [
-                                      Icon(Iconsax.edit),
-                                      SizedBox(width: 8),
-                                      Text('Message'),
-                                    ],
-                                  ),
+                          child: Row(
+                            mainAxisSize: .min,
+                            mainAxisAlignment: .center,
+                            children: [
+                              Actor(
+                                act: .compose([
+                                  .focus(),
+                                  .fadeIn(),
+                                  .clipWidth(timing: .endAt(.8)),
+                                ]),
+                                child: Row(
+                                  mainAxisSize: .min,
+                                  mainAxisAlignment: .center,
+                                  children: [
+                                    Icon(Iconsax.edit),
+                                    SizedBox(width: 8),
+                                    Text('Message'),
+                                  ],
                                 ),
-                                Actor(
-                                  act: .compose(
-                                    [
-                                      .unfocus(),
-                                      .fadeOut(),
-                                      .slideX(to: -2, from: 0),
-                                      .rotate(to: 90),
-                                    ],
-                                    timing: .startAt(.2),
-                                  ),
-                                  child: Icon(Icons.add, size: 24),
+                              ),
+                              Actor(
+                                act: .compose(
+                                  [
+                                    .unfocus(),
+                                    .fadeOut(),
+                                    .slideX(to: -2, from: 0),
+                                    .rotate(to: 90),
+                                  ],
+                                  timing: .startAt(.2),
                                 ),
-                              ],
-                            ),
+                                child: Icon(Icons.add, size: 24),
+                              ),
+                            ],
                           ),
                         ),
                       ),

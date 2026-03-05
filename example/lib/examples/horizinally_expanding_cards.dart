@@ -54,7 +54,6 @@ class _HorizontallyExpandingCardsState extends State<HorizontallyExpandingCards>
                         act: .resize(
                           from: .width(availableWidth * 0.16),
                           to: .width(availableWidth * 0.6),
-                          allowOverflow: true,
                         ),
                         child: DecoratedBox(
                           decoration: BoxDecoration(

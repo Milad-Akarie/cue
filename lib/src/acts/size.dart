@@ -17,7 +17,7 @@ class ResizeAct extends TweenAct<double> {
     super.reverseTiming,
     this.alignment,
     this.clipBehavior = Clip.hardEdge,
-    this.allowOverflow = false,
+    this.allowOverflow = true,
   }) : _fromSize = from,
        _toSize = to,
        _sizeKeyframes = null,
@@ -29,7 +29,7 @@ class ResizeAct extends TweenAct<double> {
     super.reverseCurve,
     this.alignment,
     this.clipBehavior = Clip.hardEdge,
-    this.allowOverflow = false,
+    this.allowOverflow = true,
   }) : _fromSize = null,
        _toSize = null,
        _sizeKeyframes = keyframes,
@@ -292,9 +292,6 @@ class _RenderAnimatedSize extends RenderAligningShiftedBox {
   /// - any other value → use as-is
   Size _resolveSize(NSize nsize, Size maxConstraint, Size childSize) {
     double resolveAxis(double? value, double max, double child) {
-      if (value?.isInfinite == true) {
-        print('Value: $value, Max: $max, Child: $child'); // --- IGNORE ---
-      }
       if (value == null) return child;
       if (value.isInfinite) return max;
       return value;
