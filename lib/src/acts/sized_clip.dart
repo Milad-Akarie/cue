@@ -36,7 +36,7 @@ class ClipSizeAct extends TweenAct<double> {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is ClipSizeAct &&
-          runtimeType == other.runtimeType &&
+          super == other &&
           alignment == other.alignment &&
           clipBehavior == other.clipBehavior &&
           _fromSize == other._fromSize &&
@@ -69,7 +69,7 @@ class ClipSizeAct extends TweenAct<double> {
 
   @override
   Widget apply(BuildContext context, Animation<double> animation, Widget child) {
-    return _AnimatedSize(
+    return _AnimatedSizeClip(
       driver: animation,
       fromSize: _fromSize,
       toSize: _toSize,
@@ -81,8 +81,8 @@ class ClipSizeAct extends TweenAct<double> {
   }
 }
 
-class _AnimatedSize extends SingleChildRenderObjectWidget {
-  const _AnimatedSize({
+class _AnimatedSizeClip extends SingleChildRenderObjectWidget {
+  const _AnimatedSizeClip({
     required this.driver,
     required this.fromSize,
     required this.toSize,
@@ -100,8 +100,8 @@ class _AnimatedSize extends SingleChildRenderObjectWidget {
   final Clip clipBehavior;
 
   @override
-  _RenderAnimatedSize createRenderObject(BuildContext context) {
-    return _RenderAnimatedSize(
+  _RenderAnimatedSizeClip createRenderObject(BuildContext context) {
+    return _RenderAnimatedSizeClip(
       driver: driver,
       fromSize: fromSize,
       toSize: toSize,
@@ -115,7 +115,7 @@ class _AnimatedSize extends SingleChildRenderObjectWidget {
   @override
   void updateRenderObject(
     BuildContext context,
-    _RenderAnimatedSize renderObject,
+    _RenderAnimatedSizeClip renderObject,
   ) {
     renderObject
       ..driver = driver
@@ -128,8 +128,8 @@ class _AnimatedSize extends SingleChildRenderObjectWidget {
   }
 }
 
-class _RenderAnimatedSize extends RenderAligningShiftedBox {
-  _RenderAnimatedSize({
+class _RenderAnimatedSizeClip extends RenderAligningShiftedBox {
+  _RenderAnimatedSizeClip({
     required Animation<double> driver,
     required NSize? fromSize,
     required NSize? toSize,
@@ -184,26 +184,6 @@ class _RenderAnimatedSize extends RenderAligningShiftedBox {
   set sizeKeyframes(List<Keyframe<NSize>>? value) {
     if (_sizeKeyframes == value) return;
     _sizeKeyframes = value;
-    _invalidateAnimationCache();
-  }
-
-  Curve? _curve;
-
-  Curve? get curve => _curve;
-
-  set curve(Curve? value) {
-    if (_curve == value) return;
-    _curve = value;
-    _invalidateAnimationCache();
-  }
-
-  Timing? _timing;
-
-  Timing? get timing => _timing;
-
-  set timing(Timing? value) {
-    if (_timing == value) return;
-    _timing = value;
     _invalidateAnimationCache();
   }
 
@@ -440,63 +420,4 @@ class _RenderAnimatedSize extends RenderAligningShiftedBox {
     _clipRectLayer.layer = null;
     super.dispose();
   }
-}
-
-/// A size specification where each axis can be `null` to mean
-/// "use the child's natural size for that axis" (no constraint applied).
-///
-/// `double.infinity` is still supported and means "use the maximum available
-/// constraint for that axis".
-///
-/// Examples:
-/// ```dart
-/// // Both axes fixed
-/// NSize(width: 200, height: 100)
-///
-/// // Animate width, let height follow child
-/// NSize(width: 200, height: null)
-///
-/// // Both axes follow child (no constraint)
-/// NSize.childSize
-///
-/// // From a Flutter Size (no nulls)
-/// NSize.fromSize(Size(200, 100))
-/// ```
-class NSize {
-  /// The width. `null` means use the child's natural width.
-  /// `double.infinity` means use the maximum available width constraint.
-  final double? w;
-
-  /// The height. `null` means use the child's natural height.
-  /// `double.infinity` means use the maximum available height constraint.
-  final double? h;
-
-  const NSize({this.w, this.h});
-
-  /// Both axes follow the child's natural size (no constraint on either axis).
-  static const NSize childSize = NSize();
-  static const NSize infinity = NSize(w: double.infinity, h: double.infinity);
-  static const NSize zero = NSize(w: 0, h: 0);
-
-  /// Creates an [NSize] from a Flutter [Size] (no nulls).
-  NSize.size(Size size) : w = size.width, h = size.height;
-
-  /// Both axes set to [size] (square).
-  const NSize.square(double size) : w = size, h = size;
-
-  /// Fixed [w], child's natural height
-  const NSize.width(double this.w) : h = null;
-
-  /// Fixed [h], child's natural width
-  const NSize.height(double this.h) : w = null;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) || other is NSize && runtimeType == other.runtimeType && w == other.w && h == other.h;
-
-  @override
-  int get hashCode => Object.hash(w, h);
-
-  @override
-  String toString() => 'NSize(width: $w, height: $h)';
 }
