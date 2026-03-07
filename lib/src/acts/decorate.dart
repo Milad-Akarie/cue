@@ -1,11 +1,11 @@
 part of 'base/act.dart';
 
 class DecoratedBoxAct extends MulitTweenAct<BoxDecoration> {
-  final ColorProp? color;
-  final BorderRadiusProp? borderRadius;
-  final BoxBorderProp? border;
-  final BoxShadowProp? boxShadow;
-  final GradientProp? gradient;
+  final AnimtableColor? color;
+  final AnimtableBorderRadius? borderRadius;
+  final AnimtableBoxBorder? border;
+  final AnimtableBoxShadow? boxShadow;
+  final AnimtableGradient? gradient;
   final BoxShape shape;
   final DecorationPosition position;
 
@@ -24,19 +24,19 @@ class DecoratedBoxAct extends MulitTweenAct<BoxDecoration> {
   });
 
   @override
-  Animatable<BoxDecoration> buildTween(ActContext context) {
+  CueAnimtable<BoxDecoration> buildTween(ActContext context) {
     final iFrom = context.implicitFrom as BoxDecoration?;
 
     ActContext withFrom(Object? from) {
       return context.copyWith(implicitFrom: from);
     }
 
-    return _DecorationProxyTween(
-      color: color?.asAnimtable(withFrom(iFrom?.color)),
-      borderRadius: borderRadius?.asAnimtable(withFrom(iFrom?.borderRadius)),
-      border: border?.asAnimtable(withFrom(iFrom?.border)),
-      boxShadow: boxShadow?.asAnimtable(withFrom(iFrom?.boxShadow)),
-      gradient: gradient?.asAnimtable(withFrom(iFrom?.gradient)),
+    return _DecorationTweenProxy(
+      color: color?.buildAnimtable(withFrom(iFrom?.color)),
+      borderRadius: borderRadius?.buildAnimtable(withFrom(iFrom?.borderRadius)),
+      border: border?.buildAnimtable(withFrom(iFrom?.border)),
+      boxShadow: boxShadow?.buildAnimtable(withFrom(iFrom?.boxShadow)),
+      gradient: gradient?.buildAnimtable(withFrom(iFrom?.gradient)),
       shape: shape,
     );
   }
@@ -68,15 +68,24 @@ class DecoratedBoxAct extends MulitTweenAct<BoxDecoration> {
   int get hashCode => Object.hash(color, borderRadius, border, boxShadow, gradient, shape, position);
 }
 
-class _DecorationProxyTween extends Animatable<BoxDecoration> {
-  final Animatable<Color?>? color;
-  final Animatable<BorderRadiusGeometry?>? borderRadius;
-  final Animatable<BoxBorder?>? border;
-  final Animatable<List<BoxShadow>?>? boxShadow;
-  final Animatable<Gradient?>? gradient;
+class _DecorationTweenProxy extends CueAnimtable<BoxDecoration> {
+  final CueAnimtable<Color?>? color;
+  final CueAnimtable<BorderRadiusGeometry?>? borderRadius;
+  final CueAnimtable<BoxBorder?>? border;
+  final CueAnimtable<List<BoxShadow>?>? boxShadow;
+  final CueAnimtable<Gradient?>? gradient;
   final BoxShape shape;
 
-  _DecorationProxyTween({
+  @override
+  bool shouldNotify(AnimationStatus status) {
+    return (color?.shouldNotify(status) ?? false) ||
+        (borderRadius?.shouldNotify(status) ?? false) ||
+        (border?.shouldNotify(status) ?? false) ||
+        (boxShadow?.shouldNotify(status) ?? false) ||
+        (gradient?.shouldNotify(status) ?? false);
+  }
+
+  _DecorationTweenProxy({
     this.color,
     this.borderRadius,
     this.border,
@@ -86,24 +95,24 @@ class _DecorationProxyTween extends Animatable<BoxDecoration> {
   });
 
   @override
-  BoxDecoration transform(double t) {
+  BoxDecoration transform(double t, AnimationStatus status) {
     return BoxDecoration(
       shape: shape,
-      color: color?.transform(t),
-      borderRadius: borderRadius?.transform(t),
-      border: border?.transform(t),
-      boxShadow: boxShadow?.transform(t),
-      gradient: gradient?.transform(t),
+      color: color?.transform(t, status),
+      borderRadius: borderRadius?.transform(t, status),
+      border: border?.transform(t, status),
+      boxShadow: boxShadow?.transform(t, status),
+      gradient: gradient?.transform(t, status),
     );
   }
 }
 
 class DecoratedBoxActor extends StatelessWidget {
-  final ColorProp? color;
-  final BorderRadiusProp? borderRadius;
-  final BoxBorderProp? border;
-  final BoxShadowProp? boxShadow;
-  final GradientProp? gradient;
+  final AnimtableColor? color;
+  final AnimtableBorderRadius? borderRadius;
+  final AnimtableBoxBorder? border;
+  final AnimtableBoxShadow? boxShadow;
+  final AnimtableGradient? gradient;
   final BoxShape shape;
   final Widget? child;
   final Timing? timing;

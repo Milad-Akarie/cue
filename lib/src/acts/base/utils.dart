@@ -48,3 +48,23 @@ Animatable<T> buildFromPhases<T extends Object?>(
   }
   return tween;
 }
+
+// Animation<T> applyRole<T>(
+//   Animation<double> driver,
+//   Animatable<T> animatable,
+//   ActorRole role, {
+//   Animatable<T>? reverseAnimatable,
+// }) {
+//   return switch (role) {
+//     ActorRole.both =>
+//       reverseAnimatable == null
+//           ? driver.drive(animatable)
+//           : DualAnimation(
+//               parent: driver,
+//               forward: animatable,
+//               reverse: reverseAnimatable,
+//             ),
+//     ActorRole.forward => ForwardOrStoppedAnimation(driver).drive(animatable),
+//     ActorRole.reverse => ReverseOrStoppedAnimation(driver).drive(animatable),
+//   };
+// }

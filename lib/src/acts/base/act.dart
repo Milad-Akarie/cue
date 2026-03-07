@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:cue/cue.dart';
+import 'package:cue/src/acts/base/deferred_tween_act.dart';
 import 'package:cue/src/acts/base/multi_tween_act.dart';
 import 'package:cue/src/acts/base/tween_act.dart';
 import 'package:cue/src/acts/base/utils.dart';
@@ -17,6 +18,7 @@ part '../color_tint.dart';
 part '../rotate.dart';
 part '../rotate_layout.dart';
 part '../scale.dart';
+part '../size.dart';
 part '../opacity.dart';
 part '../blur.dart';
 part '../align.dart';
@@ -67,7 +69,7 @@ abstract class Act {
   const factory Act.fractionalSize({
     AnimatableValue<double>? widthFactor,
     AnimatableValue<double>? heightFactor,
-    AlignmentProp alignment,
+    AnimtableAlignment alignment,
     Curve? curve,
     Timing? timing,
   }) = FractionalSizeAct;
@@ -228,13 +230,12 @@ abstract class Act {
     Timing? timing,
   }) = ColorTintAct;
 
-  const factory Act.clip({
-    BorderRadiusGeometry borderRadius,
-    AlignmentGeometry alignment,
-    bool useSuperellipse,
+  const factory Act.size({
+    AnimatableValue<double>? width,
+    AnimatableValue<double>? height,
     Curve? curve,
     Timing? timing,
-  }) = ClipAct;
+  }) = SizeAct;
 
   const factory Act.clipSize({
     NSize? from,
@@ -244,6 +245,14 @@ abstract class Act {
     AlignmentGeometry alignment,
     Clip clipBehavior,
   }) = ClipSizeAct;
+
+  const factory Act.clip({
+    BorderRadiusGeometry borderRadius,
+    AlignmentGeometry alignment,
+    bool useSuperellipse,
+    Curve? curve,
+    Timing? timing,
+  }) = ClipAct;
 
   const factory Act.clipHeight({
     double from,
@@ -316,11 +325,11 @@ abstract class Act {
   }) = TransformAct;
 
   const factory Act.decorate({
-    ColorProp? color,
-    BorderRadiusProp borderRadius,
-    BoxBorderProp? border,
-    BoxShadowProp? boxShadow,
-    GradientProp? gradient,
+    AnimtableColor? color,
+    AnimtableBorderRadius borderRadius,
+    AnimtableBoxBorder? border,
+    AnimtableBoxShadow? boxShadow,
+    AnimtableGradient? gradient,
     BoxShape shape,
     DecorationPosition position,
     Curve? curve,

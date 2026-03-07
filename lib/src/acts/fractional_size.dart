@@ -3,7 +3,7 @@ part of 'base/act.dart';
 class FractionalSizeAct extends MulitTweenAct<FractionaSizeProps> {
   final AnimatableValue<double>? widthFactor;
   final AnimatableValue<double>? heightFactor;
-  final AlignmentProp alignment;
+  final AnimtableAlignment alignment;
 
   const FractionalSizeAct({
     super.curve,
@@ -12,7 +12,7 @@ class FractionalSizeAct extends MulitTweenAct<FractionaSizeProps> {
     super.reverseTiming,
     this.widthFactor,
     this.heightFactor,
-    this.alignment = const AlignmentProp.fixed(Alignment.center),
+    this.alignment = const AnimtableAlignment.fixed(Alignment.center),
   });
 
   @override
@@ -33,21 +33,20 @@ class FractionalSizeAct extends MulitTweenAct<FractionaSizeProps> {
   }
 
   @override
-  Animatable<FractionaSizeProps> buildTween(ActContext context) {
+  CueAnimtable<FractionaSizeProps> buildTween(ActContext context) {
     final iFrom = context.implicitFrom as FractionaSizeProps?;
     ActContext withFrom(Object? from) {
       return context.copyWith(implicitFrom: from);
     }
 
     return _FractionalSizeTween(
-      widthFactor: widthFactor?.asAnimtable(withFrom(iFrom?.widthFactor)),
-      heightFactor: heightFactor?.asAnimtable(withFrom(iFrom?.heightFactor)),
-      alignment: alignment.asAnimtable(withFrom(iFrom?.alignment)),
+      widthFactor: widthFactor?.buildAnimtable(withFrom(iFrom?.widthFactor)),
+      heightFactor: heightFactor?.buildAnimtable(withFrom(iFrom?.heightFactor)),
+      alignment: alignment.buildAnimtable(withFrom(iFrom?.alignment)),
     );
   }
 }
 
-@internal
 class FractionaSizeProps {
   final double? widthFactor;
   final double? heightFactor;
@@ -56,10 +55,17 @@ class FractionaSizeProps {
   FractionaSizeProps(this.widthFactor, this.heightFactor, this.alignment);
 }
 
-class _FractionalSizeTween extends Animatable<FractionaSizeProps> {
-  final Animatable<double>? widthFactor;
-  final Animatable<double>? heightFactor;
-  final Animatable<Alignment?> alignment;
+class _FractionalSizeTween extends CueAnimtable<FractionaSizeProps> {
+  final CueAnimtable<double>? widthFactor;
+  final CueAnimtable<double>? heightFactor;
+  final CueAnimtable<Alignment?> alignment;
+
+  @override
+  bool shouldNotify(AnimationStatus status) {
+    return (widthFactor?.shouldNotify(status) ?? false) ||
+        (heightFactor?.shouldNotify(status) ?? false) ||
+        (alignment.shouldNotify(status));
+  }
 
   _FractionalSizeTween({
     this.widthFactor,
@@ -68,11 +74,11 @@ class _FractionalSizeTween extends Animatable<FractionaSizeProps> {
   });
 
   @override
-  FractionaSizeProps transform(double t) {
+  FractionaSizeProps transform(double t, AnimationStatus status) {
     return FractionaSizeProps(
-      widthFactor?.transform(t),
-      heightFactor?.transform(t),
-      alignment.transform(t),
+      widthFactor?.transform(t, status),
+      heightFactor?.transform(t, status),
+      alignment.transform(t, status),
     );
   }
 }

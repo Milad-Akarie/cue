@@ -67,48 +67,57 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
             // mainAxisAlignment: MainAxisAlignment.end,
             // crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Cue.onToggle(
-                toggled: checked,
-                // motion: .simulation(Spring.wobbly()),
-                child: Column(
-                  children: [
-                    Actor(
-                      act: ClipSizeAct.keyframes(
-                        [
-                          Keyframe(.square(10), at: .2),
-                          Keyframe(.square(50), at: .5),
-                          Keyframe(.square(20), at: .7),
-                        ],
-                        alignment: .center,
-                      ),
-                      child: Container(
-                        width: size,
-                        height: size,
-                        color: Colors.blue,
-                      ),
-                    ),
-                    SizedBox(height: 24),
-                    ElevatedButton(
-                      onPressed: () {
-                        setState(() {
-                          checked = !checked;
-                        });
-                      },
-                      child: Text('Toggle'),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        setState(() {
-                          size = size + 10;
-                        });
-                      },
-                      child: Text('resize'),
-                    ),
-                  ],
+              Cue.onChange(
+                fromCurrentValue: true,
+                value: size,
+                act: .clipSize(
+                  from: .square(20),
+                  to: .square(size),
                 ),
+                child: Container(width: 50, height: 50, color: Colors.red),
               ),
-              SlackStyleFab(),
-              HorizontallyExpandingCards(),
+
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    size = size + 50;
+                  });
+                },
+                child: Text('resize'),
+              ),
+              // Cue.onToggle(
+              //   toggled: checked,
+              //   motion: .simulation(Spring.wobbly()),
+              //   child: Column(
+              //     children: [
+              //       Actor(
+              //         act: .size(
+              //           width: .keyframes([
+              //             Keyframe(50, at: 0),
+              //             Keyframe(200, at: .5),
+              //             Keyframe(50, at: 1),
+              //           ]),
+              //         ),
+              //         child: Container(
+              //           width: size,
+              //           height: size,
+              //           color: Colors.blue,
+              //         ),
+              //       ),
+              //       SizedBox(height: 24),
+              //       ElevatedButton(
+              //         onPressed: () {
+              //           setState(() {
+              //             checked = !checked;
+              //           });
+              //         },
+              //         child: Text('Toggle'),
+              //       ),
+              //     ],
+              //   ),
+              // ),
+              // SlackStyleFab(),
+              // HorizontallyExpandingCards(),
             ],
           ),
         ),

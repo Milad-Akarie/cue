@@ -18,7 +18,7 @@ class _IndexedCue extends Cue {
 }
 
 class _IndexedCueState extends _CueState<_IndexedCue> {
-  final _animation = ProgressAnimation(value: 0.0);
+  final _animation = CueProgressAnimation(value: 0.0);
 
   @override
   String get debugName => 'IndexedCue';

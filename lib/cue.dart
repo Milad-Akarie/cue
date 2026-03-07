@@ -7,6 +7,5 @@ export 'src/cue/cue_debug_provider.dart';
 export 'src/motion/simulation/cue_simulation.dart';
 export 'src/motion/simulation/spring.dart';
 export 'src/acts/base/act.dart';
-export 'src/acts/base/nullable_size.dart';
 export 'src/actor/actor.dart';
 export 'src/acts/base/animated_prop.dart';

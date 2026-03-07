@@ -14,13 +14,13 @@ part of 'base/act.dart';
 class CardAct extends MulitTweenAct<CardProps> {
   final Clip clipBehavior;
   final bool borderOnForeground;
-  final ColorProp? color;
-  final ColorProp shadowColor;
-  final ColorProp? surfaceTintColor;
+  final AnimtableColor? color;
+  final AnimtableColor shadowColor;
+  final AnimtableColor? surfaceTintColor;
   final AnimatableValue<double>? elevation;
-  final BorderRadiusProp? borderRadius;
-  final EdgeInsetsProp? margin;
-  final ShapeBorderProp? shape;
+  final AnimtableBorderRadius? borderRadius;
+  final AnimtableEdgeInsets? margin;
+  final AnimtableShapeBorder? shape;
   final bool semanticContainer;
 
   CardAct({
@@ -31,7 +31,7 @@ class CardAct extends MulitTweenAct<CardProps> {
     this.surfaceTintColor,
     this.clipBehavior = Clip.none,
     this.borderOnForeground = true,
-    this.shadowColor = const ColorProp.fixed(Color(0xFF000000)),
+    this.shadowColor = const AnimtableColor.fixed(Color(0xFF000000)),
     super.timing,
     super.curve,
     super.reverseCurve,
@@ -45,20 +45,20 @@ class CardAct extends MulitTweenAct<CardProps> {
        );
 
   @override
-  Animatable<CardProps> buildTween(ActContext context) {
+  CueAnimtable<CardProps> buildTween(ActContext context) {
     final iFrom = context.implicitFrom as CardProps?;
     ActContext withFrom(Object? from) {
       return context.copyWith(implicitFrom: from);
     }
 
     return _CardPropsProxyTween(
-      elevation: elevation?.asAnimtable(withFrom(iFrom?.elevation)),
-      color: color?.asAnimtable(withFrom(iFrom?.color)),
-      shadowColor: shadowColor.asAnimtable(withFrom(iFrom?.shadowColor)),
-      surfaceTintColor: surfaceTintColor?.asAnimtable(withFrom(iFrom?.surfaceTintColor)),
-      borderRadius: borderRadius?.asAnimtable(withFrom(iFrom?.borderRadius)),
-      shape: shape?.asAnimtable(withFrom(iFrom?.shape)),
-      margin: margin?.asAnimtable(withFrom(iFrom?.margin)),
+      elevation: elevation?.buildAnimtable(withFrom(iFrom?.elevation)),
+      color: color?.buildAnimtable(withFrom(iFrom?.color)),
+      shadowColor: shadowColor.buildAnimtable(withFrom(iFrom?.shadowColor)),
+      surfaceTintColor: surfaceTintColor?.buildAnimtable(withFrom(iFrom?.surfaceTintColor)),
+      borderRadius: borderRadius?.buildAnimtable(withFrom(iFrom?.borderRadius)),
+      shape: shape?.buildAnimtable(withFrom(iFrom?.shape)),
+      margin: margin?.buildAnimtable(withFrom(iFrom?.margin)),
     );
   }
 
@@ -190,14 +190,15 @@ class CardProps {
        );
 }
 
-class _CardPropsProxyTween extends Animatable<CardProps> {
-  final Animatable<double>? elevation;
-  final Animatable<Color?>? color;
-  final Animatable<Color?>? shadowColor;
-  final Animatable<Color?>? surfaceTintColor;
-  final Animatable<BorderRadius?>? borderRadius;
-  final Animatable<ShapeBorder?>? shape;
-  final Animatable<EdgeInsets?>? margin;
+class _CardPropsProxyTween extends CueAnimtable<CardProps> {
+  final CueAnimtable<double>? elevation;
+  final CueAnimtable<Color?>? color;
+  final CueAnimtable<Color?>? shadowColor;
+  final CueAnimtable<Color?>? surfaceTintColor;
+  final CueAnimtable<BorderRadius?>? borderRadius;
+  final CueAnimtable<ShapeBorder?>? shape;
+  final CueAnimtable<EdgeInsets?>? margin;
+
   const _CardPropsProxyTween({
     this.elevation,
     this.color,
@@ -209,15 +210,26 @@ class _CardPropsProxyTween extends Animatable<CardProps> {
   });
 
   @override
-  CardProps transform(double t) {
+  bool shouldNotify(AnimationStatus status) {
+    return (elevation?.shouldNotify(status) ?? false) ||
+        (color?.shouldNotify(status) ?? false) ||
+        (shadowColor?.shouldNotify(status) ?? false) ||
+        (surfaceTintColor?.shouldNotify(status) ?? false) ||
+        (borderRadius?.shouldNotify(status) ?? false) ||
+        (shape?.shouldNotify(status) ?? false) ||
+        (margin?.shouldNotify(status) ?? false);
+  }
+
+  @override
+  CardProps transform(double t, AnimationStatus status) {
     return CardProps(
-      elevation: elevation?.transform(t) ?? 0,
-      color: color?.transform(t),
-      shadowColor: shadowColor?.transform(t),
-      surfaceTintColor: surfaceTintColor?.transform(t),
-      borderRadius: borderRadius?.transform(t),
-      margin: margin?.transform(t),
-      shape: shape?.transform(t),
+      elevation: elevation?.transform(t, status) ?? 0,
+      color: color?.transform(t, status),
+      shadowColor: shadowColor?.transform(t, status),
+      surfaceTintColor: surfaceTintColor?.transform(t, status),
+      borderRadius: borderRadius?.transform(t, status),
+      margin: margin?.transform(t, status),
+      shape: shape?.transform(t, status),
     );
   }
 }
@@ -228,13 +240,13 @@ class _CardPropsProxyTween extends Animatable<CardProps> {
 /// Wraps an [Actor] with a single [CardAct]. For composing multiple effects,
 /// use [Actor] directly with [CardAct] in the effects list.
 class CardActor extends StatelessWidget {
-  final ColorProp? color;
-  final ColorProp? shadowColor;
-  final ColorProp? surfaceTintColor;
+  final AnimtableColor? color;
+  final AnimtableColor? shadowColor;
+  final AnimtableColor? surfaceTintColor;
   final AnimatableValue<double>? elevation;
-  final BorderRadiusProp? borderRadius;
-  final ShapeBorderProp? shape;
-  final EdgeInsetsProp? margin;
+  final AnimtableBorderRadius? borderRadius;
+  final AnimtableShapeBorder? shape;
+  final AnimtableEdgeInsets? margin;
   final Clip clipBehavior;
   final bool borderOnForeground;
   final Widget? child;
@@ -273,7 +285,7 @@ class CardActor extends StatelessWidget {
       role: role,
       act: CardAct(
         color: color,
-        shadowColor: shadowColor ?? const ColorProp.fixed(Color(0xFF000000)),
+        shadowColor: shadowColor ?? const AnimtableColor.fixed(Color(0xFF000000)),
         surfaceTintColor: surfaceTintColor,
         elevation: elevation,
         borderRadius: borderRadius,

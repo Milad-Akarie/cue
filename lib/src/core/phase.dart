@@ -17,6 +17,13 @@ class Keyframe<T extends Object?> {
 
   @override
   int get hashCode => Object.hash(value, at);
+
+  Keyframe<T> copyWith({T? value, double? at}) {
+    return Keyframe<T>(
+      value ?? this.value,
+      at: at ?? this.at,
+    );
+  }
 }
 
 class Phase<T extends Object?> {
