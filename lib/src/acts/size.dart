@@ -15,11 +15,14 @@ class SizeAct extends DeferredTweenAct<Size> {
 
   @override
   Widget apply(BuildContext context, covariant DeferredCueAnimation<Size> animation, Widget child) {
-    return _AnimatedSizedBox(
+    return _OvershootWidget(
       driver: animation,
-      widthInput: width,
-      heightInput: height,
-      child: child,
+      child: _AnimatedSizedBox(
+        driver: animation,
+        width: width,
+        height: height,
+        child: child,
+      ),
     );
   }
 
@@ -35,20 +38,20 @@ class _AnimatedSizedBox extends SingleChildRenderObjectWidget {
   const _AnimatedSizedBox({
     super.child,
     required this.driver,
-    this.widthInput,
-    this.heightInput,
+    this.width,
+    this.height,
   });
 
   final DeferredCueAnimation<Size> driver;
-  final AnimatableValue<double>? widthInput;
-  final AnimatableValue<double>? heightInput;
+  final AnimatableValue<double>? width;
+  final AnimatableValue<double>? height;
 
   @override
   _AnimtableRenderConstrainedBox createRenderObject(BuildContext context) {
     return _AnimtableRenderConstrainedBox(
       driver: driver,
-      widthInput: widthInput,
-      heightInput: heightInput,
+      widthInput: width,
+      heightInput: height,
     );
   }
 
@@ -59,8 +62,8 @@ class _AnimatedSizedBox extends SingleChildRenderObjectWidget {
   ) {
     renderObject
       ..driver = driver
-      ..widthInput = widthInput
-      ..heightInput = heightInput;
+      ..width = width
+      ..height = height;
   }
 }
 
@@ -74,47 +77,31 @@ class _AnimtableRenderConstrainedBox extends RenderConstrainedBox {
        _height = heightInput,
        super(additionalConstraints: BoxConstraints());
 
-  // ── driver ──────────────────────────────────────────────────────────────────
-
   DeferredCueAnimation<Size> _driver;
-
-  DeferredCueAnimation<Size> get driver => _driver;
 
   set driver(DeferredCueAnimation<Size> newDriver) {
     if (_driver == newDriver) return;
-    _driver.removeListener(markNeedsLayout);
-    newDriver.addListener(markNeedsLayout);
+    _driver.removeListener(_onTick);
+    newDriver.addListener(_onTick);
     _driver = newDriver;
     markNeedsLayout();
   }
 
-  // ── widthInput ──────────────────────────────────────────────────────────────
-
   AnimatableValue<double>? _width;
 
-  AnimatableValue<double>? get widthInput => _width;
-
-  set widthInput(AnimatableValue<double>? value) {
+  set width(AnimatableValue<double>? value) {
     if (_width == value) return;
     _width = value;
     _invalidateAnimationCache();
   }
 
-  // ── heightInput ─────────────────────────────────────────────────────────────
-
   AnimatableValue<double>? _height;
 
-  AnimatableValue<double>? get heightInput => _height;
-
-  set heightInput(AnimatableValue<double>? value) {
+  set height(AnimatableValue<double>? value) {
     if (_height == value) return;
     _height = value;
     _invalidateAnimationCache();
   }
-
-  // ── animation cache ─────────────────────────────────────────────────────────
-
-  BoxConstraints? _lastConstraints;
 
   void _invalidateAnimationCache() {
     _driver.setAnimatable(null);
@@ -130,18 +117,19 @@ class _AnimtableRenderConstrainedBox extends RenderConstrainedBox {
     return value;
   }
 
+  BoxConstraints? _lastConstraints;
+
   void _buildAnimationIfNeeded() {
     if (_driver.hasAnimatable && _lastConstraints == constraints) return;
-
     final ifrom = _driver.context.implicitFrom as Size?;
     _driver.setAnimatable(
       _ProxySizeTween(
         width: _width?.buildAnimtable(
-          _driver.context.copyWith(implicitFrom: ifrom?.width),
+          _driver.context.copyWith(implicitFrom: ifrom?.width, isBounded: true),
           transform: (ctx, v) => _normalize(v, constraints.maxWidth),
         ),
         height: _height?.buildAnimtable(
-          _driver.context.copyWith(implicitFrom: ifrom?.height),
+          _driver.context.copyWith(implicitFrom: ifrom?.height, isBounded: true),
           transform: (ctx, v) => _normalize(v, constraints.maxHeight),
         ),
       ),
@@ -149,27 +137,27 @@ class _AnimtableRenderConstrainedBox extends RenderConstrainedBox {
     _lastConstraints = constraints;
   }
 
-  // ── lifecycle ────────────────────────────────────────────────────────────────
+  void _onTick() {
+    markNeedsLayout();
+  }
 
   @override
   void attach(PipelineOwner owner) {
     super.attach(owner);
-    _driver.addListener(markNeedsLayout);
+    _driver.addListener(_onTick);
   }
 
   @override
   void detach() {
-    _driver.removeListener(markNeedsLayout);
+    _driver.removeListener(_onTick);
     super.detach();
   }
 
   @override
   void dispose() {
-    _driver.removeListener(markNeedsLayout);
+    _driver.removeListener(_onTick);
     super.dispose();
   }
-
-  // ── layout ───────────────────────────────────────────────────────────────────
 
   @override
   void performLayout() {
@@ -208,5 +196,98 @@ class _ProxySizeTween extends CueAnimtable<Size> {
       width?.transform(t, status) ?? double.infinity,
       height?.transform(t, status) ?? double.infinity,
     );
+  }
+}
+
+class _OvershootWidget extends SingleChildRenderObjectWidget {
+  const _OvershootWidget({
+    super.child,
+    required this.driver,
+  });
+
+  final DeferredCueAnimation<Size> driver;
+
+  @override
+  RenderObject createRenderObject(BuildContext context) {
+    return _OvershootScaleRenderBox(driver: driver);
+  }
+
+  @override
+  void updateRenderObject(BuildContext context, covariant _OvershootScaleRenderBox renderObject) {
+    renderObject.driver = driver;
+  }
+}
+
+class _OvershootScaleRenderBox extends RenderProxyBox {
+  _OvershootScaleRenderBox({required DeferredCueAnimation<Size> driver}) : _driver = driver;
+
+  DeferredCueAnimation<Size> _driver;
+
+  set driver(DeferredCueAnimation<Size> value) {
+    if (_driver == value) return;
+    _driver.removeListener(markNeedsPaint);
+    value.addListener(markNeedsPaint);
+    _driver = value;
+    markNeedsPaint();
+  }
+
+  @override
+  void attach(PipelineOwner owner) {
+    super.attach(owner);
+    _driver.addListener(markNeedsPaint);
+  }
+
+  Matrix4? _transfrom;
+  Size? _lastSize;
+
+  @override
+  void performLayout() {
+    super.performLayout();
+    _lastSize = size;
+  }
+
+  @override
+  void markNeedsPaint() {
+    if (_driver.hasAnimatable && _lastSize != null) {
+      final rawSize = _driver.value;
+      // child.size is the clamped layout size
+      final scaleX = _lastSize!.width > 0 ? rawSize.width / _lastSize!.width : 1.0;
+      final scaleY = _lastSize!.height > 0 ? rawSize.height / _lastSize!.height : 1.0;
+      print(scaleX.toStringAsFixed(2));
+      _transfrom = Matrix4.diagonal3Values(scaleX * 1.5, scaleY, 1.0);
+    } else {
+      _transfrom = null;
+    }
+
+    super.markNeedsPaint();
+  }
+
+  @override
+  void detach() {
+    _driver.removeListener(markNeedsPaint);
+    super.detach();
+  }
+
+  @override
+  void paint(PaintingContext context, Offset offset) {
+    if (child == null || _transfrom == null) {
+      super.paint(context, offset);
+      return;
+    }
+
+    context.pushTransform(
+      needsCompositing,
+      offset,
+      _transfrom!,
+      super.paint,
+    );
+  }
+
+  @override
+  void applyPaintTransform(RenderBox child, Matrix4 transform) {
+    if (_transfrom != null) {
+      transform.multiply(_transfrom!);
+    }
+    super.applyPaintTransform(child, transform);
   }
 }

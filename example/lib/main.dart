@@ -60,60 +60,73 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
       // backgroundColor: theme.colorScheme.surfaceContainer,
       appBar: AppBar(),
       body: Padding(
-        padding: const EdgeInsets.only(top: 48, bottom: 48, left: 24, right: 24),
-        child: SizedBox(
-          width: double.infinity,
+        padding: const EdgeInsets.only(top: 0, bottom: 0, left: 24, right: 24),
+        child: SingleChildScrollView(
           child: Column(
             // mainAxisAlignment: MainAxisAlignment.end,
             // crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Cue.onChange(
-                fromCurrentValue: true,
-                value: size,
-                act: .clipSize(
-                  from: .square(20),
-                  to: .square(size),
+              for (var i = 0; i < 10; i++)
+                Cue.onScrollVisible(
+                  key: ValueKey(i),
+                  act: .compose([
+                    .fadeIn(),
+                    .zoomIn(from: .5),
+                    .slideDown(),
+                  ]),
+                  child: Container(
+                    width: double.infinity,
+                    height: 200,
+                    color: Colors.red,
+                    margin: EdgeInsets.only(bottom: 8),
+                  ),
                 ),
-                child: Container(width: 50, height: 50, color: Colors.red),
-              ),
+              // Cue.onChange(
+              //   fromCurrentValue: true,
+              //   value: size,
+              //   act: .clipSize(
+              //     from: .square(20),
+              //     to: .square(size),
+              //   ),
+              //   child: Container(width: 50, height: 50, color: Colors.red),
+              // ),
 
-              ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    size = size + 50;
-                  });
-                },
-                child: Text('resize'),
-              ),
-              // Cue.onToggle(
-              //   toggled: checked,
-              //   motion: .simulation(Spring.wobbly()),
-              //   child: Column(
-              //     children: [
-              //       Actor(
-              //         act: .size(
-              //           width: .keyframes([
-              //             Keyframe(50, at: 0),
-              //             Keyframe(200, at: .5),
-              //             Keyframe(50, at: 1),
-              //           ]),
-              //         ),
-              //         child: Container(
-              //           width: size,
-              //           height: size,
-              //           color: Colors.blue,
-              //         ),
+              // ElevatedButton(
+              //   onPressed: () {
+              //     setState(() {
+              //       size = size + 50;
+              //     });
+              //   },
+              //   child: Text('resize'),
+              // ),
+              // Center(
+              //   child: SizedBox(
+              //     width: 200,
+              //     child: Cue.onToggle(
+              //       toggled: checked,
+              //       motion: .simulation(Spring.wobbly()),
+              //       child: Column(
+              //         children: [
+              //           Actor(
+              //             act: .size(width: .tween(from: 100, to: 200)),
+              //             child: Container(
+              //               width: size,
+              //               height: size,
+              //               color: Colors.blue,
+              //             ),
+              //           ),
+              //           SizedBox(height: 24),
+              //           ElevatedButton(
+              //             onPressed: () {
+              //               setState(() {
+              //                 checked = !checked;
+              //               });
+              //             },
+              //             child: Text('Toggle'),
+              //           ),
+              //         ],
               //       ),
-              //       SizedBox(height: 24),
-              //       ElevatedButton(
-              //         onPressed: () {
-              //           setState(() {
-              //             checked = !checked;
-              //           });
-              //         },
-              //         child: Text('Toggle'),
-              //       ),
-              //     ],
+              //     ),
               //   ),
               // ),
               // SlackStyleFab(),

@@ -110,9 +110,7 @@ abstract class Cue extends StatefulWidget {
   const factory Cue.onScrollVisible({
     required Key key,
     String? debugLabel,
-    CueMotion motion,
     bool enabled,
-    double visibilityThreshold,
     Act? act,
     required Widget child,
   }) = _OnScrollVisibleCue;

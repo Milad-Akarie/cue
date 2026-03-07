@@ -1,59 +1,33 @@
 part of 'cue.dart';
 
-class _OnScrollVisibleCue extends SelfAnimatedCue {
+class _OnScrollVisibleCue extends Cue {
   const _OnScrollVisibleCue({
     required Key super.key,
     required super.child,
     super.debugLabel,
-    super.motion,
     this.enabled = true,
     super.act,
-    this.visibilityThreshold = 0.0,
-  }) : assert(visibilityThreshold >= 0 && visibilityThreshold <= 1, 'visibilityThreshold must be between 0 and 1');
+  }) : super._();
 
   final bool enabled;
-  final double visibilityThreshold;
 
   @override
   State<StatefulWidget> createState() => _OnVisibleCueState();
 }
 
-class _OnVisibleCueState extends SelfAnimatedState<_OnScrollVisibleCue> {
-  bool? _wasVisible;
-
+class _OnVisibleCueState extends _CueState<_OnScrollVisibleCue> {
   @override
   String get debugName => 'OnScrollVisibleCue';
 
   @override
-  void onControllerReady() {
-    // Assume visible on mount so the widget renders at its final state
-    // until the VisibilityDetector fires and corrects if needed.
-    controller.value = 1.0;
+  Animation<double> getAnimation(BuildContext context) {
+    return _progressAnimation;
   }
 
-  void _onVisibilityChanged(bool isVisible) {
-    if (_wasVisible == null) {
-      if (!isVisible && widget.enabled) {
-        controller.value = 0.0;
-      }
-      _wasVisible = isVisible;
-      return;
-    }
-    if (_wasVisible == isVisible) return;
+  late final _progressAnimation = CueProgressAnimation(value: 1.0);
 
-    // Only animate if going from not visible to invisible.
-    if (isVisible) {
-      controller.forward();
-    } else {
-      if (widget.visibilityThreshold == 0) {
-        // no need to animate an invisible widget, just jump to the end state.
-        controller.value = 0.0;
-      } else {
-        controller.reverse();
-      }
-    }
-    _wasVisible = isVisible;
-  }
+  @override
+  bool get isBounded => true;
 
   ScrollPosition? _scrollPosition;
   double? _cachedRevealedOffset;
@@ -72,11 +46,11 @@ class _OnVisibleCueState extends SelfAnimatedState<_OnScrollVisibleCue> {
       throw FlutterError('Cue.onScrollVisible must be used inside a scrollable widget');
     }
     if (_scrollPosition != position) {
-      _scrollPosition?.removeListener(_checkVisibility);
+      _scrollPosition?.removeListener(_trackViiblity);
       _scrollPosition = position;
-      _scrollPosition!.addListener(_checkVisibility);
+      _scrollPosition!.addListener(_trackViiblity);
     }
-    _checkVisibility();
+    _trackViiblity();
   }
 
   @override
@@ -84,8 +58,8 @@ class _OnVisibleCueState extends SelfAnimatedState<_OnScrollVisibleCue> {
     super.didUpdateWidget(oldWidget);
     if (widget.enabled != oldWidget.enabled) {
       if (!widget.enabled) {
-        controller.value = 1.0;
-        _scrollPosition?.removeListener(_checkVisibility);
+        _progressAnimation.update(1.0, status: AnimationStatus.completed);
+        _scrollPosition?.removeListener(_trackViiblity);
       } else {
         _subscribeToScrollPosition();
       }
@@ -94,11 +68,11 @@ class _OnVisibleCueState extends SelfAnimatedState<_OnScrollVisibleCue> {
 
   @override
   void dispose() {
-    _scrollPosition?.removeListener(_checkVisibility);
+    _scrollPosition?.removeListener(_trackViiblity);
     super.dispose();
   }
 
-  void _checkVisibility() {
+  void _trackViiblity() {
     final renderObject = context.findRenderObject();
     if (renderObject is! RenderBox) return;
 
@@ -122,7 +96,12 @@ class _OnVisibleCueState extends SelfAnimatedState<_OnScrollVisibleCue> {
     // Widget is considered visible when the visible fraction meets or exceeds the threshold.
     // A threshold of 0.0 means any overlap counts as visible.
     final visibleFraction = itemExtent > 0 ? (visibleExtent / itemExtent).clamp(0.0, 1.0) : 0.0;
-    final isVisible = visibleFraction > widget.visibilityThreshold;
-    _onVisibilityChanged(isVisible);
+    final status = switch (visibleFraction) {
+      final v when v <= 0.0 => AnimationStatus.dismissed,
+      final v when v >= 1.0 => AnimationStatus.completed,
+      final v when v >= _progressAnimation.value => AnimationStatus.forward,
+      _ => AnimationStatus.reverse,
+    };
+    _progressAnimation.update(visibleFraction, status: status);
   }
 }

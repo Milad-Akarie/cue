@@ -57,7 +57,7 @@ abstract class SelfAnimatedState<T extends SelfAnimatedCue> extends _CueState<T>
   CueMotion get motion => widget.motion;
 
   @override
-  bool get isBounded => controller.usesSimulation;
+  bool get isBounded => !controller.usesSimulation;
 
   @override
   Animation<double> getAnimation(BuildContext context) => controller.view;
