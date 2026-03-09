@@ -50,7 +50,7 @@ class SlackStyleFab extends StatelessWidget {
             side: BorderSide(color: theme.primaryColor.withValues(alpha: .2), width: .4),
           ),
           child: Actor(
-            act: .clipSize(
+            act: .sizedClip(
               from: .size(rect.size),
               to: NSize(w: 300),
               alignment: .bottomRight,
@@ -98,7 +98,7 @@ class SlackStyleFab extends StatelessWidget {
                       minimumSize: .zero,
                     ),
                     child: Actor(
-                      act: .clipSize(
+                      act: .sizedClip(
                         from: .size(rect.size),
                         to: NSize(w: .infinity, h: 44),
                       ),

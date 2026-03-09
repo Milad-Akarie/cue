@@ -39,7 +39,7 @@ class OptionsButton extends StatelessWidget {
                 ),
                 elevation: 1,
                 child: Actor(
-                  act: .clipSize(from: .size(rect.size)),
+                  act: .sizedClip(from: .size(rect.size)),
                   child: Column(
                     mainAxisSize: .min,
                     crossAxisAlignment: .start,

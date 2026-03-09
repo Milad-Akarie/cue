@@ -1,13 +1,13 @@
 part of 'base/act.dart';
 
-class ClipSizeAct extends DeferredTweenAct<Size?> {
+class SizedClipAct extends DeferredTweenAct<Size?> {
   final AlignmentGeometry? alignment;
   final Clip clipBehavior;
   final NSize? from;
   final NSize? to;
   final List<Keyframe<NSize>>? keyframes;
 
-  const ClipSizeAct({
+  const SizedClipAct({
     this.from = NSize.childSize,
     this.to = NSize.childSize,
     super.curve,
@@ -18,7 +18,7 @@ class ClipSizeAct extends DeferredTweenAct<Size?> {
     this.clipBehavior = Clip.hardEdge,
   }) : keyframes = null;
 
-  const ClipSizeAct.keyframes(
+  const SizedClipAct.keyframes(
     List<Keyframe<NSize>> this.keyframes, {
     super.curve,
     super.reverseCurve,
@@ -30,7 +30,7 @@ class ClipSizeAct extends DeferredTweenAct<Size?> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is ClipSizeAct &&
+      other is SizedClipAct &&
           super == other &&
           alignment == other.alignment &&
           clipBehavior == other.clipBehavior &&

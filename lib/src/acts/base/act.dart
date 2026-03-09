@@ -240,14 +240,14 @@ abstract class Act {
     Timing? timing,
   }) = SizeAct;
 
-  const factory Act.clipSize({
+  const factory Act.sizedClip({
     NSize? from,
     NSize? to,
     Curve? curve,
     Timing? timing,
     AlignmentGeometry alignment,
     Clip clipBehavior,
-  }) = ClipSizeAct;
+  }) = SizedClipAct;
 
   const factory Act.clip({
     BorderRadiusGeometry borderRadius,

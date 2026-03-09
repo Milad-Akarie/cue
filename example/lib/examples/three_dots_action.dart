@@ -62,7 +62,7 @@ class ThreeDotsAction extends StatelessWidget {
                       Actor(
                         act: .compose([
                           .padding(from: .all(1), to: .only(bottom: 10.0)),
-                          .clipSize(from: .square(5), to: .square(44)),
+                          .sizedClip(from: .square(5), to: .square(44)),
                         ]),
                         child: FloatingActionButton(
                           mini: true,

@@ -66,7 +66,7 @@ class _BottomBarState extends State<BottomBar> {
                                 motion: .simulation(Spring.smooth(damping: 30)),
                                 child: Actor(
                                   act: .compose([
-                                    .clipSize(from: .width(collapsedWidth), to: .width(expandedWidth)),
+                                    .sizedClip(from: .width(collapsedWidth), to: .width(expandedWidth)),
                                     .colorTint(from: Colors.white60, to: Colors.black),
                                   ]),
                                   child: Row(

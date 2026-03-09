@@ -65,7 +65,6 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
         maxChildSize: .6,
         snapAnimationDuration: const Duration(milliseconds: 300),
         builder: (context, scrollController) {
-        
           return Cue.onProgress(
             listenable: _sheetController,
             progress: () => _sheetController.isAttached ? _sheetController.size : 0.0,
@@ -80,7 +79,8 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
                     Actor(
                       act: .compose([
                         .slideY(from: -.8 * i,),
-                        .scale(to: .5 + i * (.5/5), from: 0)
+                        .scale(to: .5 + i * (.5/5), from: 0),
+                      
                     ]),
                     child: Card(
                       elevation: i * .5,

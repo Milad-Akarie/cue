@@ -32,7 +32,7 @@ class DeleteConfirmationDialog extends StatelessWidget {
             shadowColor: Colors.black.withValues(alpha: .3),
             child: Actor(
               act: .compose([
-                .clipSize(from: .size(rect.size), to: .width(220)),
+                .sizedClip(from: .size(rect.size), to: .width(220)),
                 .slideY(from: 0.4),
               ]),
               child: Column(
