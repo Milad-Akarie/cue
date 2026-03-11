@@ -89,18 +89,22 @@ class SlackStyleFab extends StatelessWidget {
                       subtitle: Text('Start an audio or video chat', style: theme.textTheme.bodySmall),
                     ),
                   ),
-                  TextButton(
-                    onPressed: () {},
-                    style: TextButton.styleFrom(
-                      padding: EdgeInsets.zero,
-                      backgroundColor: theme.colorScheme.primary,
-                      foregroundColor: theme.colorScheme.onPrimary,
-                      minimumSize: .zero,
+                  Actor(
+                    act: .size(
+                      width:  .tween(from: rect.width, to: .infinity),
+                      height: .tween(from: rect.height, to: 44),
+                      alignment: .bottomEnd,
+                      timing: .startAt(.05),
+                      // from: .size(rect.size),
+                      // to: NSize(w: .infinity, h: 44),
                     ),
-                    child: Actor(
-                      act: .sizedClip(
-                        from: .size(rect.size),
-                        to: NSize(w: .infinity, h: 44),
+                    child: TextButton(
+                      onPressed: () {},
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                        backgroundColor: theme.colorScheme.primary,
+                        foregroundColor: theme.colorScheme.onPrimary,
+                        minimumSize: .zero,
                       ),
                       child: Row(
                         mainAxisSize: .min,

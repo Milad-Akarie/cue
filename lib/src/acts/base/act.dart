@@ -236,8 +236,10 @@ abstract class Act {
   const factory Act.size({
     AnimatableValue<double>? width,
     AnimatableValue<double>? height,
+    AlignmentGeometry alignment,
     Curve? curve,
     Timing? timing,
+    
   }) = SizeAct;
 
   const factory Act.sizedClip({
@@ -373,6 +375,7 @@ class ComposeAct extends Act {
 
   @override
   List<(Act, ActContext)> resolve(ActContext base) {
+
     final result = <(Act, ActContext)>[];
     final context = base.copyWith(
       curve: curve,

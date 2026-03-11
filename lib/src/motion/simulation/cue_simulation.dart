@@ -3,6 +3,8 @@ import 'package:flutter/physics.dart';
 abstract class CueSimulation {
   const CueSimulation();
   Simulation build(SimulationBuildData data);
+
+    double computeSettlingDuration();
 }
 
 class SimulationBuildData {
@@ -11,9 +13,11 @@ class SimulationBuildData {
   final double progress;
   double get end => forward ? 1.0 : 0.0;
 
-  SimulationBuildData({
+  const SimulationBuildData({
     this.velocity,
-    required this.forward,
-    required this.progress,
+     this.forward = true,
+     this.progress = 0.0,
   });
+
+ 
 }

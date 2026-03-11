@@ -22,7 +22,7 @@ class ActorState extends State<Actor> {
   final _cachedAnimations = <Act, Animation<Object?>>{};
   final _animationSnapshots = <Type, Object?>{};
 
-  late List<(Act, ActContext)> _acts = widget.act.resolve(const ActContext());
+   List<(Act, ActContext)> _acts = [];
 
   void _onWillReAnimate(bool forward) {
     for (final entry in _animations.entries) {
@@ -67,13 +67,10 @@ class ActorState extends State<Actor> {
   void didUpdateWidget(covariant Actor oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.act != widget.act) {
-      _acts = widget.act.resolve(const ActContext());
-      _setupAnimations(CueScope.of(context));
+      final scope = CueScope.of(context);
+      _acts = widget.act.resolve( ActContext(isBounded: scope.isBounded));
+      _setupAnimations(scope);
     }
-    if (oldWidget.act != widget.act) {
-      _acts = widget.act.resolve(const ActContext());
-    }
-    _setupAnimations(CueScope.of(context));
   }
 
   void _clearCache() {
@@ -86,6 +83,10 @@ class ActorState extends State<Actor> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final scope = CueScope.of(context);
+       if(_acts.isEmpty) {
+        print(scope.isBounded);
+         _acts = widget.act.resolve( ActContext(isBounded: scope.isBounded));
+       }
     if (_cachedScope?.willReanimateNotifier != scope.willReanimateNotifier) {
       _cachedScope?.willReanimateNotifier?.removeEventListener(_onWillReAnimate);
       scope.willReanimateNotifier?.addEventListener(_onWillReAnimate);

@@ -6,9 +6,11 @@ Animatable<R> applyCurves<R>(Animatable<R> animatable, {Curve? curve, Timing? ti
   if (curve == null && timing == null) {
     return animatable;
   }
+  
   final effectiveCurve = timing != null
-      ? BoundedInterval(timing.start, timing.end, curve: curve ?? Curves.linear)
-      : curve ?? Curves.linear;
+      ? Interval(timing.start, timing.end)
+      : curve ?? const UnboundedLinearCurve();
+
   return animatable.chain(BoundedCurveTween(curve: effectiveCurve, applyBounds: isBounded));
 }
 

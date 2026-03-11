@@ -65,6 +65,12 @@ class CueAnimationController extends AnimationController {
     );
   }
 
+  double get timingProgress {
+    final elapsedTime = lastElapsedDuration!.inMicroseconds / 1000000.0;
+    final durationSeconds = duration!.inMicroseconds / 1000000.0;
+    return (elapsedTime / durationSeconds).clamp(0.0, 1.0);
+  }
+
   @override
   TickerFuture forward({double? from}) {
     if (from != null) {
@@ -83,12 +89,13 @@ class CueAnimationController extends AnimationController {
     if (from != null) {
       value = from;
     }
+
     switch (_motion) {
       case TimedMotion(curve: final curve, reverseCurve: final reverseCurve):
         return super.animateBack(_lowerBound, curve: reverseCurve ?? curve ?? Curves.linear);
       case SimulationMotion(reverse: final reverse, simulation: final simulation):
         final effectiveSim = reverse ?? simulation;
-        return animateWith(_createSimulation(effectiveSim, false));
+        return animateBackWith(_createSimulation(effectiveSim, false));
     }
   }
 

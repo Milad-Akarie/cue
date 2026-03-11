@@ -1,9 +1,7 @@
 import 'package:cue/cue.dart';
-import 'package:example/examples/indicator_to_button_2.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:iconsax/iconsax.dart';
 
 void main() {
   runApp(const MyApp());
@@ -52,54 +50,73 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    BoxDecoration;
+   
     return Scaffold(
       // backgroundColor: Colors.blue,
       appBar: AppBar(),
-      bottomSheet: DraggableScrollableSheet(
-        controller: _sheetController,
-        expand: false,
-        initialChildSize: 0.2,
-        minChildSize: 0.2,
-        maxChildSize: .6,
-        snapAnimationDuration: const Duration(milliseconds: 300),
-        builder: (context, scrollController) {
-          return Cue.onProgress(
-            listenable: _sheetController,
-            progress: () => _sheetController.isAttached ? _sheetController.size : 0.0,
-            min: 0.2,
-            max: 0.8,
-            child: SingleChildScrollView(
-              controller: scrollController,
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
+      body: SizedBox.expand(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(
+              height: 100,
+              child: Row(
+                crossAxisAlignment: .stretch,
                 children: [
-                  for (var i = 6; i > 0; i--)
-                    Actor(
+                  Expanded(child: ColoredBox(color: Colors.red)),
+                  SizedBox(
+                    child: Cue.onToggle(
+                      toggled: checked,
+                      motion: .simulation(Spring.wobbly(damping: 8)),
                       act: .compose([
-                        .slideY(from: -.8 * i,),
-                        .scale(to: .5 + i * (.5/5), from: 0),
-                    ]),
-                    child: Card(
-                      elevation: i * .5,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16.0),
-                        side: BorderSide(color: theme.colorScheme.primary, width: 1.0),
-                      ),
-                      child: ListTile(
-                        leading: const Icon(Iconsax.box),
-                        title: Text('Item $i'),
-                        subtitle: const Text('Subtitle'),
-                      ),
+                        .size(
+                          width: .tween(
+                            from: 50,
+                            to: 100,
+                            curve: SpringCurve(),
+                            timing: .startAt(.2),
+                            reverse: .mirror(curve: SpringCurve(SimulationBuildData(forward: false, progress: 1))),
+                          ),
+                        ),
+                      ]),
+                      child: ColoredBox(color: Colors.blue),
                     ),
                   ),
-              ]
+                  Expanded(child: ColoredBox(color: Colors.green)),
+                ],
+              ),
             ),
+            // Align(
+            //    alignment: .bottomEnd,
+            //   child: SlackStyleFab()),
+            SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  checked = !checked;
+                });
+              },
+              child: Text('Toggle'),
             ),
-          );
-        },
+          ],
+        ),
       ),
-      body: IndicatorToButton2(),
     );
+  }
+}
+
+class SpringCurve extends Curve {
+  final SimulationBuildData buildData;
+  final Simulation _sim;
+
+  SpringCurve([this.buildData = const SimulationBuildData()]) : _sim = Spring.wobbly(damping: 8).build(buildData);
+
+  @override
+  double transformInternal(double t) {
+    if(!buildData.forward){
+       t = 1.0 - t;
+    }
+    return _sim.x(t * 0.7833333333333341);
   }
 }

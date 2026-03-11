@@ -98,12 +98,12 @@ abstract class Cue extends StatefulWidget {
     Key? key,
     String? debugLabel,
     Act? act,
-    
+
     required Listenable listenable,
     required ValueGetter<double> progress,
     required Widget child,
-      double min,
-      double max,
+    double min,
+    double max,
   }) = _ProgressCue;
 
   // This only works within the nearest scrollable ancestor and is not meant to be used as a general purpose visibility detector.
@@ -163,10 +163,7 @@ abstract class _CueState<T extends Cue> extends State<Cue> {
   Widget build(BuildContext context) {
     Widget child = widget.child;
     if (widget.act != null) {
-      child = Actor(
-        act: widget.act!,
-        child: child,
-      );
+      child = Actor(act: widget.act!, child: child);
     }
 
     final animation = getAnimation(context);

@@ -159,7 +159,11 @@ class DualAnimatable<T> extends CueAnimtable<T> {
   final Animatable<T> _reverse;
   final bool flipTimeOnReverse;
 
-  DualAnimatable({required this.forward, required Animatable<T>? reverse, this.flipTimeOnReverse = false}) : _reverse = reverse ?? forward;
+  DualAnimatable({
+    required this.forward,
+    required Animatable<T>? reverse,
+    this.flipTimeOnReverse = false,
+  }) : _reverse = reverse ?? forward;
 
   @override
   bool shouldNotify(AnimationStatus status) => true;
@@ -167,7 +171,7 @@ class DualAnimatable<T> extends CueAnimtable<T> {
   @override
   T transform(double t, AnimationStatus status) {
     final isReversing = status == AnimationStatus.reverse || status == AnimationStatus.dismissed;
-    return isReversing ? _reverse.transform(flipTimeOnReverse? 1.0 - t: t) : forward.transform(t);
+    return isReversing ? _reverse.transform(flipTimeOnReverse ? 1.0 - t : t) : forward.transform(t);
   }
 }
 

@@ -9,6 +9,23 @@ const Tolerance _kStandardIosTolerance = Tolerance(velocity: 0.03);
 const Tolerance _kDefaultTolerance = Tolerance(distance: 0.01, velocity: 0.03);
 
 class Spring extends CueSimulation {
+
+  @override
+  double computeSettlingDuration() {
+    double t = 0;
+    const step = 1 / 60; // 60fps steps
+    final sim = build(const SimulationBuildData());
+    while (t < 10.0) {
+      // cap at 10s
+      final x = sim.x(t);
+      final v = sim.dx(t);
+      if ((x - 1.0).abs() < tolerance.distance && v.abs() < tolerance.velocity) return t;
+      t += step;
+    }
+    return t;
+  }
+
+
   final double mass;
   final double stiffness;
   final double damping;
@@ -28,6 +45,8 @@ class Spring extends CueSimulation {
     stiffness: stiffness,
     damping: damping,
   );
+ 
+
 
   @override
   Simulation build(SimulationBuildData data) {

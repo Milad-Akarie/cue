@@ -98,6 +98,8 @@ abstract class AnimatablePropBase<T extends Object?, R extends Object?> {
       return AlwaysStoppedAnimatable<R>(tween.begin as R);
     }
 
+    
+
     final animtable = applyCurves(
       tween,
       curve: curve ?? context.curve,
@@ -359,7 +361,7 @@ class AnimatableValue<T> extends AnimatableProp<T> {
     super.curve,
   });
 
-  const AnimatableValue.tween({required super.from, required super.to, super.timing, super.curve}) : super.tween();
+  const AnimatableValue.tween({required super.from, required super.to, super.timing, super.curve,super.reverse}) : super.tween();
 
   const AnimatableValue.fixed(super.value) : super.fixed();
   const AnimatableValue.keyframes(super.keyframes, {super.curve}) : super.keyframes();
