@@ -4,14 +4,14 @@ class CueScope extends InheritedWidget {
   const CueScope({
     super.key,
     required super.child,
-    required this.animation,
+    required this.animations,
     required this.isBounded,
     this.willReanimateNotifier,
     required this.reanimateFromCurrent,
   });
 
   final EventNotifier<bool>? willReanimateNotifier;
-  final Animation<double> animation;
+  final Timeline animations;
   final bool isBounded;
   final bool reanimateFromCurrent;
 
@@ -21,14 +21,9 @@ class CueScope extends InheritedWidget {
     return cue!;
   }
 
-  bool get isReversing => animation.status == AnimationStatus.reverse;
-  bool get isCompleted => animation.status == AnimationStatus.completed;
-  bool get isDismissed => animation.status == AnimationStatus.dismissed;
-  bool get isAnimating => animation.isAnimating;
-
   @override
   bool updateShouldNotify(covariant CueScope oldWidget) {
-    return animation != oldWidget.animation ||
+    return animations != oldWidget.animations ||
         isBounded != oldWidget.isBounded ||
         willReanimateNotifier != oldWidget.willReanimateNotifier ||
         reanimateFromCurrent != oldWidget.reanimateFromCurrent;

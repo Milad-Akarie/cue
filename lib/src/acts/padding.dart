@@ -4,14 +4,13 @@ class PaddingAct extends TweenAct<EdgeInsetsGeometry> {
   const PaddingAct({
     super.from = EdgeInsets.zero,
     super.to = EdgeInsets.zero,
-    super.curve,
-    super.timing,
+    super.motion,
     super.reverse,
   });
 
   const PaddingAct.keyframes(
     super.keyframes, {
-    super.curve,
+    super.motion,
     super.reverse,
   }) : super.keyframes();
 

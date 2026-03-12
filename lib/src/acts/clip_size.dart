@@ -10,18 +10,16 @@ class SizedClipAct extends DeferredTweenAct<Size?> {
   const SizedClipAct({
     this.from = NSize.childSize,
     this.to = NSize.childSize,
-    super.curve,
-    super.timing,
-    super.reverseCurve,
-    super.reverseTiming,
+    super.motion,
+    super.reverseMotion,
     this.alignment,
     this.clipBehavior = Clip.hardEdge,
   }) : keyframes = null;
 
   const SizedClipAct.keyframes(
     List<Keyframe<NSize>> this.keyframes, {
-    super.curve,
-    super.reverseCurve,
+    super.motion,
+    super.reverseMotion,
     this.alignment,
     this.clipBehavior = Clip.hardEdge,
   }) : from = null,

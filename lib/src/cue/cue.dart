@@ -1,12 +1,14 @@
 import 'package:cue/cue.dart';
+import 'package:cue/src/motion/cue_animation_controller.dart';
 import 'package:cue/src/motion/cue_motion.dart';
+import 'package:cue/src/motion/simulations.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'dart:math' as math;
 part 'indexed_cue.dart';
 part 'on_change_cue.dart';
-part 'route_transition_cue.dart';
+// part 'route_transition_cue.dart';
 part 'self_animated_cue.dart';
 part 'on_hover_cue.dart';
 part 'on_toggle_cue.dart';
@@ -32,22 +34,22 @@ abstract class Cue extends StatefulWidget {
     String? debugLabel,
     bool isBounded,
     Act? act,
-    required Animation<double> animation,
+    required Timeline animations,
     required Widget child,
   }) = _ControlledCue;
 
-  const factory Cue.onTransition({
-    Key? key,
-    String? debugLabel,
-    required Widget child,
-    Act? act,
-  }) = _RouteTransitionStage;
+  // const factory Cue.onTransition({
+  //   Key? key,
+  //   String? debugLabel,
+  //   required Widget child,
+  //   Act? act,
+  // }) = _RouteTransitionStage;
 
   const factory Cue.onMount({
     Key? key,
     String? debugLabel,
     CueMotion motion,
-    Duration? delay,
+    CueMotion? reverseMotion,
     bool loop,
     bool reverseOnLoop,
     Act? act,
@@ -68,6 +70,7 @@ abstract class Cue extends StatefulWidget {
     Key? key,
     String? debugLabel,
     CueMotion motion,
+    CueMotion? reverseMotion,
     required bool toggled,
     bool skipFirstAnimation,
     required Widget child,
@@ -146,7 +149,6 @@ abstract class _CueState<T extends Cue> extends State<Cue> {
             id: _debugId,
             duration: const Duration(seconds: 1),
             curve: Curves.easeOut,
-            simulation: const Spring.smooth(),
           );
         }
       });
@@ -166,34 +168,34 @@ abstract class _CueState<T extends Cue> extends State<Cue> {
       child = Actor(act: widget.act!, child: child);
     }
 
-    final animation = getAnimation(context);
-    if (kDebugMode) {
-      final debugToolsScope = CueDebugTools.maybeOf(context);
-      if (debugToolsScope != null) {
-        final isActive = debugToolsScope.activeTargetId == _debugId;
-        final useDebugAnimation = !debugToolsScope.isMinimized && isActive;
-        return DecoratedBox(
-          position: DecorationPosition.foreground,
-          decoration: isActive && debugToolsScope.isSelectMode
-              ? BoxDecoration(
-                  color: Colors.amber.withValues(alpha: .2),
-                  border: Border.all(
-                    color: Colors.amber.withValues(alpha: .8),
-                  ),
-                )
-              : const BoxDecoration(),
-          child: CueScope(
-            reanimateFromCurrent: reanimateFromCurrent,
-            animation: useDebugAnimation ? debugToolsScope.animation : animation,
-            willReanimateNotifier: willReanimateNotifier,
-            isBounded: isBounded,
-            child: child,
-          ),
-        );
-      }
-    }
+    final animation = getAnimations(context);
+    // if (kDebugMode) {
+    //   final debugToolsScope = CueDebugTools.maybeOf(context);
+    //   if (debugToolsScope != null) {
+    //     final isActive = debugToolsScope.activeTargetId == _debugId;
+    //     final useDebugAnimation = !debugToolsScope.isMinimized && isActive;
+    //     return DecoratedBox(
+    //       position: DecorationPosition.foreground,
+    //       decoration: isActive && debugToolsScope.isSelectMode
+    //           ? BoxDecoration(
+    //               color: Colors.amber.withValues(alpha: .2),
+    //               border: Border.all(
+    //                 color: Colors.amber.withValues(alpha: .8),
+    //               ),
+    //             )
+    //           : const BoxDecoration(),
+    //       child: CueScope(
+    //         reanimateFromCurrent: reanimateFromCurrent,
+    //         animation: useDebugAnimation ? debugToolsScope.animation : animation,
+    //         willReanimateNotifier: willReanimateNotifier,
+    //         isBounded: isBounded,
+    //         child: child,
+    //       ),
+    //     );
+    //   }
+    // }
     return CueScope(
-      animation: animation,
+      animations: animation,
       isBounded: isBounded,
       willReanimateNotifier: willReanimateNotifier,
       reanimateFromCurrent: reanimateFromCurrent,
@@ -201,5 +203,5 @@ abstract class _CueState<T extends Cue> extends State<Cue> {
     );
   }
 
-  Animation<double> getAnimation(BuildContext context);
+  Timeline getAnimations(BuildContext context);
 }

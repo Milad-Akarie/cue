@@ -17,7 +17,7 @@ class _NotificationBellState extends State<NotificationBell> {
       children: [
         Cue.onChange(
           value: _notificationsCount,
-          motion: .simulation(Spring.gentle()),
+          motion: Spring.gentle(),
           child: SizedBox.square(
             dimension: 38,
             child: Stack(

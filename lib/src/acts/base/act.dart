@@ -5,7 +5,8 @@ import 'package:cue/cue.dart';
 import 'package:cue/src/acts/base/deferred_tween_act.dart';
 import 'package:cue/src/acts/base/multi_tween_act.dart';
 import 'package:cue/src/acts/base/tween_act.dart';
-import 'package:cue/src/acts/base/utils.dart';
+import 'package:cue/src/motion/cue_motion.dart';
+import 'package:cue/src/motion/simulations.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -39,214 +40,183 @@ abstract class Act {
 
   const factory Act.compose(
     List<Act> acts, {
-    Curve? curve,
-    Timing? timing,
-    Curve? reverseCurve,
-    Timing? reverseTiming,
+    CueMotion? motion,
+    CueMotion? reverseMotion,
   }) = ComposeAct;
 
   const factory Act.scale({
     required double from,
     required double to,
-    Curve? curve,
-    Timing? timing,
+    CueMotion? motion,
     ReverseBehavior<double> reverse,
   }) = ScaleAct;
 
   const factory Act.zoomIn({
     double from,
     double to,
-    Curve? curve,
-    Timing? timing,
+    CueMotion? motion,
   }) = ScaleAct.zoomIn;
 
   const factory Act.zoomOut({
     double from,
     double to,
-    Curve? curve,
-    Timing? timing,
+    CueMotion? motion,
   }) = ScaleAct.zoomOut;
 
   const factory Act.fractionalSize({
     AnimatableValue<double>? widthFactor,
     AnimatableValue<double>? heightFactor,
     AnimtableAlignment alignment,
-    Curve? curve,
-    Timing? timing,
+    CueMotion? motion,
   }) = FractionalSizeAct;
 
   const factory Act.translate({
     required Offset from,
     Offset to,
-    Curve? curve,
-    Timing? timing,
+    CueMotion? motion,
   }) = TranslateAct;
 
   const factory Act.translateX({
     double from,
     double to,
-    Curve? curve,
-    Timing? timing,
+    CueMotion? motion,
   }) = TranslateAct.fromX;
 
   const factory Act.translateY({
     double from,
     double to,
-    Curve? curve,
-    Timing? timing,
+    CueMotion? motion,
   }) = TranslateAct.y;
 
   const factory Act.translateFromGlobal({
     required Offset offset,
     Offset toLocal,
-    Curve? curve,
-    Timing? timing,
+    CueMotion? motion,
   }) = TranslateAct.fromGlobal;
 
   const factory Act.translateFromGlobalRect(
     Rect rect, {
     AlignmentGeometry alignment,
     Offset toLocal,
-    Curve? curve,
-    Timing? timing,
+    CueMotion? motion,
   }) = TranslateAct.fromGlobalRect;
 
   const factory Act.translateFromGlobalKey(
     GlobalKey key, {
     AlignmentGeometry alignment,
     Offset toLocal,
-    Curve? curve,
-    Timing? timing,
+    CueMotion? motion,
   }) = TranslateAct.fromGlobalKey;
 
   const factory Act.slide({
     Offset from,
     Offset to,
-    Curve? curve,
-    Timing? timing,
+    CueMotion? motion,
   }) = SlideAct;
 
   const factory Act.slideX({
     double from,
     double to,
-    Curve? curve,
-    Timing? timing,
+    CueMotion? motion,
     ReverseBehavior<double> reverse,
   }) = SlideAct.fromX;
 
   const factory Act.slideY({
      double from,
     double to,
-    Curve? curve,
-    Timing? timing,
+    CueMotion? motion,
     ReverseBehavior<double> reverse,
   }) = SlideAct.fromY;
 
   const factory Act.slideUp({
-    Curve? curve,
-    Timing? timing,
+    CueMotion? motion,
   }) = SlideAct.up;
 
   const factory Act.slideDown({
-    Curve? curve,
-    Timing? timing,
+    CueMotion? motion,
   }) = SlideAct.down;
 
   const factory Act.slideFromLeading({
-    Curve? curve,
-    Timing? timing,
+    CueMotion? motion,
   }) = SlideAct.fromLeading;
 
   const factory Act.slideFromTrailing({
-    Curve? curve,
-    Timing? timing,
+    CueMotion? motion,
   }) = SlideAct.fromTrailing;
 
   const factory Act.opacity({
     required double from,
     required double to,
-    Curve? curve,
-    Timing? timing,
+      CueMotion? motion,
   }) = OpacityAct;
 
   const factory Act.fadeIn({
     double from,
     double to,
-    Curve? curve,
-    Timing? timing,
+      CueMotion? motion,
   }) = OpacityAct.fadeIn;
 
   const factory Act.fadeOut({
     double from,
     double to,
-    Curve? curve,
-    Timing? timing,
+      CueMotion? motion,
   }) = OpacityAct.fadeOut;
 
   const factory Act.align({
     AlignmentGeometry from,
     AlignmentGeometry to,
-    Curve? curve,
-    Timing? timing,
+      CueMotion? motion,
   }) = AlignAct;
 
   const factory Act.padding({
     EdgeInsetsGeometry from,
     EdgeInsetsGeometry to,
-    Curve? curve,
-    Timing? timing,
+      CueMotion? motion,
   }) = PaddingAct;
 
   const factory Act.blur({
     double from,
     double to,
-    Curve? curve,
-    Timing? timing,
+      CueMotion? motion,
   }) = BlurAct;
 
   const factory Act.focus({
     double from,
     double to,
-    Curve? curve,
-    Timing? timing,
+      CueMotion? motion,
   }) = BlurAct.focus;
 
   const factory Act.unfocus({
     double from,
     double to,
-    Curve? curve,
-    Timing? timing,
+      CueMotion? motion,
   }) = BlurAct.unfocus;
 
   const factory Act.backdropBlur({
     double from,
     double to,
-    Curve? curve,
-    Timing? timing,
+      CueMotion? motion,
     BlendMode blendMode,
   }) = BackdropBlurAct;
 
   const factory Act.colorTint({
     required Color from,
     required Color to,
-    Curve? curve,
-    Timing? timing,
+      CueMotion? motion,
   }) = ColorTintAct;
 
-  const factory Act.size({
+  const factory Act.sizedBox({
     AnimatableValue<double>? width,
     AnimatableValue<double>? height,
     AlignmentGeometry alignment,
-    Curve? curve,
-    Timing? timing,
+      CueMotion? motion,
     
   }) = SizeAct;
 
   const factory Act.sizedClip({
     NSize? from,
     NSize? to,
-    Curve? curve,
-    Timing? timing,
+    CueMotion? motion,
     AlignmentGeometry alignment,
     Clip clipBehavior,
   }) = SizedClipAct;
@@ -255,37 +225,32 @@ abstract class Act {
     BorderRadiusGeometry borderRadius,
     AlignmentGeometry alignment,
     bool useSuperellipse,
-    Curve? curve,
-    Timing? timing,
+   CueMotion? motion,
   }) = ClipAct;
 
   const factory Act.clipHeight({
     double from,
     double to,
     AlignmentGeometry alignment,
-    Curve? curve,
-    Timing? timing,
+    CueMotion? motion,
   }) = ClipAct.height;
 
   const factory Act.clipWidth({
     double from,
     double to,
     AlignmentGeometry alignment,
-    Curve? curve,
-    Timing? timing,
+    CueMotion? motion,
   }) = ClipAct.width;
 
   const factory Act.circularClip({
     AlignmentGeometry alignment,
-    Curve? curve,
-    Timing? timing,
+    CueMotion? motion,
   }) = ClipAct.circular;
 
   const factory Act.rotate({
     double from,
     double to,
-    Curve? curve,
-    Timing? timing,
+    CueMotion? motion,
     RotateUnit unit,
     RotateAxis axis,
   }) = RotateAct;
@@ -293,40 +258,34 @@ abstract class Act {
   const factory Act.rotateLayout({
     double from,
     double to,
-    Curve? curve,
-    Timing? timing,
+    CueMotion? motion,
     RotateUnit unit,
   }) = RotateLayoutAct;
 
   const factory Act.flipX({
-    Curve? curve,
-    Timing? timing,
+    CueMotion? motion,
   }) = RotateAct.flipX;
 
   const factory Act.flipY({
-    Curve? curve,
-    Timing? timing,
+    CueMotion? motion,
   }) = RotateAct.flipY;
 
   const factory Act.textStyle({
     required TextStyle from,
     required TextStyle to,
-    Curve? curve,
-    Timing? timing,
+    CueMotion? motion,
   }) = TextStyleAct;
 
   const factory Act.iconTheme({
     required IconThemeData from,
     required IconThemeData to,
-    Curve? curve,
-    Timing? timing,
+    CueMotion? motion,
   }) = IconThemeAct;
 
   const factory Act.transform({
     required Matrix4 from,
     required Matrix4 to,
-    Curve? curve,
-    Timing? timing,
+    CueMotion? motion,
   }) = TransformAct;
 
   const factory Act.decorate({
@@ -337,39 +296,34 @@ abstract class Act {
     AnimtableGradient? gradient,
     BoxShape shape,
     DecorationPosition position,
-    Curve? curve,
-    Timing? timing,
+    CueMotion? motion,
   }) = DecoratedBoxAct;
 
-  Animation<Object?> buildAnimation(Animation<double> driver, ActContext context);
+  CueAnimation<Object?> buildAnimation(Timeline timline, ActContext context);
 
-  Widget build(BuildContext context, covariant Animation<Object?> animation, Widget child);
+  Widget build(BuildContext context, covariant CueAnimation<Object?> animation, Widget child);
 
   List<(Act, ActContext)> resolve(ActContext base);
 }
 
 class ComposeAct extends Act {
   final List<Act> acts;
-  final Curve? curve;
-  final Timing? timing;
-  final Curve? reverseCurve;
-  final Timing? reverseTiming;
-
+  final CueMotion? motion;
+  final CueMotion? reverseMotion;
   const ComposeAct(
     this.acts, {
-    this.curve,
-    this.timing,
-    this.reverseCurve,
-    this.reverseTiming,
+    this.motion,
+    this.reverseMotion,
+ 
   });
 
   @override
-  Animation<Object?> buildAnimation(Animation<double> driver, ActContext context) {
+  CueAnimationImpl<Object?> buildAnimation(Timeline timline, ActContext context) {
     throw StateError('ComposeAct should not be used directly');
   }
 
   @override
-  Widget build(BuildContext context, Animation<Object?> animation, Widget child) {
+  Widget build(BuildContext context, covariant CueAnimationImpl<Object?> animation, Widget child) {
     throw StateError('ComposeAct should not be used directly');
   }
 
@@ -378,10 +332,8 @@ class ComposeAct extends Act {
 
     final result = <(Act, ActContext)>[];
     final context = base.copyWith(
-      curve: curve,
-      timing: timing,
-      reverseCurve: reverseCurve,
-      reverseTiming: reverseTiming,
+      motion: motion,
+      reverseMotion: reverseMotion,
     );
     for (final act in acts) {
       result.addAll(act.resolve(context));
@@ -395,51 +347,49 @@ class ComposeAct extends Act {
       other is ComposeAct &&
           runtimeType == other.runtimeType &&
           listEquals(acts, other.acts) &&
-          curve == other.curve &&
-          timing == other.timing &&
-          reverseCurve == other.reverseCurve &&
-          reverseTiming == other.reverseTiming;
+          motion == other.motion &&
+          reverseMotion == other.reverseMotion;
 
   @override
   int get hashCode => Object.hashAll(acts);
 }
 
 class ActContext {
-  final Timing? timing;
-  final Timing? reverseTiming;
-  final Curve? curve;
-  final Curve? reverseCurve;
+  final CueMotion? motion;
+  final CueMotion? reverseMotion;
+  final Duration? delay;
+  final Duration? reverseDelay;
   final bool isBounded;
   final TextDirection textDirection;
   final Object? implicitFrom;
 
   const ActContext({
-    this.timing,
-    this.curve,
+    this.motion,
+    this.delay,
+    this.reverseDelay,
     this.isBounded = true,
-    this.reverseTiming,
-    this.reverseCurve,
+    this.reverseMotion,
     this.textDirection = TextDirection.ltr,
     this.implicitFrom,
   });
 
   ActContext copyWith({
-    Timing? timing,
-    Timing? reverseTiming,
-    Curve? curve,
-    Curve? reverseCurve,
+    CueMotion? motion,
+    CueMotion? reverseMotion,
     bool? isBounded,
     TextDirection? textDirection,
     Object? implicitFrom,
+    Duration? delay,
+    Duration? reverseDelay,
   }) {
     return ActContext(
-      timing: timing ?? this.timing,
-      reverseTiming: reverseTiming ?? this.reverseTiming,
-      curve: curve ?? this.curve,
-      reverseCurve: reverseCurve ?? this.reverseCurve,
+      motion: motion ?? this.motion,
+      reverseMotion: reverseMotion ?? this.reverseMotion,
       isBounded: isBounded ?? this.isBounded,
       textDirection: textDirection ?? this.textDirection,
       implicitFrom: implicitFrom ?? this.implicitFrom,
+      delay: delay ?? this.delay,
+      reverseDelay: reverseDelay ?? this.reverseDelay,
     );
   }
 }

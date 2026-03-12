@@ -1,5 +1,6 @@
 import 'package:cue/cue.dart';
 import 'package:cue/src/core/curves.dart';
+import 'package:cue/src/motion/cue_animation_controller.dart';
 import 'package:cue/src/motion/cue_motion.dart';
 import 'package:flutter/material.dart';
 
@@ -19,6 +20,7 @@ class CueModalTransition extends StatefulWidget {
     this.barrierLabel = 'ModalTransition',
     this.barrierColor = const Color(0x80000000),
     this.motion = .defaultDuration,
+    this.reverseMotion,
     this.hideTriggerOnTransition = false,
   });
 
@@ -29,6 +31,7 @@ class CueModalTransition extends StatefulWidget {
   final bool barrierDismissible;
   final Color? barrierColor;
   final CueMotion motion;
+  final CueMotion? reverseMotion;
   final String barrierLabel;
   final bool hideTriggerOnTransition;
 
@@ -45,15 +48,9 @@ class _CueModalTransitionState extends State<CueModalTransition> {
   Widget build(BuildContext context) {
     return CompositedTransformTarget(
       link: _link,
-      child: Visibility(
+      child: Visibility.maintain(
         key: _triggerKey,
         visible: !_isModalOpen || !widget.hideTriggerOnTransition,
-        maintainAnimation: true,
-        maintainState: true,
-        maintainSize: true,
-        maintainFocusability: true,
-        maintainInteractivity: false,
-        maintainSemantics: true,
         child: widget.triggerBuilder(context, _showModel),
       ),
     );
@@ -70,6 +67,7 @@ class _CueModalTransitionState extends State<CueModalTransition> {
       barrierColor: widget.barrierColor,
       transitionBuilder: (context, anim, _, child) => child,
       motion: widget.motion,
+      reverseMotion: widget.reverseMotion,
       onAnimationStatusChanged: (status) {
         if (mounted) {
           setState(() {
@@ -85,7 +83,6 @@ class _CueModalTransitionState extends State<CueModalTransition> {
           builder: widget.builder,
           barrierDismissible: widget.barrierDismissible,
           triggerRect: triggerRect,
-          isBounded: widget.motion.isTimed,
           link: _link,
         );
       },
@@ -108,11 +105,9 @@ class _ModelContent extends StatelessWidget {
     required this.barrierDismissible,
     required this.triggerRect,
     required this.link,
-    required this.isBounded,
   });
 
   final Animation<double> animation;
-  final bool isBounded;
   final Widget? backdrop;
   final AlignmentGeometry? alignment;
   final ModalContentBuilder builder;
@@ -123,39 +118,35 @@ class _ModelContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final resolvedAlignment = alignment?.resolve(Directionality.of(context));
-    return Cue(
-      animation: animation,
-      isBounded: isBounded,
-      child: Material(
-        type: MaterialType.transparency,
-        child: Stack(
-          children: [
-            if (backdrop case final backdrop?)
-              Positioned.fill(
-                child: barrierDismissible
-                    ? GestureDetector(
-                        onTap: () => Navigator.of(context).pop(),
-                        child: backdrop,
-                      )
-                    : backdrop,
+    return Material(
+      type: MaterialType.transparency,
+      child: Stack(
+        children: [
+          if (backdrop case final backdrop?)
+            Positioned.fill(
+              child: barrierDismissible
+                  ? GestureDetector(
+                      onTap: () => Navigator.of(context).pop(),
+                      child: backdrop,
+                    )
+                  : backdrop,
+            ),
+          if (resolvedAlignment case final alignment?)
+            CustomSingleChildLayout(
+              delegate: _ModalPositionDelegate(
+                triggerRect: triggerRect,
+                alignment: alignment,
               ),
-            if (resolvedAlignment case final alignment?)
-              CustomSingleChildLayout(
-                delegate: _ModalPositionDelegate(
-                  triggerRect: triggerRect,
-                  alignment: alignment,
-                ),
-                child: CompositedTransformFollower(
-                  link: link,
-                  followerAnchor: alignment,
-                  targetAnchor: alignment,
-                  child: builder(context, triggerRect),
-                ),
-              )
-            else
-              builder(context, triggerRect),
-          ],
-        ),
+              child: CompositedTransformFollower(
+                link: link,
+                followerAnchor: alignment,
+                targetAnchor: alignment,
+                child: builder(context, triggerRect),
+              ),
+            )
+          else
+            builder(context, triggerRect),
+        ],
       ),
     );
   }
@@ -197,51 +188,41 @@ class _ModalRoute<T extends Object> extends RawDialogRoute<T> {
     super.barrierLabel,
     super.barrierColor,
     super.transitionBuilder,
-
     required this.motion,
+    this.reverseMotion,
     required this.onAnimationStatusChanged,
   }) : super();
 
   final CueMotion motion;
+  final CueMotion? reverseMotion;
   final AnimationStatusListener onAnimationStatusChanged;
 
   @override
   Curve get barrierCurve => BoundedCurve(curve: Curves.easeIn);
 
   @override
-  Duration get transitionDuration => switch (motion) {
-    TimedMotion(duration: final duration) => duration,
-    _ => Duration.zero,
-  };
-
-  @override
-  Duration get reverseTransitionDuration => switch (motion) {
-    TimedMotion(
-      reverseDuration: final reverseDuration,
-      duration: final duration,
-    ) =>
-      reverseDuration ?? duration,
-    _ => transitionDuration,
-  };
-
-  @override
   AnimationController createAnimationController() {
-    final AnimationController ctrl;
-    if (motion is TimedMotion) {
-      ctrl = super.createAnimationController();
-    } else {
-      ctrl = AnimationController.unbounded(vsync: navigator!);
-    }
+    final ctrl = CueAnimationController(
+      motion: motion,
+      reverseMotion: reverseMotion,
+      vsync: navigator!,
+    );
+
     ctrl.addStatusListener(onAnimationStatusChanged);
     return ctrl;
   }
 
   @override
   Animation<double> createAnimation() {
-    return switch (motion) {
-      SimulationMotion _ => super.createAnimation(),
-      TimedMotion m => m.applyCurve(super.createAnimation()),
-    };
+    return controller!.view;
+  }
+
+  @override
+  Widget buildPage(BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) {
+    return Cue(
+      animations: (controller as CueAnimationController).animations,
+      child: super.buildPage(context, animation, secondaryAnimation),
+    );
   }
 
   @override
@@ -252,17 +233,6 @@ class _ModalRoute<T extends Object> extends RawDialogRoute<T> {
 
   @override
   Simulation? createSimulation({required bool forward}) {
-    if (motion is SimulationMotion) {
-      final simMotion = motion as SimulationMotion;
-      final sim = forward ? simMotion.simulation : simMotion.reverse ?? simMotion.simulation;
-      return sim.build(
-        SimulationBuildData(
-          velocity: controller?.velocity,
-          forward: forward,
-          progress: controller?.value ?? 0.0,
-        ),
-      );
-    }
-    return super.createSimulation(forward: forward);
+    return null;
   }
 }

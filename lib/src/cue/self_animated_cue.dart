@@ -5,15 +5,15 @@ class SelfAnimatedCue extends Cue {
     super.key,
     required super.child,
     this.motion = CueMotion.defaultDuration,
+    this.reverseMotion,
     super.debugLabel,
     this.loop = false,
     this.reverseOnLoop = false,
-    this.delay,
     super.act,
   }) : super._();
 
   final CueMotion motion;
-  final Duration? delay;
+  final CueMotion? reverseMotion;
   final bool loop;
   final bool reverseOnLoop;
 
@@ -27,9 +27,6 @@ class SelfAnimatedCueState extends SelfAnimatedState<SelfAnimatedCue> {
 
   @override
   void onControllerReady() async {
-    if (widget.delay case final delay?) {
-      await Future.delayed(delay);
-    }
     if (widget.loop) {
       controller.repeat(reverse: widget.reverseOnLoop);
     } else {
@@ -60,7 +57,7 @@ abstract class SelfAnimatedState<T extends SelfAnimatedCue> extends _CueState<T>
   bool get isBounded => !controller.usesSimulation;
 
   @override
-  Animation<double> getAnimation(BuildContext context) => controller.view;
+Timeline getAnimations(BuildContext context) => controller.animations;
 
   @override
   void initState() {
@@ -72,6 +69,7 @@ abstract class SelfAnimatedState<T extends SelfAnimatedCue> extends _CueState<T>
   void _createController() {
     controller = CueAnimationController(
       motion: motion,
+      reverseMotion: widget.reverseMotion,
       vsync: this,
       debugLabel: 'Cue Controller',
     );

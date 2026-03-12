@@ -32,10 +32,8 @@ class CardAct extends MulitTweenAct<CardProps> {
     this.clipBehavior = Clip.none,
     this.borderOnForeground = true,
     this.shadowColor = const AnimtableColor.fixed(Color(0xFF000000)),
-    super.timing,
-    super.curve,
-    super.reverseCurve,
-    super.reverseTiming,
+    super.motion,
+    super.reverseMotion,
     this.semanticContainer = true,
     this.margin,
   }) : assert(
@@ -250,10 +248,8 @@ class CardActor extends StatelessWidget {
   final Clip clipBehavior;
   final bool borderOnForeground;
   final Widget? child;
-  final Timing? timing;
-  final Timing? reverseTiming;
-  final Curve? curve;
-  final Curve? reverseCurve;
+  final CueMotion? motion;
+  final CueMotion? reverseMotion;
 
   const CardActor({
     super.key,
@@ -267,10 +263,8 @@ class CardActor extends StatelessWidget {
     this.borderOnForeground = true,
     this.margin,
     this.child,
-    this.timing,
-    this.reverseTiming,
-    this.curve,
-    this.reverseCurve,
+    this.motion,
+    this.reverseMotion,
   }) : assert(
          shape == null || borderRadius == null,
          'Cannot specify both shape and borderRadius. '
@@ -290,10 +284,8 @@ class CardActor extends StatelessWidget {
         clipBehavior: clipBehavior,
         borderOnForeground: borderOnForeground,
         margin: margin,
-        curve: curve,
-        timing: timing,
-        reverseCurve: reverseCurve,
-        reverseTiming: reverseTiming,
+        motion: motion,
+        reverseMotion: reverseMotion,
       ),
       child: child ?? const SizedBox.shrink(),
     );

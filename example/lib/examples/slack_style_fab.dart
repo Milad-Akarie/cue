@@ -12,7 +12,8 @@ class SlackStyleFab extends StatelessWidget {
       barrierColor: Colors.transparent,
       alignment: .bottomRight,
       barrierDismissible: true,
-      motion: const .simulation(Spring.smooth(damping: 17), reverse: Spring.smooth()),
+      motion: Spring.smooth(damping: 17),
+      reverseMotion: Spring.iosDefault(),
       hideTriggerOnTransition: true,
       triggerBuilder: (_, showModal) {
         return CueModalTransition(
@@ -20,7 +21,7 @@ class SlackStyleFab extends StatelessWidget {
           barrierColor: Colors.black87,
           hideTriggerOnTransition: true,
           barrierDismissible: true,
-          motion: const .simulation(Spring.wobbly()),
+          motion: Spring.wobbly(),
           triggerBuilder: (context, showModal2) {
             return GestureDetector(
               onLongPress: showModal2,
@@ -67,7 +68,7 @@ class SlackStyleFab extends StatelessWidget {
                   Actor(
                     act: .compose([
                       .slide(from: Offset(.8, .8)),
-                      .fadeIn(timing: .startAt(.5)),
+                      .fadeIn(),
                       .focus(),
                     ]),
                     child: ListTile(
@@ -89,22 +90,19 @@ class SlackStyleFab extends StatelessWidget {
                       subtitle: Text('Start an audio or video chat', style: theme.textTheme.bodySmall),
                     ),
                   ),
-                  Actor(
-                    act: .size(
-                      width:  .tween(from: rect.width, to: .infinity),
-                      height: .tween(from: rect.height, to: 44),
-                      alignment: .bottomEnd,
-                      timing: .startAt(.05),
-                      // from: .size(rect.size),
-                      // to: NSize(w: .infinity, h: 44),
+                  TextButton(
+                    onPressed: () {},
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                      backgroundColor: theme.colorScheme.primary,
+                      foregroundColor: theme.colorScheme.onPrimary,
+                      minimumSize: .zero,
                     ),
-                    child: TextButton(
-                      onPressed: () {},
-                      style: TextButton.styleFrom(
-                        padding: EdgeInsets.zero,
-                        backgroundColor: theme.colorScheme.primary,
-                        foregroundColor: theme.colorScheme.onPrimary,
-                        minimumSize: .zero,
+                    child: Actor(
+                      act: .sizedBox(
+                        width: .tween(from: rect.width, to: .infinity),
+                        height: .tween(from: rect.height, to: 44),
+                        alignment: .bottomEnd,
                       ),
                       child: Row(
                         mainAxisSize: .min,
@@ -114,7 +112,7 @@ class SlackStyleFab extends StatelessWidget {
                             act: .compose([
                               .focus(),
                               .fadeIn(),
-                              .clipWidth(timing: .endAt(.8)),
+                              .clipWidth(),
                             ]),
                             child: Row(
                               mainAxisSize: .min,
@@ -134,7 +132,6 @@ class SlackStyleFab extends StatelessWidget {
                                 .slideX(to: -2, from: 0),
                                 .rotate(to: 90),
                               ],
-                              timing: .startAt(.2),
                             ),
                             child: Icon(Icons.add, size: 24),
                           ),
@@ -170,7 +167,7 @@ class _LongPressContent extends StatelessWidget {
                 offset: Offset(triggerRect.left - 64, triggerRect.top),
                 toLocal: Offset(-40, 0),
               ),
-              .fadeIn(timing: .startAt(.2)),
+              .fadeIn(),
               .focus(from: 6),
             ]),
             child: Padding(
@@ -217,35 +214,4 @@ class _LongPressContent extends StatelessWidget {
   }
 }
 
-class OvershootActor extends StatelessWidget {
-  const OvershootActor({
-    super.key,
-    required this.child,
-    this.axis,
-    this.factor = 0.3,
-  });
-
-  final Widget child;
-  final Axis? axis;
-  final double factor;
-
-  @override
-  Widget build(BuildContext context) {
-    final animation = CueScope.of(context).animation;
-    return AnimatedBuilder(
-      animation: animation,
-      builder: (context, child) {
-        final overshoot = animation.value - animation.value.clamp(0.0, 1.0);
-        final scale = 1.0 + (overshoot * factor);
-        final scaleX = axis == Axis.vertical ? 1.0 : scale;
-        final scaleY = axis == Axis.horizontal ? 1.0 : scale;
-        return Transform(
-          alignment: Alignment.centerRight,
-          transform: Matrix4.diagonal3Values(scaleX, scaleY, 1.0),
-          child: child,
-        );
-      },
-      child: child,
-    );
-  }
-}
+ 

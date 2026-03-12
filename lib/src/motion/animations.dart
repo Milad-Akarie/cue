@@ -44,10 +44,10 @@ class CueProgressAnimation<T> extends Animation<T>
   }
 }
 
-abstract class _CueAnimationBase<T> extends Animation<T> {
+abstract class CueAnimation<T> extends Animation<T> {
   final Animation<double> parent;
 
-  _CueAnimationBase({required this.parent});
+  CueAnimation({required this.parent});
 
   final _wrappers = <VoidCallback, VoidCallback>{};
 
@@ -88,14 +88,14 @@ abstract class _CueAnimationBase<T> extends Animation<T> {
   AnimationStatus get status => parent.status;
 }
 
-class CueAnimation<T> extends _CueAnimationBase<T> {
+class CueAnimationImpl<T> extends CueAnimation<T> {
   @override
   final CueAnimtable<T> animtable;
 
-  CueAnimation({required super.parent, required this.animtable});
+  CueAnimationImpl({required super.parent, required this.animtable});
 }
 
-class DeferredCueAnimation<T> extends _CueAnimationBase<T> {
+class DeferredCueAnimation<T> extends CueAnimation<T> {
   ActContext context;
 
   DeferredCueAnimation({
@@ -161,7 +161,7 @@ class DualAnimatable<T> extends CueAnimtable<T> {
 
   DualAnimatable({
     required this.forward,
-    required Animatable<T>? reverse,
+     Animatable<T>? reverse,
     this.flipTimeOnReverse = false,
   }) : _reverse = reverse ?? forward;
 

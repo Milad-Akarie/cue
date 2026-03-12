@@ -6,6 +6,7 @@ class _TogglableCue extends SelfAnimatedCue {
     required super.child,
     super.debugLabel,
     super.motion,
+    super.reverseMotion,
     required this.toggled,
     this.skipFirstAnimation = true,
     super.act,

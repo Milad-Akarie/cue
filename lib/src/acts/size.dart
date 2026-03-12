@@ -6,10 +6,7 @@ class SizeAct extends DeferredTweenAct<Size> {
   final AlignmentGeometry alignment;
 
   const SizeAct({
-    super.curve,
-    super.timing,
-    super.reverseCurve,
-    super.reverseTiming,
+    super.motion,
     this.width,
     this.height,
     this.alignment = Alignment.center,

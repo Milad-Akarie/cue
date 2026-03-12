@@ -11,7 +11,7 @@ class OptionsButton extends StatelessWidget {
     return CueModalTransition(
       barrierColor: Colors.transparent,
       alignment: Alignment.center,
-      motion: const .simulation(Spring.smooth()),
+      motion: Spring.smooth(),
       triggerBuilder: (context, showModal) {
         return ElevatedButton(
           style: ElevatedButton.styleFrom(

@@ -15,10 +15,8 @@ class DecoratedBoxAct extends MulitTweenAct<BoxDecoration> {
     this.border,
     this.boxShadow,
     this.gradient,
-    super.timing,
-    super.reverseTiming,
-    super.reverseCurve,
-    super.curve,
+    super.motion,
+    super.reverseMotion,
     this.position = DecorationPosition.background,
     this.shape = BoxShape.rectangle,
   });
@@ -115,10 +113,8 @@ class DecoratedBoxActor extends StatelessWidget {
   final AnimtableGradient? gradient;
   final BoxShape shape;
   final Widget? child;
-  final Timing? timing;
-  final Timing? reverseTiming;
-  final Curve? curve;
-  final Curve? reverseCurve;
+  final CueMotion? motion;
+  final CueMotion? reverseMotion;
   final DecorationPosition position;
 
   const DecoratedBoxActor({
@@ -130,10 +126,8 @@ class DecoratedBoxActor extends StatelessWidget {
     this.gradient,
     this.shape = BoxShape.rectangle,
     this.child,
-    this.timing,
-    this.reverseTiming,
-    this.curve,
-    this.reverseCurve,
+    this.motion,
+    this.reverseMotion,
     this.position = DecorationPosition.background,
   });
 
@@ -148,10 +142,8 @@ class DecoratedBoxActor extends StatelessWidget {
         gradient: gradient,
         shape: shape,
         position: position,
-        curve: curve,
-        timing: timing,
-        reverseCurve: reverseCurve,
-        reverseTiming: reverseTiming,
+        motion:  motion,
+        reverseMotion: reverseMotion,
       ),
       child: child ?? const SizedBox.shrink(),
     );

@@ -6,8 +6,7 @@ class ScaleAct extends TweenAct<double> {
   const ScaleAct({
     required super.from,
     required super.to,
-    super.curve,
-    super.timing,
+    super.motion,
     super.reverse,
     this.alignment,
   });
@@ -15,8 +14,7 @@ class ScaleAct extends TweenAct<double> {
   const ScaleAct.zoomIn({
     super.from = 0.0,
     super.to = 1.0,
-    super.curve,
-    super.timing,
+    super.motion,
     super.reverse,
     this.alignment,
   });
@@ -24,15 +22,14 @@ class ScaleAct extends TweenAct<double> {
   const ScaleAct.zoomOut({
     super.from = 1.0,
     super.to = 0.0,
-    super.curve,
-    super.timing,
+    super.motion,
     super.reverse,
     this.alignment,
   });
 
   const ScaleAct.keyframes(
     super.keyframes, {
-    super.curve,
+    super.motion,
     super.reverse,
     this.alignment,
   }) : super.keyframes();

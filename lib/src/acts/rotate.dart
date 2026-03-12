@@ -8,8 +8,7 @@ class RotateAct extends TweenAct<double> {
   const RotateAct({
     super.from = 0,
     super.to = 0,
-    super.curve,
-    super.timing,
+    super.motion,
     super.reverse,
     this.axis = RotateAxis.z,
     this.alignment = Alignment.center,
@@ -17,8 +16,7 @@ class RotateAct extends TweenAct<double> {
   });
 
   const RotateAct.flipX({
-    super.curve,
-    super.timing,
+    super.motion,
     super.reverse,
     this.alignment = Alignment.center,
   }) : unit = RotateUnit.radians,
@@ -26,8 +24,7 @@ class RotateAct extends TweenAct<double> {
        super(from: 0, to: math.pi);
 
   const RotateAct.flipY({
-    super.curve,
-    super.timing,
+    super.motion,
     super.reverse,
     this.alignment = Alignment.center,
   }) : unit = RotateUnit.radians,
@@ -36,7 +33,7 @@ class RotateAct extends TweenAct<double> {
 
   const RotateAct.keyframes(
     super.keyframes, {
-    super.curve,
+    super.motion,
     super.reverse,
     this.alignment = Alignment.center,
     this.axis = RotateAxis.z,
@@ -46,8 +43,7 @@ class RotateAct extends TweenAct<double> {
   const RotateAct.radians({
     super.from = 0,
     super.to = 0,
-    super.curve,
-    super.timing,
+    super.motion,
     super.reverse,
     this.axis = RotateAxis.z,
     this.alignment = Alignment.center,
@@ -56,8 +52,7 @@ class RotateAct extends TweenAct<double> {
   const RotateAct.degrees({
     super.from = 0,
     super.to = 0,
-    super.curve,
-    super.timing,
+    super.motion,
     super.reverse,
     this.alignment = Alignment.center,
     this.axis = RotateAxis.z,
@@ -66,8 +61,7 @@ class RotateAct extends TweenAct<double> {
   const RotateAct.turns({
     super.from = 0,
     super.to = 0,
-    super.curve,
-    super.timing,
+    super.motion,
     super.reverse,
     this.axis = RotateAxis.z,
     this.alignment = Alignment.center,

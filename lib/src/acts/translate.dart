@@ -4,66 +4,60 @@ abstract class TranslateAct extends Act {
   const factory TranslateAct({
     required Offset from,
     Offset to,
-    Curve? curve,
-    Timing? timing,
+    CueMotion? motion,
     ReverseBehavior<Offset> reverse,
   }) = _TranslateOffset;
 
   const factory TranslateAct.keyframes(
     List<Keyframe<Offset>> keyframes, {
-    Curve? curve,
+     CueMotion? motion,
     ReverseBehavior<Offset> reverse,
   }) = _TranslateOffset.keyframes;
 
   const factory TranslateAct.fromX({
     double from,
     double to,
-    Curve? curve,
-    Timing? timing,
+     CueMotion? motion,
     ReverseBehavior<double> reverse,
   }) = _AxisTranslate.horizontal;
 
   const factory TranslateAct.keyframesX(
     List<Keyframe<double>> keyframes, {
-    Curve? curve,
+     CueMotion? motion,
     ReverseBehavior<double> reverse,
   }) = _AxisTranslate.keyframesX;
 
   const factory TranslateAct.y({
     double from,
     double to,
-    Curve? curve,
-    Timing? timing,
+    CueMotion? motion,
     ReverseBehavior<double> reverse,
   }) = _AxisTranslate.vertical;
 
   const factory TranslateAct.keyframesY(
     List<Keyframe<double>> keyframes, {
-    Curve? curve,
+     CueMotion? motion,
     ReverseBehavior<double> reverse,
   }) = _AxisTranslate.keyframesY;
 
   const factory TranslateAct.fromGlobal({
     required Offset offset,
     Offset toLocal,
-    Curve? curve,
-    Timing? timing,
+    CueMotion? motion,
   }) = _TranslateFromGlobalEffect.offset;
 
   const factory TranslateAct.fromGlobalRect(
     Rect rect, {
     AlignmentGeometry alignment,
     Offset toLocal,
-    Curve? curve,
-    Timing? timing,
+     CueMotion? motion,
   }) = _TranslateFromGlobalEffect.fromRect;
 
   const factory TranslateAct.fromGlobalKey(
     GlobalKey key, {
     AlignmentGeometry alignment,
     Offset toLocal,
-    Curve? curve,
-    Timing? timing,
+     CueMotion? motion,
   }) = _TranslateFromGlobalEffect.fromKey;
 }
 
@@ -71,14 +65,13 @@ class _TranslateOffset extends TweenAct<Offset> implements TranslateAct {
   const _TranslateOffset({
     required super.from,
     super.to = Offset.zero,
-    super.curve,
-    super.timing,
+    super.motion,
     super.reverse,
   });
 
   const _TranslateOffset.keyframes(
     super.keyframes, {
-    super.curve,
+    super.motion,
     super.reverse,
   }) : super.keyframes();
 
@@ -98,29 +91,27 @@ class _AxisTranslate extends TweenActBase<double, Offset> implements TranslateAc
   const _AxisTranslate.vertical({
     super.from = 0,
     super.to = 0,
-    super.curve,
-    super.timing,
+    super.motion,
     super.reverse,
   }) : _axis = Axis.vertical;
 
   const _AxisTranslate.horizontal({
     super.from = 0,
     super.to = 0,
-    super.curve,
-    super.timing,
+    super.motion,
     super.reverse,
   }) : _axis = Axis.horizontal;
 
   const _AxisTranslate.keyframesY(
     super.keyframes, {
-    super.curve,
+    super.motion,
     super.reverse,
   }) : _axis = Axis.vertical,
        super.keyframes();
 
   const _AxisTranslate.keyframesX(
     super.keyframes, {
-    super.curve,
+    super.motion,
     super.reverse,
   }) : _axis = Axis.horizontal,
        super.keyframes();
@@ -177,8 +168,7 @@ class _TranslateFromGlobalEffect extends TweenAct<double> implements TranslateAc
   const _TranslateFromGlobalEffect.offset({
     required Offset this.offset,
     this.toLocal = Offset.zero,
-    super.curve,
-    super.timing,
+    super.motion,
   }) : rect = null,
        alignment = null,
        globalKey = null,
@@ -188,8 +178,7 @@ class _TranslateFromGlobalEffect extends TweenAct<double> implements TranslateAc
     this.rect, {
     this.toLocal = Offset.zero,
     this.alignment = Alignment.center,
-    super.curve,
-    super.timing,
+    super.motion,
   }) : offset = null,
        globalKey = null,
        super(from: 0, to: 1);
@@ -198,8 +187,7 @@ class _TranslateFromGlobalEffect extends TweenAct<double> implements TranslateAc
     GlobalKey this.globalKey, {
     this.toLocal = Offset.zero,
     this.alignment = Alignment.center,
-    super.curve,
-    super.timing,
+    super.motion,
   }) : offset = null,
        rect = null,
        super(from: 0, to: 1);

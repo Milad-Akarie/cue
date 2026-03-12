@@ -6,15 +6,14 @@ class RotateLayoutAct extends TweenAct<double> {
   const RotateLayoutAct({
     super.from = 0,
     super.to = 0,
-    super.curve,
-    super.timing,
+    super.motion,
     super.reverse,
     this.unit = RotateUnit.degrees,
   });
 
   const RotateLayoutAct.keyframes(
     super.keyframes, {
-    super.curve,
+    super.motion,
     super.reverse,
     this.unit = RotateUnit.radians,
   }) : super.keyframes();
@@ -22,16 +21,14 @@ class RotateLayoutAct extends TweenAct<double> {
   const RotateLayoutAct.degrees({
     super.from = 0,
     super.to = 0,
-    super.curve,
-    super.timing,
+    super.motion,
     super.reverse,
   }) : unit = RotateUnit.degrees;
 
   const RotateLayoutAct.turns({
     super.from = 0,
     super.to = 0,
-    super.curve,
-    super.timing,
+    super.motion,
     super.reverse,
   }) : unit = RotateUnit.quarterTurns;
 

@@ -77,7 +77,7 @@ class _IndicatorToButtonState extends State<IndicatorToButton> {
                                 from: .square(10),
                                 to: isLast ? .height(44) : NSize(w: 38, h: 10),
                               ),
-                              if (isLast) .zoomIn(),
+                              if (isLast) .zoomIn(motion: Spring.wobbly(damping: 8)),
                               if (isLast) .slideX(from: -1),
                             ]),
                             child: isLast

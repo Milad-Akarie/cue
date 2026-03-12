@@ -6,10 +6,7 @@ class FractionalSizeAct extends MulitTweenAct<FractionaSizeProps> {
   final AnimtableAlignment alignment;
 
   const FractionalSizeAct({
-    super.curve,
-    super.timing,
-    super.reverseCurve,
-    super.reverseTiming,
+     super.motion,
     this.widthFactor,
     this.heightFactor,
     this.alignment = const AnimtableAlignment.fixed(Alignment.center),

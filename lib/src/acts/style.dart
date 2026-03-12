@@ -4,14 +4,13 @@ class TextStyleAct extends TweenAct<TextStyle> {
   const TextStyleAct({
     required super.from,
     required super.to,
-    super.curve,
-    super.timing,
+    super.motion,
     super.reverse,
   });
 
   const TextStyleAct.keyframes(
     super.keyframes, {
-    super.curve,
+    super.motion,
     super.reverse,
   }) : super.keyframes();
 
@@ -30,14 +29,13 @@ class IconThemeAct extends TweenAct<IconThemeData> {
   const IconThemeAct({
     required super.from,
     required super.to,
-    super.curve,
-    super.timing,
+    super.motion,
     super.reverse,
   });
 
   const IconThemeAct.keyframes(
     super.keyframes, {
-    super.curve,
+    super.motion,
     super.reverse,
   }) : super.keyframes();
 

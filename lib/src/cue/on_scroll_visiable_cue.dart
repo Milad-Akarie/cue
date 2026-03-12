@@ -20,11 +20,11 @@ class _OnVisibleCueState extends _CueState<_OnScrollVisibleCue> {
   String get debugName => 'OnScrollVisibleCue';
 
   @override
-  Animation<double> getAnimation(BuildContext context) {
+  Timeline getAnimations(BuildContext context) {
     return _progressAnimation;
   }
 
-  late final _progressAnimation = CueProgressAnimation(value: 1.0, status: AnimationStatus.completed);
+  late final _progressAnimation = ProgressAnimationsSet(1.0, status: AnimationStatus.completed);
 
   @override
   bool get isBounded => true;
@@ -58,7 +58,7 @@ class _OnVisibleCueState extends _CueState<_OnScrollVisibleCue> {
     super.didUpdateWidget(oldWidget);
     if (widget.enabled != oldWidget.enabled) {
       if (!widget.enabled) {
-        _progressAnimation.update(1.0, status: AnimationStatus.completed);
+        _progressAnimation.advance(1.0, status: AnimationStatus.completed);
         _scrollPosition?.removeListener(_trackViiblity);
       } else {
         _subscribeToScrollPosition();
@@ -118,7 +118,7 @@ class _OnVisibleCueState extends _CueState<_OnScrollVisibleCue> {
     } else {
       status = _committedStatus!;
     }
-    _progressAnimation.update(visibleFraction.clamp(0.0, 1.0), status: status);
+    _progressAnimation.advance(visibleFraction.clamp(0.0, 1.0), status: status);
   }
 
   // @override

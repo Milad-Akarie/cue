@@ -12,7 +12,7 @@ class DeleteConfirmationDialog extends StatelessWidget {
       alignment: Alignment.bottomRight,
       barrierColor: Colors.transparent,
       hideTriggerOnTransition: true,
-      motion: const .simulation(Spring.bouncy(damping: 19)),
+      motion: Spring.bouncy(damping: 19),
       triggerBuilder: (context, open) => FloatingActionButton(
         onPressed: open,
         backgroundColor: theme.colorScheme.surface,

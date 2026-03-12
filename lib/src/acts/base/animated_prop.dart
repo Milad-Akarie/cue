@@ -1,25 +1,34 @@
 import 'package:cue/cue.dart';
 import 'package:cue/src/acts/base/utils.dart';
+import 'package:cue/src/motion/cue_motion.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 typedef ValueTransformer<R, T> = R Function(ActContext context, T value);
 
 abstract class AnimatablePropBase<T extends Object?, R extends Object?> {
+
+  final T? from;
+  final T? to;
+  final List<Keyframe<T>>? keyframes;
+  final CueMotion? motion;
+  final Duration? delay;
+  final ReverseBehavior<T> reverse;
+
   const AnimatablePropBase({
     this.from,
     this.to,
     this.keyframes,
-    this.timing,
-    this.curve,
+    this.motion,
+    this.delay,
     this.reverse = const ReverseBehavior.mirror(),
   });
 
   const AnimatablePropBase.tween({
     required T this.from,
     required T this.to,
-    this.timing,
-    this.curve,
+    this.motion,
+    this.delay,
     this.reverse = const ReverseBehavior.mirror(),
   }) : keyframes = null;
 
@@ -27,24 +36,20 @@ abstract class AnimatablePropBase<T extends Object?, R extends Object?> {
     : from = value,
       to = value,
       keyframes = null,
-      timing = null,
-      curve = null,
+      motion = null,
+      delay = null,
+
       reverse = const ReverseBehavior.mirror();
 
   const AnimatablePropBase.keyframes(
     List<Keyframe<T>> this.keyframes, {
-    this.curve,
+    this.motion,
+    this.delay,
     this.reverse = const ReverseBehavior.mirror(),
   }) : from = null,
-       to = null,
-       timing = null;
+       to = null;
 
-  final T? from;
-  final T? to;
-  final List<Keyframe<T>>? keyframes;
-  final Timing? timing;
-  final Curve? curve;
-  final ReverseBehavior<T> reverse;
+
 
   bool get isConstant => from != null && to != null && from == to;
 
@@ -98,15 +103,6 @@ abstract class AnimatablePropBase<T extends Object?, R extends Object?> {
       return AlwaysStoppedAnimatable<R>(tween.begin as R);
     }
 
-    
-
-    final animtable = applyCurves(
-      tween,
-      curve: curve ?? context.curve,
-      timing: mainTweenRes.timing ?? timing ?? context.timing,
-      isBounded: context.isBounded,
-    );
-
     switch (reverse.type) {
       case ReverseBehaviorType.mirror:
       case ReverseBehaviorType.to:
@@ -125,26 +121,26 @@ abstract class AnimatablePropBase<T extends Object?, R extends Object?> {
             );
           }
           Animatable<R>? reverseAnimatable;
-          final effectiveReverseCurve = reverse.curve ?? context.reverseCurve;
-          final effectiveReverseTiming = reverse.timing ?? context.reverseTiming;
-          if (hasReverse || effectiveReverseCurve != null || effectiveReverseTiming != null) {
-            reverseAnimatable = applyCurves(
-              reverseTweenRes.tween,
-              curve: effectiveReverseCurve,
-              timing: reverseTweenRes.timing ?? effectiveReverseTiming,
-              isBounded: context.isBounded,
-            );
-          }
+          // final effectiveReverseCurve = reverse.curve ?? context.reverseCurve;
+          // final effectiveReverseTiming = reverse.timing ?? context.reverseTiming;
+          // if (hasReverse || effectiveReverseCurve != null || effectiveReverseTiming != null) {
+          //   reverseAnimatable = applyCurves(
+          //     reverseTweenRes.tween,
+          //     curve: effectiveReverseCurve,
+          //     timing: reverseTweenRes.timing ?? effectiveReverseTiming,
+          //     isBounded: context.isBounded,
+          //   );
+          // }
           return DualAnimatable(
-            forward: animtable,
+            forward: tween,
             reverse: reverseAnimatable,
             flipTimeOnReverse: hasReverse,
           );
         }
       case ReverseBehaviorType.none:
-        return ForwardAnimatable(animtable);
+        return ForwardAnimatable(tween);
       case ReverseBehaviorType.exclusive:
-        return ReverseAnimatable(animtable);
+        return ReverseAnimatable(tween);
     }
   }
 
@@ -169,10 +165,10 @@ class ReverseBehavior<T> {
   final ReverseBehaviorType type;
   final T? to;
   final List<Keyframe<T>>? keyframes;
-  final Curve? curve;
-  final Timing? timing;
+  final CueMotion? motion;
+  final Duration? delay;
 
-  const ReverseBehavior.mirror({this.curve, this.timing})
+  const ReverseBehavior.mirror({this.motion, this.delay})
     : type = ReverseBehaviorType.mirror,
       to = null,
       keyframes = null;
@@ -180,20 +176,21 @@ class ReverseBehavior<T> {
     : type = ReverseBehaviorType.exclusive,
       to = null,
       keyframes = null,
-      curve = null,
-      timing = null;
+      motion = null,
+      delay = null;
+
   const ReverseBehavior.none()
     : type = ReverseBehaviorType.none,
       to = null,
       keyframes = null,
-      curve = null,
-      timing = null;
+      motion = null,
+      delay = null;
 
-  const ReverseBehavior.to(T this.to, {this.curve, this.timing}) : type = ReverseBehaviorType.to, keyframes = null;
-  const ReverseBehavior.keyframes(List<Keyframe<T>> this.keyframes, {this.curve})
+  const ReverseBehavior.to(T this.to, {this.motion, this.delay}) : type = ReverseBehaviorType.to, keyframes = null;
+  const ReverseBehavior.keyframes(List<Keyframe<T>> this.keyframes, {this.motion, this.delay})
     : type = ReverseBehaviorType.keyframes,
-      to = null,
-      timing = null;
+      to = null;
+      
 
   @override
   bool operator ==(Object other) {
@@ -203,12 +200,12 @@ class ReverseBehavior<T> {
         other.type == type &&
         other.to == to &&
         listEquals(keyframes, other.keyframes) &&
-        other.curve == curve &&
-        other.timing == timing;
+        other.motion == motion &&
+        other.delay == delay;
   }
 
   @override
-  int get hashCode => Object.hash(type, to, Object.hashAll(keyframes ?? []), curve, timing);
+  int get hashCode => Object.hash(type, to, Object.hashAll(keyframes ?? []), motion, delay);
 }
 
 abstract class AnimatableProp<T> extends AnimatablePropBase<T, T> {
@@ -216,8 +213,8 @@ abstract class AnimatableProp<T> extends AnimatablePropBase<T, T> {
     super.from,
     super.to,
     super.keyframes,
-    super.timing,
-    super.curve,
+    super.motion,
+    super.delay,
   });
 
   @override
@@ -226,12 +223,12 @@ abstract class AnimatableProp<T> extends AnimatablePropBase<T, T> {
   const AnimatableProp.tween({
     required super.from,
     required super.to,
-    super.timing,
-    super.curve,
+    super.motion,
+    super.delay,
     super.reverse,
   }) : super.tween();
   const AnimatableProp.fixed(super.value) : super.fixed();
-  const AnimatableProp.keyframes(super.keyframes, {super.curve, super.reverse}) : super.keyframes();
+  const AnimatableProp.keyframes(super.keyframes, {super.motion, super.delay, super.reverse}) : super.keyframes();
 }
 
 class _LerpFnTween<T> extends Animatable<T> {
@@ -246,10 +243,10 @@ class _LerpFnTween<T> extends Animatable<T> {
 }
 
 class AnimtableColor extends AnimatableProp<Color?> {
-  const AnimtableColor.tween({required Color super.from, required Color super.to, super.timing, super.curve})
+  const AnimtableColor.tween({required Color super.from, required Color super.to, super.motion, super.delay})
     : super.tween();
   const AnimtableColor.fixed(Color super.value) : super.fixed();
-  const AnimtableColor.keyframes(List<Keyframe<Color>> super.keyframes, {super.curve}) : super.keyframes();
+  const AnimtableColor.keyframes(List<Keyframe<Color>> super.keyframes, {super.motion}) : super.keyframes();
 
   @override
   Animatable<Color?> createSingleTween(Color? from, Color? to) {
@@ -261,11 +258,10 @@ class AnimtableBorderRadius extends AnimatablePropBase<BorderRadiusGeometry?, Bo
   const AnimtableBorderRadius.tween({
     required BorderRadiusGeometry super.from,
     required BorderRadiusGeometry super.to,
-    super.timing,
-    super.curve,
+    super.motion,
   }) : super.tween();
   const AnimtableBorderRadius.fixed(BorderRadiusGeometry super.value) : super.fixed();
-  const AnimtableBorderRadius.keyframes(List<Keyframe<BorderRadiusGeometry>> super.keyframes, {super.curve})
+  const AnimtableBorderRadius.keyframes(List<Keyframe<BorderRadiusGeometry>> super.keyframes, {super.motion})
     : super.keyframes();
 
   @override
@@ -283,12 +279,11 @@ class AnimtableAlignment extends AnimatablePropBase<AlignmentGeometry?, Alignmen
   const AnimtableAlignment.tween({
     required AlignmentGeometry super.from,
     required AlignmentGeometry super.to,
-    super.timing,
-    super.curve,
+    super.motion,
   }) : super.tween();
 
   const AnimtableAlignment.fixed(AlignmentGeometry super.value) : super.fixed();
-  const AnimtableAlignment.keyframes(List<Keyframe<AlignmentGeometry>> super.keyframes, {super.curve})
+  const AnimtableAlignment.keyframes(List<Keyframe<AlignmentGeometry>> super.keyframes, {super.motion})
     : super.keyframes();
 
   @override
@@ -303,11 +298,11 @@ class AnimtableAlignment extends AnimatablePropBase<AlignmentGeometry?, Alignmen
 }
 
 class AnimtableDecorationImage extends AnimatableProp<DecorationImage?> {
-  const AnimtableDecorationImage.tween({required super.from, required super.to, super.timing, super.curve})
+  const AnimtableDecorationImage.tween({required super.from, required super.to, super.motion})
     : super.tween();
 
   const AnimtableDecorationImage.fixed(super.value) : super.fixed();
-  const AnimtableDecorationImage.keyframes(super.keyframes, {super.curve}) : super.keyframes();
+  const AnimtableDecorationImage.keyframes(super.keyframes, {super.motion}) : super.keyframes();
 
   @override
   Animatable<DecorationImage?> createSingleTween(DecorationImage? from, DecorationImage? to) {
@@ -316,10 +311,10 @@ class AnimtableDecorationImage extends AnimatableProp<DecorationImage?> {
 }
 
 class AnimtableBoxBorder extends AnimatableProp<BoxBorder?> {
-  const AnimtableBoxBorder.tween({required super.from, required super.to, super.timing, super.curve}) : super.tween();
+  const AnimtableBoxBorder.tween({required super.from, required super.to, super.motion}) : super.tween();
 
   const AnimtableBoxBorder.fixed(super.value) : super.fixed();
-  const AnimtableBoxBorder.keyframes(super.keyframes, {super.curve}) : super.keyframes();
+  const AnimtableBoxBorder.keyframes(super.keyframes, {super.motion}) : super.keyframes();
 
   @override
   Animatable<BoxBorder?> createSingleTween(BoxBorder? from, BoxBorder? to) {
@@ -328,10 +323,10 @@ class AnimtableBoxBorder extends AnimatableProp<BoxBorder?> {
 }
 
 class AnimtableBoxShadow extends AnimatableProp<List<BoxShadow>?> {
-  const AnimtableBoxShadow.tween({required super.from, required super.to, super.timing, super.curve}) : super.tween();
+  const AnimtableBoxShadow.tween({required super.from, required super.to, super.motion}) : super.tween();
 
   const AnimtableBoxShadow.fixed(super.value) : super.fixed();
-  const AnimtableBoxShadow.keyframes(super.keyframes, {super.curve}) : super.keyframes();
+  const AnimtableBoxShadow.keyframes(super.keyframes, {super.motion}) : super.keyframes();
 
   @override
   Animatable<List<BoxShadow>?> createSingleTween(List<BoxShadow>? from, List<BoxShadow>? to) {
@@ -340,10 +335,10 @@ class AnimtableBoxShadow extends AnimatableProp<List<BoxShadow>?> {
 }
 
 class AnimtableGradient extends AnimatableProp<Gradient?> {
-  const AnimtableGradient.tween({required super.from, required super.to, super.timing, super.curve}) : super.tween();
+  const AnimtableGradient.tween({required super.from, required super.to, super.motion}) : super.tween();
 
   const AnimtableGradient.fixed(super.value) : super.fixed();
-  const AnimtableGradient.keyframes(super.keyframes, {super.curve}) : super.keyframes();
+  const AnimtableGradient.keyframes(super.keyframes, {super.motion}) : super.keyframes();
 
   @override
   Animatable<Gradient?> createSingleTween(Gradient? from, Gradient? to) {
@@ -357,21 +352,21 @@ class AnimatableValue<T> extends AnimatableProp<T> {
     super.from,
     super.to,
     super.keyframes,
-    super.timing,
-    super.curve,
+  
+    super.motion,
   });
 
-  const AnimatableValue.tween({required super.from, required super.to, super.timing, super.curve,super.reverse}) : super.tween();
+  const AnimatableValue.tween({required super.from, required super.to, super.motion,super.reverse}) : super.tween();
 
   const AnimatableValue.fixed(super.value) : super.fixed();
-  const AnimatableValue.keyframes(super.keyframes, {super.curve}) : super.keyframes();
+  const AnimatableValue.keyframes(super.keyframes, {super.motion}) : super.keyframes();
 }
 
 class AnimtableShapeBorder extends AnimatableProp<ShapeBorder?> {
-  const AnimtableShapeBorder.tween({required super.from, required super.to, super.timing, super.curve}) : super.tween();
+  const AnimtableShapeBorder.tween({required super.from, required super.to, super.motion}) : super.tween();
 
   const AnimtableShapeBorder.fixed(super.value) : super.fixed();
-  const AnimtableShapeBorder.keyframes(super.keyframes, {super.curve}) : super.keyframes();
+  const AnimtableShapeBorder.keyframes(super.keyframes, {super.motion}) : super.keyframes();
 
   @override
   Animatable<ShapeBorder?> createSingleTween(ShapeBorder? from, ShapeBorder? to) {
@@ -383,12 +378,11 @@ class AnimtableEdgeInsets extends AnimatablePropBase<EdgeInsetsGeometry?, EdgeIn
   const AnimtableEdgeInsets.tween({
     required super.from,
     required super.to,
-    super.timing,
-    super.curve,
+    super.motion,
   }) : super.tween();
 
   const AnimtableEdgeInsets.fixed(super.value) : super.fixed();
-  const AnimtableEdgeInsets.keyframes(super.keyframes, {super.curve}) : super.keyframes();
+  const AnimtableEdgeInsets.keyframes(super.keyframes, {super.motion}) : super.keyframes();
 
   @override
   EdgeInsets? transform(ActContext context, EdgeInsetsGeometry? value) {
@@ -407,14 +401,13 @@ class AnimtableSize extends AnimatableProp<Size?> {
     super.from,
     super.to,
     super.keyframes,
-    super.timing,
-    super.curve,
+    super.motion,
   });
 
-  const AnimtableSize.tween({required super.from, required super.to, super.timing, super.curve}) : super.tween();
+  const AnimtableSize.tween({required super.from, required super.to, super.motion}) : super.tween();
 
   const AnimtableSize.fixed(super.value) : super.fixed();
-  const AnimtableSize.keyframes(super.keyframes, {super.curve}) : super.keyframes();
+  const AnimtableSize.keyframes(super.keyframes, {super.motion}) : super.keyframes();
 
   @override
   Animatable<Size?> createSingleTween(Size? from, Size? to) {

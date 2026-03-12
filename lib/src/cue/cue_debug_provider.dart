@@ -1,4 +1,3 @@
-import 'package:cue/cue.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -19,7 +18,6 @@ class CueDebugTools extends StatefulWidget {
     required String id,
     required Duration duration,
     Curve? curve,
-    CueSimulation? simulation,
   }) {
     final provider = context.findAncestorStateOfType<_CueDebugToolsState>();
     return provider?.attachDebugTarget(
@@ -27,7 +25,6 @@ class CueDebugTools extends StatefulWidget {
       id: id,
       curve: curve,
       duration: duration,
-      simulation: simulation,
     );
   }
 
@@ -88,12 +85,10 @@ class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProvider
     required String id,
     required Duration duration,
     Curve? curve,
-    CueSimulation? simulation,
   }) {
     final target = _DebugTarget(
       id: id,
       curve: curve,
-      simulation: simulation,
       duration: duration,
     );
     _overlayData.value = _overlayData.value.copyWith(
@@ -797,12 +792,10 @@ class _DebugTarget {
   final String id;
   final Duration duration;
   final Curve? curve;
-  final CueSimulation? simulation;
 
   _DebugTarget({
     required this.id,
     required this.duration,
     this.curve,
-    this.simulation,
   });
 }

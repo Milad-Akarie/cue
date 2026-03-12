@@ -19,7 +19,7 @@ class _SmoothSwitchState extends State<SmoothSwitch> {
     final thumbColor = theme.colorScheme.onSurface;
     return Cue.onToggle(
       toggled: _toggled,
-      motion: .simulation(const Spring.smooth()),
+      motion: const Spring.smooth(),
       child: GestureDetector(
         onTap: () {
           setState(() {
@@ -76,7 +76,7 @@ class _SmoothSwitchState extends State<SmoothSwitch> {
                       child: DecoratedBoxActor(
                         shape: .circle,
                         color: .tween(from: trackColor, to: thumbColor),
-                        timing: .endAt(.5),
+                        // timing: .endAt(.5),
                         child: SizedBox.square(dimension: width * .16),
                       ),
                     ),
@@ -85,7 +85,7 @@ class _SmoothSwitchState extends State<SmoothSwitch> {
                         child: DecoratedBoxActor(
                           color: .tween(from: trackColor, to: thumbColor),
                           borderRadius: .tween(from: .circular(width * .2), to: .circular(width * .2)),
-                          timing: .startAt(.5),
+                          // timing: .startAt(.5),
                           child: SizedBox(width: width * .08, height: width * .22),
                         ),
                       ),

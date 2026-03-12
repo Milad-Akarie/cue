@@ -1,6 +1,6 @@
+import 'package:cue/src/motion/cue_motion.dart';
+import 'package:cue/src/motion/simulations.dart';
 import 'package:flutter/physics.dart';
-
-import 'cue_simulation.dart';
 
 // holds default values for spring simulation
 const double _kStandardIosStiffness = 522.35;
@@ -8,24 +8,7 @@ const double _kStandardIosDamping = 45.7099552;
 const Tolerance _kStandardIosTolerance = Tolerance(velocity: 0.03);
 const Tolerance _kDefaultTolerance = Tolerance(distance: 0.01, velocity: 0.03);
 
-class Spring extends CueSimulation {
-
-  @override
-  double computeSettlingDuration() {
-    double t = 0;
-    const step = 1 / 60; // 60fps steps
-    final sim = build(const SimulationBuildData());
-    while (t < 10.0) {
-      // cap at 10s
-      final x = sim.x(t);
-      final v = sim.dx(t);
-      if ((x - 1.0).abs() < tolerance.distance && v.abs() < tolerance.velocity) return t;
-      t += step;
-    }
-    return t;
-  }
-
-
+final class Spring extends SimulationMotion<SpringSimulation> {
   final double mass;
   final double stiffness;
   final double damping;
@@ -45,16 +28,14 @@ class Spring extends CueSimulation {
     stiffness: stiffness,
     damping: damping,
   );
- 
-
 
   @override
-  Simulation build(SimulationBuildData data) {
+  SpringSimulation build(bool forward, double progress, double? velocity) {
     return SpringSimulation(
       springDescription,
-      data.progress,
-      data.end,
-      data.velocity ?? 0.0,
+      progress,
+      forward ? 1.0 : 0.0,
+      velocity ?? 0.0,
       tolerance: tolerance,
       snapToEnd: snapToEnd,
     );
@@ -169,5 +150,33 @@ class Spring extends CueSimulation {
       stiffness: desc.stiffness,
       damping: desc.damping,
     );
+  }
+
+  @override
+  BakedMotion bake({int samples = 60}) {
+    final sim = build(true, 0.0, 0.0);
+    final settlingDuration = _calculateSettleDuration(sim);
+
+    final values = List.generate(samples, (i) {
+      final t = (i / (samples - 1)) * settlingDuration;
+      return sim.x(t);
+    });
+    return BakedMotion(
+      samples: values,
+      durationSeconds: settlingDuration,
+      motion: this,
+    );
+  }
+
+  double _calculateSettleDuration(SpringSimulation sim, {double stepSize = 1 / 60}) {
+    double t = 0.0;
+    final tolerance = sim.tolerance;
+    while (t < 100.0) {
+      final x = sim.x(t);
+      final v = sim.dx(t);
+      if ((x - 1.0).abs() < tolerance.distance && v.abs() < tolerance.velocity) return t;
+      t += stepSize;
+    }
+    return t;
   }
 }

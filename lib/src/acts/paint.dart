@@ -7,8 +7,7 @@ class PaintAct extends TweenAct<double> {
   PaintAct({
     required this.painter,
     this.paintOnTop = false,
-    super.curve,
-    super.timing,
+    super.motion,
     super.reverse,
   }) : super(from: 0.0, to: 1.0);
 
@@ -32,8 +31,7 @@ class PaintActor extends SingleActorBase<double> {
     required this.painter,
     this.paintOnTop = false,
     required super.child,
-    super.curve,
-    super.timing,
+    super.motion,
     super.reverse,
   }) : super(from: 0.0, to: 1.0);
 
@@ -41,8 +39,7 @@ class PaintActor extends SingleActorBase<double> {
   Act get effect => PaintAct(
     painter: painter,
     paintOnTop: paintOnTop,
-    curve: curve,
-    timing: timing,
+    motion: motion,
     reverse: reverse,
   );
 }

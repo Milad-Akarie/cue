@@ -4,8 +4,7 @@ class TransformAct extends TweenAct<Matrix4> {
   const TransformAct({
     required super.from,
     required super.to,
-    super.curve,
-    super.timing,
+    super.motion,
     super.reverse,
     this.alignment,
     this.origin,
@@ -16,7 +15,7 @@ class TransformAct extends TweenAct<Matrix4> {
 
   const TransformAct.keyframes(
     super.keyframes, {
-    super.curve,
+    super.motion,
     super.reverse,
     this.alignment,
     this.origin,

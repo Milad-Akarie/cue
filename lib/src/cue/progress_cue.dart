@@ -7,7 +7,7 @@ class _ProgressCue extends Cue {
     required super.child,
     required this.listenable,
     required this.progress,
-     this.min = 0.0,
+     this.min = 0.0, 
      this.max = 1.0,
     super.act,
   }) : super._();
@@ -22,7 +22,7 @@ class _ProgressCue extends Cue {
 }
 
 class _ProgressCueState extends _CueState<_ProgressCue> {
-  final _animation = CueProgressAnimation(value: 0.0);
+  final _animation = ProgressAnimationsSet(0.0);
 
   @override
   String get debugName => 'ProgressCue';
@@ -47,18 +47,13 @@ class _ProgressCueState extends _CueState<_ProgressCue> {
 
      final progress = widget.progress();
      final value = ((progress - widget.min) / (widget.max - widget.min)).clamp(0.0, 1.0);
-
- 
-
-
     final status = switch (value) {
       1.0 => AnimationStatus.completed,
       0.0 => AnimationStatus.dismissed,
       _ => value > _animation.value ? AnimationStatus.forward : AnimationStatus.reverse,
     };
-    print(value);
 
-    _animation.update(value, status: status);
+    _animation.advance(value, status: status);
   }
 
   @override
@@ -72,5 +67,5 @@ class _ProgressCueState extends _CueState<_ProgressCue> {
   }
 
   @override
-  Animation<double> getAnimation(BuildContext context) => _animation;
+  Timeline getAnimations(BuildContext context) => _animation;
 }

@@ -5,30 +5,26 @@ abstract class ClipAct extends Act {
     BorderRadiusGeometry borderRadius,
     AlignmentGeometry alignment,
     bool useSuperellipse,
-    Curve? curve,
-    Timing? timing,
+     CueMotion? motion,
   }) = _ClipEffect;
 
   const factory ClipAct.circular({
     AlignmentGeometry alignment,
-    Curve? curve,
-    Timing? timing,
+      CueMotion? motion,
   }) = _ClipEffect.circular;
 
   const factory ClipAct.width({
     double from,
     double to,
     AlignmentGeometry alignment,
-    Curve? curve,
-    Timing? timing,
+     CueMotion? motion,
   }) = _AxisClipEffect.horizontal;
 
   const factory ClipAct.height({
     double from,
     double to,
     AlignmentGeometry alignment,
-    Curve? curve,
-    Timing? timing,
+      CueMotion? motion,
   }) = _AxisClipEffect.vertical;
 }
 
@@ -40,8 +36,7 @@ class _AxisClipEffect extends TweenAct<double> implements ClipAct {
     super.from = 0,
     super.to = 1,
     this.alignment = AlignmentDirectional.centerStart,
-    super.curve,
-    super.timing,
+    super.motion,
   }) : _axis = Axis.horizontal,
        super();
 
@@ -49,8 +44,7 @@ class _AxisClipEffect extends TweenAct<double> implements ClipAct {
     super.from = 0,
     super.to = 1,
     this.alignment = AlignmentDirectional.topCenter,
-    super.curve,
-    super.timing,
+    super.motion,
   }) : _axis = Axis.vertical,
        super();
 
@@ -83,8 +77,7 @@ class _ClipEffect extends TweenAct<double> implements ClipAct {
   const _ClipEffect({
     BorderRadiusGeometry this.borderRadius = BorderRadius.zero,
     this.alignment,
-    super.curve,
-    super.timing,
+    super.motion,
     this.useSuperellipse = false,
     super.from = 0,
     super.to = 1,
@@ -92,8 +85,7 @@ class _ClipEffect extends TweenAct<double> implements ClipAct {
 
   const _ClipEffect.circular({
     this.alignment,
-    super.curve,
-    super.timing,
+    super.motion,
     super.from = 0,
     super.to = 1,
   }) : borderRadius = null,

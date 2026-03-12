@@ -1,17 +1,15 @@
 import 'package:cue/cue.dart';
+import 'package:cue/src/motion/cue_motion.dart';
+import 'package:cue/src/motion/simulations.dart';
 import 'package:flutter/widgets.dart';
 
 abstract class DeferredTweenAct<T extends Object?> extends Act {
-  final Curve? curve;
-  final Timing? timing;
-  final Curve? reverseCurve;
-  final Timing? reverseTiming;
+  final CueMotion ? motion;
+  final CueMotion ? reverseMotion;
 
   const DeferredTweenAct({
-    this.curve,
-    this.timing,
-    this.reverseCurve,
-    this.reverseTiming,
+    this.motion,
+    this.reverseMotion,
   });
 
   @override
@@ -20,25 +18,24 @@ abstract class DeferredTweenAct<T extends Object?> extends Act {
       (
         this,
         context.copyWith(
-          curve: curve,
-          timing: timing,
-          reverseCurve: reverseCurve,
-          reverseTiming: reverseTiming,
+          motion: motion,
+          reverseMotion: reverseMotion,
         ),
       ),
     ];
   }
 
   @override
-  DeferredCueAnimation<T> buildAnimation(Animation<double> driver, ActContext context) {
-    return DeferredCueAnimation(parent: driver, context: context);
+  DeferredCueAnimation<T> buildAnimation(Timeline timline, ActContext context) {
+    final driver = timline.animationFor(AnimationConfig(motion: motion, reverseMotion: reverseMotion));
+    return DeferredCueAnimation(parent: driver, context: context);  
   }
 
   @override
   Widget build(BuildContext context, covariant Animation<Object?> animation, Widget child) {
     assert(
       animation is DeferredCueAnimation<T>,
-      'Expected animation of type DeferredProxyAnimation<$T>, but got ${animation.runtimeType}',
+      'Expected animation of type DeferredCueAnimation<$T>, but got ${animation.runtimeType}',
     );
     return apply(context, animation as DeferredCueAnimation<T>, child);
   }
@@ -50,12 +47,10 @@ abstract class DeferredTweenAct<T extends Object?> extends Act {
     if (identical(this, other)) return true;
     if (other.runtimeType != runtimeType) return false;
     return other is DeferredTweenAct<T> &&
-        other.timing == timing &&
-        other.curve == curve &&
-        other.reverseTiming == reverseTiming &&
-        other.reverseCurve == reverseCurve;
+        other.motion == motion &&
+        other.reverseMotion == reverseMotion;
   }
 
   @override
-  int get hashCode => Object.hash(timing, curve, reverseTiming, reverseCurve);
+  int get hashCode => Object.hash(motion, reverseMotion);
 }

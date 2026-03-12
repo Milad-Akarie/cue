@@ -1,6 +1,5 @@
 import 'package:cue/cue.dart';
-import 'package:cue/src/acts/base/utils.dart';
-import 'package:flutter/foundation.dart';
+import 'package:cue/src/motion/cue_motion.dart';
 import 'package:flutter/widgets.dart';
 
 class Actor extends StatefulWidget {
@@ -18,11 +17,11 @@ class Actor extends StatefulWidget {
 }
 
 class ActorState extends State<Actor> {
-  final _animations = <Type, Animation<Object?>>{};
-  final _cachedAnimations = <Act, Animation<Object?>>{};
+  final _animations = <Type, CueAnimation<Object?>>{};
+  final _cachedAnimations = <Act, CueAnimation<Object?>>{};
   final _animationSnapshots = <Type, Object?>{};
 
-   List<(Act, ActContext)> _acts = [];
+  List<(Act, ActContext)> _acts = [];
 
   void _onWillReAnimate(bool forward) {
     for (final entry in _animations.entries) {
@@ -50,7 +49,7 @@ class ActorState extends State<Actor> {
       if (!_cachedAnimations.containsKey(act)) {
         final implicitFrom = scope.reanimateFromCurrent ? _animationSnapshots[act.runtimeType] : null;
         final animation = act.buildAnimation(
-          scope.animation,
+          scope.animations,
           actContext.copyWith(
             textDirection: Directionality.maybeOf(context) ?? TextDirection.ltr,
             isBounded: scope.isBounded,
@@ -68,7 +67,7 @@ class ActorState extends State<Actor> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.act != widget.act) {
       final scope = CueScope.of(context);
-      _acts = widget.act.resolve( ActContext(isBounded: scope.isBounded));
+      _acts = widget.act.resolve(ActContext(isBounded: scope.isBounded));
       _setupAnimations(scope);
     }
   }
@@ -83,16 +82,15 @@ class ActorState extends State<Actor> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final scope = CueScope.of(context);
-       if(_acts.isEmpty) {
-        print(scope.isBounded);
-         _acts = widget.act.resolve( ActContext(isBounded: scope.isBounded));
-       }
+    if (_acts.isEmpty) {
+      _acts = widget.act.resolve(ActContext(isBounded: scope.isBounded));
+    }
     if (_cachedScope?.willReanimateNotifier != scope.willReanimateNotifier) {
       _cachedScope?.willReanimateNotifier?.removeEventListener(_onWillReAnimate);
       scope.willReanimateNotifier?.addEventListener(_onWillReAnimate);
     }
     if (_cachedScope == null || scope.updateShouldNotify(_cachedScope!)) {
-      if (_cachedScope?.animation != scope.animation) {
+      if (_cachedScope?.animations != scope.animations) {
         _clearCache();
       }
       _setupAnimations(scope);
@@ -120,14 +118,14 @@ class ActorState extends State<Actor> {
   void dispose() {
     super.dispose();
     _cachedScope?.willReanimateNotifier?.removeEventListener(_onWillReAnimate);
+    // _cachedScope?.animations.disposeAll(_animations.values);
   }
 }
 
 abstract class SingleActorBase<T> extends StatelessWidget {
   final Widget child;
-  final Curve? curve;
   final ReverseBehavior<T> reverse;
-  final Timing? timing;
+  final CueMotion? motion;
   final List<Keyframe<T>>? frames;
   final T? _from;
   final T? _to;
@@ -140,8 +138,7 @@ abstract class SingleActorBase<T> extends StatelessWidget {
     required this.child,
     required T from,
     required T to,
-    this.curve,
-    this.timing,
+    this.motion,
     this.reverse = const ReverseBehavior.mirror(),
   }) : frames = null,
        _from = from,
@@ -152,9 +149,8 @@ abstract class SingleActorBase<T> extends StatelessWidget {
     super.key,
     required this.child,
     this.reverse = const ReverseBehavior.mirror(),
-    this.curve,
-  }) : timing = null,
-       _from = null,
+    this.motion,
+  }) : _from = null,
        _to = null;
 
   Act get effect;
@@ -165,124 +161,124 @@ abstract class SingleActorBase<T> extends StatelessWidget {
   }
 }
 
-class TweenActor<T> extends StatefulWidget {
-  final List<Keyframe<T>>? _keyframes;
-  final Widget? child;
-  final ValueWidgetBuilder<T> builder;
-  final TweenBuilder<T>? _tweenBuilder;
-  final Tween<T>? _tween;
-  final Curve? curve;
-  final Timing? timing;
+// class TweenActor<T> extends StatefulWidget {
+//   final List<Keyframe<T>>? _keyframes;
+//   final Widget? child;
+//   final ValueWidgetBuilder<T> builder;
+//   final TweenBuilder<T>? _tweenBuilder;
+//   final Tween<T>? _tween;
+//   final Curve? curve;
+//   final Timing? timing;
 
-  const TweenActor({
-    super.key,
-    required this.builder,
-    required Tween<T> tween,
-    this.curve,
-    this.timing,
-    this.child,
-  }) : _tween = tween,
-       _keyframes = null,
-       _tweenBuilder = null;
+//   const TweenActor({
+//     super.key,
+//     required this.builder,
+//     required Tween<T> tween,
+//     this.curve,
+//     this.timing,
+//     this.child,
+//   }) : _tween = tween,
+//        _keyframes = null,
+//        _tweenBuilder = null;
 
-  const TweenActor.keyframes({
-    super.key,
-    required this.builder,
-    required List<Keyframe<T>> keys,
-    TweenBuilder<T>? tweenBuilder,
-    this.curve,
-    this.child,
-  }) : _tweenBuilder = tweenBuilder,
-       _keyframes = keys,
-       _tween = null,
-       timing = null;
+//   const TweenActor.keyframes({
+//     super.key,
+//     required this.builder,
+//     required List<Keyframe<T>> keys,
+//     TweenBuilder<T>? tweenBuilder,
+//     this.curve,
+//     this.child,
+//   }) : _tweenBuilder = tweenBuilder,
+//        _keyframes = keys,
+//        _tween = null,
+//        timing = null;
 
-  @override
-  State<StatefulWidget> createState() => _ProgressActorState<T>();
-}
+//   @override
+//   State<StatefulWidget> createState() => _ProgressActorState<T>();
+// }
 
-class ProgressActor extends TweenActor<double> {
-  ProgressActor({
-    super.key,
-    required super.builder,
-    super.curve,
-    super.timing,
-    super.child,
-  }) : super(tween: Tween<double>(begin: 0.0, end: 1.0));
+// class ProgressActor extends TweenActor<double> {
+//   ProgressActor({
+//     super.key,
+//     required super.builder,
+//     super.curve,
+//     super.timing,
+//     super.child,
+//   }) : super(tween: Tween<double>(begin: 0.0, end: 1.0));
 
-  @override
-  State<StatefulWidget> createState() => _ProgressActorState<double>();
-}
+//   @override
+//   State<StatefulWidget> createState() => _ProgressActorState<double>();
+// }
 
-class _ProgressActorState<T> extends State<TweenActor<T>> {
-  late Animation<T> animation;
+// class _ProgressActorState<T> extends State<TweenActor<T>> {
+//   late Animation<T> animation;
 
-  Animation<double>? _cachedDriver;
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final driver = CueScope.of(context).animation;
-    if (_cachedDriver != driver) {
-      _setupAnimation(driver);
-    }
-  }
+//   Animation<double>? _cachedDriver;
+//   @override
+//   void didChangeDependencies() {
+//     super.didChangeDependencies();
+//     final driver = CueScope.of(context).animations;
+//     if (_cachedDriver != driver) {
+//       _setupAnimation(driver);
+//     }
+//   }
 
-  @override
-  void didUpdateWidget(covariant TweenActor<T> oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget._tween != widget._tween ||
-        oldWidget.curve != widget.curve ||
-        oldWidget.timing != widget.timing ||
-        !listEquals(widget._keyframes, oldWidget._keyframes)) {
-      _setupAnimation(CueScope.of(context).animation);
-    }
-  }
+//   @override
+//   void didUpdateWidget(covariant TweenActor<T> oldWidget) {
+//     super.didUpdateWidget(oldWidget);
+//     if (oldWidget._tween != widget._tween ||
+//         oldWidget.curve != widget.curve ||
+//         oldWidget.timing != widget.timing ||
+//         !listEquals(widget._keyframes, oldWidget._keyframes)) {
+//       _setupAnimation(CueScope.of(context).animations);
+//     }
+//   }
 
-  void _setupAnimation(Animation<double> driver) {
-    _cachedDriver = driver;
-    Timing? timing = widget.timing;
-    Curve? curve = widget.curve;
+//   void _setupAnimation(Animation<double> driver) {
+//     _cachedDriver = driver;
+//     Timing? timing = widget.timing;
+//     Curve? curve = widget.curve;
 
-    Animatable<T> effectiveTween;
-    if (widget._tween case final tween?) {
-      effectiveTween = tween;
-    } else {
-      final result = Phase.normalize(widget._keyframes!, (value) => value);
+//     Animatable<T> effectiveTween;
+//     if (widget._tween case final tween?) {
+//       effectiveTween = tween;
+//     } else {
+//       final result = Phase.normalize(widget._keyframes!, (value) => value);
 
-      if (result.timing != null) {
-        timing = result.timing;
-      }
-      effectiveTween = buildFromPhases<T>(
-        result.phases,
-        widget._tweenBuilder ?? (begin, end) => Tween<T>(begin: begin, end: end),
-      );
-    }
+//       if (result.timing != null) {
+//         timing = result.timing;
+//       }
+//       effectiveTween = buildFromPhases<T>(
+//         result.phases,
+//         widget._tweenBuilder ?? (begin, end) => Tween<T>(begin: begin, end: end),
+//       );
+//     }
 
-    if (timing == null && curve == null) {
-      animation = driver.drive<T>(effectiveTween);
-      return;
-    }
+//     if (timing == null && curve == null) {
+//       animation = driver.drive<T>(effectiveTween);
+//       return;
+//     }
 
-    final effectiveCurve = timing != null
-        ? Interval(timing.start, timing.end, curve: curve ?? Curves.linear)
-        : curve ?? Curves.linear;
+//     final effectiveCurve = timing != null
+//         ? Interval(timing.start, timing.end, curve: curve ?? Curves.linear)
+//         : curve ?? Curves.linear;
 
-    animation = driver.drive<T>(
-      effectiveTween.chain(CurveTween(curve: effectiveCurve)),
-    );
-  }
+//     animation = driver.drive<T>(
+//       effectiveTween.chain(CurveTween(curve: effectiveCurve)),
+//     );
+//   }
 
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: animation,
-      builder: (context, child) {
-        return widget.builder(
-          context,
-          animation.value,
-          widget.child,
-        );
-      },
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return AnimatedBuilder(
+//       animation: animation,
+//       builder: (context, child) {
+//         return widget.builder(
+//           context,
+//           animation.value,
+//           widget.child,
+//         );
+//       },
+//     );
+//   }
+// }

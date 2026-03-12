@@ -1,4 +1,6 @@
 import 'package:cue/cue.dart';
+import 'package:example/examples/indicator_to_button.dart';
+import 'package:example/examples/slack_style_fab.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +14,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Curves.elasticIn;
     return MaterialApp(
       title: 'Cue Demo',
       // showPerformanceOverlay: true,
@@ -44,13 +45,11 @@ class _OnChangeDemo extends StatefulWidget {
 class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProviderStateMixin {
   double size = 100.0;
   bool checked = false;
-  final _sheetController = DraggableScrollableController();
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-   
     return Scaffold(
       // backgroundColor: Colors.blue,
       appBar: AppBar(),
@@ -59,31 +58,41 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            // SlackStyleFab(),
+                  IndicatorToButton(),
+
             SizedBox(
               height: 100,
               child: Row(
                 crossAxisAlignment: .stretch,
                 children: [
-                  Expanded(child: ColoredBox(color: Colors.red)),
-                  SizedBox(
-                    child: Cue.onToggle(
-                      toggled: checked,
-                      motion: .simulation(Spring.wobbly(damping: 8)),
-                      act: .compose([
-                        .size(
-                          width: .tween(
-                            from: 50,
-                            to: 100,
-                            curve: SpringCurve(),
-                            timing: .startAt(.2),
-                            reverse: .mirror(curve: SpringCurve(SimulationBuildData(forward: false, progress: 1))),
+                  // Expanded(child: ColoredBox(color: Colors.red)),
+                  Cue.onToggle(
+                    toggled: checked,
+                    // motion: Spring.wobbly(damping: 8),
+                    // reverseMotion: Spring.smooth(),
+                    
+                    child: Row(
+                      crossAxisAlignment: .stretch,
+                      children: [
+                        Actor(
+                          act: .sizedBox(
+                            width: .tween(from: 50, to: 100),
+                            motion: Spring.wobbly(damping: 8),
                           ),
+                          child: ColoredBox(color: Colors.blue),
                         ),
-                      ]),
-                      child: ColoredBox(color: Colors.blue),
+                         Actor(
+                          act: .sizedBox(
+                            width: .tween(from: 50, to: 100),
+                            motion: Spring.smooth(),
+                          ),
+                          child: ColoredBox(color: Colors.yellow),
+                        ),
+                      ],
                     ),
                   ),
-                  Expanded(child: ColoredBox(color: Colors.green)),
+                  // Expanded(child: ColoredBox(color: Colors.green)),
                 ],
               ),
             ),
@@ -106,17 +115,17 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
   }
 }
 
-class SpringCurve extends Curve {
-  final SimulationBuildData buildData;
-  final Simulation _sim;
+// class SpringCurve extends Curve {
+//   final SimulationBuildData buildData;
+//   final Simulation _sim;
 
-  SpringCurve([this.buildData = const SimulationBuildData()]) : _sim = Spring.wobbly(damping: 8).build(buildData);
+//   SpringCurve([this.buildData = const SimulationBuildData()]) : _sim = Spring.wobbly(damping: 8).build(buildData);
 
-  @override
-  double transformInternal(double t) {
-    if(!buildData.forward){
-       t = 1.0 - t;
-    }
-    return _sim.x(t * 0.7833333333333341);
-  }
-}
+//   @override
+//   double transformInternal(double t) {
+//     if(!buildData.forward){
+//        t = 1.0 - t;
+//     }
+//     return _sim.x(t * 0.7833333333333341);
+//   }
+// }

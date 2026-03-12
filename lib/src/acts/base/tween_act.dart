@@ -1,4 +1,5 @@
 import 'package:cue/cue.dart';
+import 'package:cue/src/motion/simulations.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
@@ -6,14 +7,15 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends Animat
   const TweenActBase({
     required T super.from,
     required T super.to,
-    super.curve,
-    super.timing,
+    super.motion,
+    super.delay,
     super.reverse,
   }) : super(keyframes: null);
 
   const TweenActBase.keyframes(
     List<Keyframe<T>> keyframes, {
-    super.curve,
+    super.motion,
+    super.delay,
     super.reverse,
   }) : super(
          from: null,
@@ -26,9 +28,9 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends Animat
     super.from,
     super.to,
     super.keyframes,
-    super.curve,
-    super.timing,
+    super.motion,
     super.reverse,
+    super.delay,
   });
 
   @override
@@ -49,8 +51,14 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends Animat
   Widget apply(BuildContext context, Animation<R> animation, Widget child);
 
   @override
-  Animation<R> buildAnimation(Animation<double> driver, ActContext context) {
-    return CueAnimation<R>(parent: driver, animtable: buildAnimtable(context));
+  CueAnimation<R> buildAnimation(Timeline timline, ActContext context) {
+    final driver = timline.animationFor(AnimationConfig(
+      motion: motion,
+      delay: delay,
+      reverseMotion: reverse.motion,
+      reverseDelay: reverse.delay,
+    ));
+    return CueAnimationImpl<R>(parent: driver, animtable: buildAnimtable(context));
   }
 }
 
@@ -58,8 +66,7 @@ abstract class TweenAct<T extends Object?> extends TweenActBase<T, T> {
   const TweenAct({
     required super.from,
     required super.to,
-    super.curve,
-    super.timing,
+    super.motion,
     super.reverse,
   });
 
@@ -68,7 +75,7 @@ abstract class TweenAct<T extends Object?> extends TweenActBase<T, T> {
 
   const TweenAct.keyframes(
     super.keyframes, {
-    super.curve,
+    super.motion,
     super.reverse,
   }) : super.keyframes();
 
@@ -77,8 +84,7 @@ abstract class TweenAct<T extends Object?> extends TweenActBase<T, T> {
     super.from,
     super.to,
     super.keyframes,
-    super.curve,
-    super.timing,
+    super.motion,
     super.reverse,
   }) : super.internal();
 }
