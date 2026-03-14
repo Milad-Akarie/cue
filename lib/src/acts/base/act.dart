@@ -212,7 +212,7 @@ abstract class Act {
     AlignmentGeometry alignment,
     CueMotion? motion,
     Duration? delay,
-  }) = SizeAct;
+  }) = SizedBoxAct;
 
   const factory Act.sizedClip({
     NSize? from,

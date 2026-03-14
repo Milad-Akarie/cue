@@ -23,8 +23,9 @@ abstract class DeferredTweenAct<T extends Object?> extends ActImpl<T, T> {
   Widget apply(BuildContext context, covariant DeferredCueAnimation<T> animation, Widget child);
 
   @override
-  (CueAnimtable<T> animtable, CueAnimtable<T>? reverseAnimtable) buildTweens(ActContext context, {ValueTransformer<T, T>? transform}) {
+  (CueAnimtable<T> animtable, CueAnimtable<T>? reverseAnimtable) buildTweens(ActContext context) {
     throw StateError('DeferredTweenAct does not build a tween directly. It should be used with a DeferredCueAnimation that will set the tween later.');
   }
+
 }
 

@@ -115,7 +115,6 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends ActImp
 
   @override
   (CueAnimtable<R> animtable, CueAnimtable<R>? reverseAnimtable) buildTweens(ActContext context) {
-
     final animtable = resolveTween(
       context,
       from: from,
@@ -261,6 +260,14 @@ abstract class TweenAct<T> extends TweenActBase<T, T> {
 
   const TweenAct.keyframes(super.keyframes, {super.motion, super.delay, super.reverse}) : super.keyframes();
 
+  const TweenAct.fractionalKeyframes(
+    super.fractionalKeyframes, {
+    super.duration,
+    super.motion,
+    super.delay,
+    super.reverse = const ReverseBehavior.mirror(),
+  }) : super.fractionalKeyframes();
+
   @internal
   const TweenAct.internal({
     super.from,
@@ -269,6 +276,8 @@ abstract class TweenAct<T> extends TweenActBase<T, T> {
     super.delay,
     super.reverse,
     super.keyframes,
+    super.fractionalKeyframes,
+    super.fractionalKeyframesDuration,
   });
 }
 

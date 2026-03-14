@@ -199,7 +199,7 @@ class LinearSimulation extends Simulation with CueSimulation {
 
 extension DurationExtension on int {
   Duration get ms => Duration(milliseconds: this);
-  Duration get s => Duration(seconds: this);
+  Duration get sec => Duration(seconds: this);
   Duration get m => Duration(minutes: this);
 }
 
@@ -279,16 +279,26 @@ class SegmentedSimulation extends Simulation with CueSimulation {
 
   @override
   bool isDone(double time) {
-    return _phase >= _motions.length - 1 && _current.isDone(time - _phaseStartTime);
+    if (_forward) {
+      return _phase >= _motions.length - 1 && _current.isDone(time - _phaseStartTime);
+    } else {
+      return _phase <= 0 && _current.isDone(time - _phaseStartTime);
+    }
   }
 
   void _advanceIfNeeded(double time) {
     final localTime = time - _phaseStartTime;
-    if (_phase < _motions.length - 1 && _current.isDone(localTime)) {
-      final exitVelocity = _current.dx(localTime);
+    final canAdvance = _forward ? _phase < _motions.length - 1 : _phase > 0;
+    if (canAdvance && _current.isDone(localTime)) {
+       double exitVelocity = _current.dx((localTime - 0.016).clamp(0.0, double.infinity));
+      // Negate velocity when reversing
+      if (!_forward) {
+        exitVelocity = -exitVelocity;
+      }
       _phaseStartTime = time;
-      _phase++;
-      _current = _motions[_phase].build(_forward, 0, 0, exitVelocity);
+      _forward ? _phase++ : _phase--;
+      final initialProgress = _forward ? 0.0 : 1.0;
+      _current = _motions[_phase].build(_forward, 0, initialProgress, exitVelocity);
     }
   }
 }

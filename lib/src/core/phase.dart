@@ -53,6 +53,14 @@ class Keyframe<T> extends KeyframeBase<T> {
 
   @override
   int get hashCode => Object.hash(value, motion);
+
+
+  Keyframe<T> copyWith({T? value, CueMotion? motion}) {
+    return Keyframe<T>(
+      value ?? this.value,
+      motion: motion ?? this.motion,
+    );
+  }
 }
 
 class Phase<T extends Object?> {

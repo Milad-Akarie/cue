@@ -1,10 +1,8 @@
 import 'package:cue/cue.dart';
-import 'package:example/examples/delete_confirmation.dart';
-import 'package:example/examples/expanding_cards.dart';
-import 'package:example/examples/indicator_to_button.dart';
 import 'package:example/examples/slack_style_fab.dart';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -59,46 +57,59 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            crossAxisAlignment: CrossAxisAlignment.end,
+            // mainAxisAlignment: MainAxisAlignment.end,
+            // crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              SlackStyleFab(),
+              // SlackStyleFab(),
               // DeleteConfirmationDialog(),
-          
-              SizedBox(
-                height: 100,
-                child: Row(
-                  crossAxisAlignment: .stretch,
+              Cue.onToggle(
+                toggled: checked,
+                motion: .curved(500.ms, curve: Curves.elasticOut),
+
+                // reverseMotion: Spring.smooth(),
+                child: Column(
                   children: [
-                    // Expanded(child: ColoredBox(color: Colors.red)),
-                    Cue.onToggle(
-                      toggled: checked,
-                      motion: Spring.bouncy(),
-                      // reverseMotion: Spring.smooth(),
-                      
-                      child: Row(
-                        crossAxisAlignment: .stretch,
-                        children: [
-                          Actor(
-                            act: .sizedBox(
-                              width: .tween(from: 50, to: 100),
-                            ),
-                            child: ColoredBox(color: Colors.blue),
-                          ),
-                           Actor(
-                            act: .sizedBox(
-                              width: .tween(from: 50, to: 100),
-                            ),
-                            child: ColoredBox(color: Colors.yellow),
-                          ),
-                        ],
+                    Actor(
+                      // act: SizedBoxAct.keyframes([
+                      //   .key(Size(100, .infinity), motion: .smooth()),
+                      //   .key(Size(50, .infinity), motion: .linear(300.ms)),
+                      //   .key(Size(150, .infinity), motion: .bouncy()),
+                      // ]),
+                      act: SlideAct.fractionalKeyframes([
+                        .key(Offset(0, 0), at: 0.0),
+                        .key(Offset(1, .2), at: 0.5, curve: Curves.elasticOut),
+                        .key(Offset(2, 0), at: 1.0),
+                      ],reverse: .keyframes([
+                        .key(Offset(2, 0), motion: .bouncy()),
+                        .key(Offset(1, .2), motion: .bouncy()),
+                        .key(Offset(0, 0), motion: .bouncy()),
+                      ])),
+                      // act: SlideAct.keyframes([
+                      //   .key(Offset(-1, 0), motion: .wobbly()),
+                      //   .key(Offset(0, 0), motion: .wobbly()),
+                      //   .key(Offset(1, 0), motion: .wobbly()),
+                      // .key(Offset(2, 0), motion: .wobbly()),
+                      // ]),
+                      child: SizedBox(
+                        width: 50,
+                        height: 50,
+                        child: ColoredBox(color: Colors.blue),
                       ),
                     ),
-                    // Expanded(child: ColoredBox(color: Colors.green)),
+                    // Actor(
+                    //   act: .slide(
+                    //      to: const Offset(2, 0),
+                    //   ),
+                    //   child: SizedBox(
+                    //     width: 50,
+                    //     height: 50,
+                    //     child: ColoredBox(color: Colors.yellow),
+                    //   ),
+                    // ),
                   ],
                 ),
               ),
-               
+
               SizedBox(height: 24),
               ElevatedButton(
                 onPressed: () {

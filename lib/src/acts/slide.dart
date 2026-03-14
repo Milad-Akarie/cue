@@ -30,8 +30,14 @@ abstract class SlideAct extends Act {
 
   const factory SlideAct.keyframes(
     List<Keyframe<Offset>> keyframes, {
-   CueMotion? motion,
+    CueMotion? motion,
   }) = _SlideEffect.keyframes;
+
+  const factory SlideAct.fractionalKeyframes(
+    List<FractionalKeyframe<Offset>> keyframes, {
+    Duration? duration,
+    ReverseBehavior<Offset> reverse,
+  }) = _SlideEffect.fractionalKeyframes;
 
   const factory SlideAct.fromY({
     double from,
@@ -49,7 +55,7 @@ abstract class SlideAct extends Act {
   const factory SlideAct.fromX({
     double from,
     double to,
-   CueMotion? motion,
+    CueMotion? motion,
     ReverseBehavior<double> reverse,
   }) = _AxisSlideEffect.tweenX;
 
@@ -105,6 +111,12 @@ class _SlideEffect extends TweenAct<Offset> implements SlideAct {
     super.motion,
     super.reverse,
   }) : super.keyframes();
+
+  const _SlideEffect.fractionalKeyframes(
+    super.keyframes, {
+    super.duration,
+    super.reverse,
+  }) : super.fractionalKeyframes();
 
   @override
   Widget apply(BuildContext context, Animation<Offset> animation, Widget child) {
