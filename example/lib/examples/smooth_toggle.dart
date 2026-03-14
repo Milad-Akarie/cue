@@ -19,7 +19,7 @@ class _SmoothSwitchState extends State<SmoothSwitch> {
     final thumbColor = theme.colorScheme.onSurface;
     return Cue.onToggle(
       toggled: _toggled,
-      motion: const Spring.smooth(),
+      motion:  .linear(200.ms),
       child: GestureDetector(
         onTap: () {
           setState(() {
@@ -33,10 +33,10 @@ class _SmoothSwitchState extends State<SmoothSwitch> {
         },
         child: Actor(
           act: ScaleAct.keyframes([
-            Keyframe(1, at: .0),
-            Keyframe(.90, at: .45),
-            Keyframe(.99, at: .65),
-            Keyframe(1.0, at: 1.0),
+            // KeyframeBase(1, at: .0),
+            // KeyframeBase(.90, at: .45),
+            // KeyframeBase(.99, at: .65),
+            // KeyframeBase(1.0, at: 1.0),
           ]),
           child: Container(
             width: width,
@@ -57,10 +57,10 @@ class _SmoothSwitchState extends State<SmoothSwitch> {
               children: [
                 PositionActor.keyframes(
                   frames: [
-                    Keyframe(.fill(end: .5), at: .0),
-                    Keyframe(.fill(end: 0, top: .15, bottom: .15), at: .45),
-                    Keyframe(.fill(end: 0, top: .15, bottom: .15), at: .55),
-                    Keyframe(.fill(start: .5), at: 1.0),
+                    // KeyframeBase(.fill(end: .5), at: .0),
+                    // KeyframeBase(.fill(end: 0, top: .15, bottom: .15), at: .45),
+                    // KeyframeBase(.fill(end: 0, top: .15, bottom: .15), at: .55),
+                    // KeyframeBase(.fill(start: .5), at: 1.0),
                   ],
                   relativeTo: Size(width, height),
                   child: DecoratedBox(

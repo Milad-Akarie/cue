@@ -7,5 +7,5 @@ export 'src/cue/cue_debug_provider.dart';
 export 'src/motion/spring_motion.dart';
 export 'src/acts/base/act.dart';
 export 'src/actor/actor.dart';
-export 'src/acts/base/animated_prop.dart';
+export 'src/acts/base/tween_act.dart';
 export 'src/motion/cue_motion.dart';

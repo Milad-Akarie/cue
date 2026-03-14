@@ -1,30 +1,90 @@
-import 'package:cue/src/motion/simulations.dart';
+import 'package:cue/src/motion/timeline.dart';
 import 'package:flutter/material.dart';
+import 'spring_motion.dart';
 
 sealed class CueMotion {
   const CueMotion();
 
   BakedMotion bake({int samples = 60});
 
-  Simulation build(bool forward, double progress, double? velocity);
+  Duration get duration;
 
-  const factory CueMotion.timed(
-    Duration duration, {
-    Curve curve,
-  }) = TimedMotion;
-
-  static const CueMotion defaultDuration = CueMotion.timed(
-    Duration(milliseconds: 300),
-  );
+  CueSimulation build(bool forward, int phase, double progress, double? velocity);
 
   bool get isTimed => this is TimedMotion;
   bool get isSimulation => this is SimulationMotion;
+
+  const factory CueMotion.curved(
+    Duration duration, {
+    required Curve curve,
+  }) = TimedMotion.curved;
+
+  const factory CueMotion.linear(Duration duration) = TimedMotion;
+
+  static const CueMotion defaultDuration = TimedMotion(
+    Duration(milliseconds: 300),
+  );
+
+  factory CueMotion.spring({
+    Duration duration,
+    double bounce,
+  }) = Spring;
+
+  const factory CueMotion.smooth({
+    double mass,
+    double stiffness,
+    double damping,
+    Tolerance tolerance,
+    bool snapToEnd,
+  }) = Spring.smooth;
+
+  const factory CueMotion.gentle({
+    double mass,
+    double stiffness,
+    double damping,
+    Tolerance tolerance,
+    bool snapToEnd,
+  }) = Spring.gentle;
+
+  const factory CueMotion.iosDefaultSpring({
+    double mass,
+    double stiffness,
+    double damping,
+    Tolerance tolerance,
+    bool snapToEnd,
+  }) = Spring.iosDefault;
+
+  const factory CueMotion.bouncy({
+    double mass,
+    double stiffness,
+    double damping,
+    Tolerance tolerance,
+    bool snapToEnd,
+  }) = Spring.bouncy;
+
+  const factory CueMotion.wobbly({
+    double mass,
+    double stiffness,
+    double damping,
+    Tolerance tolerance,
+    bool snapToEnd,
+  }) = Spring.wobbly;
+
+  const factory CueMotion.stiff({
+    double mass,
+    double stiffness,
+    double damping,
+    Tolerance tolerance,
+    bool snapToEnd,
+  }) = Spring.stiff;
 }
 
 class TimedMotion extends CueMotion {
+  @override
   final Duration duration;
   final Curve? curve;
-  const TimedMotion(this.duration, {this.curve});
+  const TimedMotion(this.duration) : curve = null;
+  const TimedMotion.curved(this.duration, {required Curve this.curve});
 
   @override
   BakedMotion bake({int samples = 60}) {
@@ -44,7 +104,7 @@ class TimedMotion extends CueMotion {
   int get hashCode => duration.hashCode ^ curve.hashCode;
 
   @override
-  Simulation build(bool forward, double progress, double? velocity) {
+  CueSimulation build(bool forward, int phase, double progress, double? velocity) {
     return CurvedSimulation(
       duration: duration,
       curve: curve ?? Curves.linear,
@@ -54,11 +114,21 @@ class TimedMotion extends CueMotion {
   }
 }
 
-class CurvedSimulation extends Simulation {
+mixin CueSimulation on Simulation {
+  int get phase => 0;
+  double get progress;
+}
+
+class CurvedSimulation extends Simulation with CueSimulation {
   final double _durationSeconds;
   final Curve _curve;
   final double _from;
   final double _to;
+
+  double _progress = 0.0;
+
+  @override
+  double get progress => _progress;
 
   CurvedSimulation({
     required Duration duration,
@@ -73,7 +143,7 @@ class CurvedSimulation extends Simulation {
   @override
   double x(double t) {
     final progress = (t / _durationSeconds).clamp(0.0, 1.0);
-    return _from + (_to - _from) * _curve.transform(progress);
+    return _progress = _from + (_to - _from) * _curve.transform(progress);
   }
 
   @override
@@ -83,7 +153,7 @@ class CurvedSimulation extends Simulation {
   bool isDone(double t) => t >= _durationSeconds;
 }
 
-abstract base class SimulationMotion<S extends Simulation> extends CueMotion {
+abstract base class SimulationMotion<S extends CueSimulation> extends CueMotion {
   const SimulationMotion();
 }
 
@@ -101,13 +171,21 @@ final class LinearSimulationMotion extends SimulationMotion<LinearSimulation> {
   }
 
   @override
-  LinearSimulation build(bool forward, double progress, double? velocity) {
+  LinearSimulation build(bool forward, int phase, double progress, double? velocity) {
     return LinearSimulation();
   }
+  
+  @override
+  Duration get duration => Duration.zero;
 }
 
-class LinearSimulation extends Simulation {
+class LinearSimulation extends Simulation with CueSimulation {
   LinearSimulation();
+
+  double _progress = 0.0;
+
+  @override
+  double get progress => _progress;
 
   @override
   double dx(double time) => time;
@@ -116,11 +194,101 @@ class LinearSimulation extends Simulation {
   bool isDone(double time) => false;
 
   @override
-  double x(double time) => time;
+  double x(double time) => _progress = time;
 }
 
 extension DurationExtension on int {
   Duration get ms => Duration(milliseconds: this);
   Duration get s => Duration(seconds: this);
   Duration get m => Duration(minutes: this);
+}
+
+class SegmentedMotion extends CueMotion {
+  final List<CueMotion> motions;
+  const SegmentedMotion(this.motions);
+
+  @override
+  BakedMotion bake({int samples = 60}) {
+    final segmentCount = motions.length;
+    final samplesPerSegment = (samples / segmentCount).ceil();
+    return BakedMotion(
+      motion: this,
+      samples: motions.expand((s) => s.bake(samples: samplesPerSegment).samples).toList(),
+      durationSeconds: motions.fold(0.0, (sum, s) => sum + s.bake(samples: samplesPerSegment).durationSeconds),
+    );
+  }
+
+  @override
+  CueSimulation build(bool forward, int phase, double progress, double? velocity) {
+    return SegmentedSimulation(
+      motions: motions,
+      forward: forward,
+      initialPhase: phase,
+      initialProgress: progress,
+      initialVelocity: velocity ?? 0.0,
+    );
+  }
+  
+  @override
+  Duration get duration => motions.fold(Duration.zero, (acc,a)=> acc + a.duration);
+}
+
+class SegmentedSimulation extends Simulation with CueSimulation {
+  final List<CueMotion> _motions;
+  final bool _forward;
+
+  int _phase;
+  double _phaseStartTime = 0;
+  late CueSimulation _current;
+  double _progress = 0.0;
+
+  @override
+  double get progress => _progress;
+
+  @override
+  int get phase => _phase;
+
+  SegmentedSimulation({
+    required List<CueMotion> motions,
+    required bool forward,
+    required double initialVelocity,
+    int initialPhase = 0,
+    double initialProgress = 0,
+  }) : _motions = motions,
+       _forward = forward,
+       _phase = initialPhase {
+    _current = motions[initialPhase].build(
+      forward,
+      initialPhase,
+      initialProgress,
+      initialVelocity,
+    );
+  }
+
+  @override
+  double x(double time) {
+    _advanceIfNeeded(time);
+    return _progress = _current.x(time - _phaseStartTime);
+  }
+
+  @override
+  double dx(double time) {
+    _advanceIfNeeded(time);
+    return _current.dx(time - _phaseStartTime);
+  }
+
+  @override
+  bool isDone(double time) {
+    return _phase >= _motions.length - 1 && _current.isDone(time - _phaseStartTime);
+  }
+
+  void _advanceIfNeeded(double time) {
+    final localTime = time - _phaseStartTime;
+    if (_phase < _motions.length - 1 && _current.isDone(localTime)) {
+      final exitVelocity = _current.dx(localTime);
+      _phaseStartTime = time;
+      _phase++;
+      _current = _motions[_phase].build(_forward, 0, 0, exitVelocity);
+    }
+  }
 }

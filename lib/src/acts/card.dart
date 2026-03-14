@@ -11,31 +11,31 @@ part of 'base/act.dart';
 /// Use [borderRadius] for the common case of animating rounded corners on a
 /// rectangle. Use [shape] for arbitrary [ShapeBorder] animations (e.g.
 /// [StadiumBorder], [BeveledRectangleBorder]). The two are mutually exclusive.
-class CardAct extends MulitTweenAct<CardProps> {
+class CardAct extends ActImpl<CardProps, CardProps> {
   final Clip clipBehavior;
   final bool borderOnForeground;
-  final AnimtableColor? color;
-  final AnimtableColor shadowColor;
-  final AnimtableColor? surfaceTintColor;
+  final AnimatableValue<Color>? color;
+  final AnimatableValue<Color> shadowColor;
+  final AnimatableValue<Color>? surfaceTintColor;
   final AnimatableValue<double>? elevation;
-  final AnimtableBorderRadius? borderRadius;
-  final AnimtableEdgeInsets? margin;
-  final AnimtableShapeBorder? shape;
+  final AnimatableValue<BorderRadiusGeometry>? borderRadius;
+  final AnimatableValue<EdgeInsetsGeometry>? margin;
+  final AnimatableValue<ShapeBorder>? shape;
   final bool semanticContainer;
 
   CardAct({
+    super.motion,
+    super.reverse,
     this.color,
     this.borderRadius,
+    this.shadowColor = const AnimatableValue.fixed(Color(0xFF000000)),
+    this.margin,
     this.shape,
     this.elevation,
     this.surfaceTintColor,
     this.clipBehavior = Clip.none,
     this.borderOnForeground = true,
-    this.shadowColor = const AnimtableColor.fixed(Color(0xFF000000)),
-    super.motion,
-    super.reverseMotion,
     this.semanticContainer = true,
-    this.margin,
   }) : assert(
          shape == null || borderRadius == null,
          'Cannot specify both shape and borderRadius. '
@@ -43,21 +43,29 @@ class CardAct extends MulitTweenAct<CardProps> {
        );
 
   @override
-  CueAnimtable<CardProps> buildTween(ActContext context) {
+  (CueAnimtable<CardProps> animtable, CueAnimtable<CardProps>? reverseAnimtable) buildTweens(ActContext context) {
     final iFrom = context.implicitFrom as CardProps?;
-    ActContext withFrom(Object? from) {
-      return context.copyWith(implicitFrom: from);
-    }
-
-    return _CardPropsProxyTween(
-      elevation: elevation?.buildAnimtable(withFrom(iFrom?.elevation)),
-      color: color?.buildAnimtable(withFrom(iFrom?.color)),
-      shadowColor: shadowColor.buildAnimtable(withFrom(iFrom?.shadowColor)),
-      surfaceTintColor: surfaceTintColor?.buildAnimtable(withFrom(iFrom?.surfaceTintColor)),
-      borderRadius: borderRadius?.buildAnimtable(withFrom(iFrom?.borderRadius)),
-      shape: shape?.buildAnimtable(withFrom(iFrom?.shape)),
-      margin: margin?.buildAnimtable(withFrom(iFrom?.margin)),
+    final from =
+        iFrom ??
+        CardProps(
+          elevation: elevation?.from,
+          color: color?.from,
+          shadowColor: shadowColor.from,
+          surfaceTintColor: surfaceTintColor?.from,
+          borderRadius: borderRadius?.from,
+          shape: shape?.from,
+          margin: margin?.from,
+        );
+    final to = CardProps(
+      elevation: elevation?.to,
+      color: color?.to,
+      shadowColor: shadowColor.to,
+      surfaceTintColor: surfaceTintColor?.to,
+      borderRadius: borderRadius?.to,
+      shape: shape?.to,
+      margin: margin?.to,
     );
+    return (TweenAnimtable(_CardPropsProxyTween(begin: from, end: to), motion: motion ?? context.motion), null);
   }
 
   @override
@@ -170,9 +178,9 @@ class CardProps {
   final Color? color;
   final Color? shadowColor;
   final Color? surfaceTintColor;
-  final BorderRadius? borderRadius;
+  final BorderRadiusGeometry? borderRadius;
   final ShapeBorder? shape;
-  final EdgeInsets? margin;
+  final EdgeInsetsGeometry? margin;
 
   const CardProps({
     this.elevation = 0,
@@ -186,49 +194,51 @@ class CardProps {
          shape == null || borderRadius == null,
          'Cannot specify both shape and borderRadius.',
        );
-}
-
-class _CardPropsProxyTween extends CueAnimtable<CardProps> {
-  final CueAnimtable<double>? elevation;
-  final CueAnimtable<Color?>? color;
-  final CueAnimtable<Color?>? shadowColor;
-  final CueAnimtable<Color?>? surfaceTintColor;
-  final CueAnimtable<BorderRadius?>? borderRadius;
-  final CueAnimtable<ShapeBorder?>? shape;
-  final CueAnimtable<EdgeInsets?>? margin;
-
-  const _CardPropsProxyTween({
-    this.elevation,
-    this.color,
-    this.shadowColor,
-    this.surfaceTintColor,
-    this.borderRadius,
-    this.margin,
-    this.shape,
-  });
 
   @override
-  bool shouldNotify(AnimationStatus status) {
-    return (elevation?.shouldNotify(status) ?? false) ||
-        (color?.shouldNotify(status) ?? false) ||
-        (shadowColor?.shouldNotify(status) ?? false) ||
-        (surfaceTintColor?.shouldNotify(status) ?? false) ||
-        (borderRadius?.shouldNotify(status) ?? false) ||
-        (shape?.shouldNotify(status) ?? false) ||
-        (margin?.shouldNotify(status) ?? false);
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other.runtimeType != runtimeType) return false;
+    return other is CardProps &&
+        other.elevation == elevation &&
+        other.color == color &&
+        other.shadowColor == shadowColor &&
+        other.surfaceTintColor == surfaceTintColor &&
+        other.borderRadius == borderRadius &&
+        other.shape == shape &&
+        other.margin == margin;
   }
 
   @override
-  CardProps transform(double t, AnimationStatus status) {
+  int get hashCode => Object.hash(
+    elevation,
+    color,
+    shadowColor,
+    surfaceTintColor,
+    borderRadius,
+    shape,
+    margin,
+  );
+
+  static CardProps lerp(CardProps a, CardProps b, double t) {
     return CardProps(
-      elevation: elevation?.transform(t, status) ?? 0,
-      color: color?.transform(t, status),
-      shadowColor: shadowColor?.transform(t, status),
-      surfaceTintColor: surfaceTintColor?.transform(t, status),
-      borderRadius: borderRadius?.transform(t, status),
-      margin: margin?.transform(t, status),
-      shape: shape?.transform(t, status),
+      elevation: lerpDouble(a.elevation, b.elevation, t),
+      color: Color.lerp(a.color, b.color, t),
+      shadowColor: Color.lerp(a.shadowColor, b.shadowColor, t),
+      surfaceTintColor: Color.lerp(a.surfaceTintColor, b.surfaceTintColor, t),
+      borderRadius: BorderRadiusGeometry.lerp(a.borderRadius, b.borderRadius, t),
+      shape: ShapeBorder.lerp(a.shape, b.shape, t),
+      margin: EdgeInsetsGeometry.lerp(a.margin, b.margin, t),
     );
+  }
+}
+
+class _CardPropsProxyTween extends Tween<CardProps> {
+  _CardPropsProxyTween({super.begin, super.end});
+
+  @override
+  CardProps transform(double t) {
+    return CardProps.lerp(begin!, end!, t);
   }
 }
 
@@ -238,23 +248,23 @@ class _CardPropsProxyTween extends CueAnimtable<CardProps> {
 /// Wraps an [Actor] with a single [CardAct]. For composing multiple effects,
 /// use [Actor] directly with [CardAct] in the effects list.
 class CardActor extends StatelessWidget {
-  final AnimtableColor? color;
-  final AnimtableColor? shadowColor;
-  final AnimtableColor? surfaceTintColor;
+  final AnimatableValue<Color>? color;
+  final AnimatableValue<Color> shadowColor;
+  final AnimatableValue<Color>? surfaceTintColor;
   final AnimatableValue<double>? elevation;
-  final AnimtableBorderRadius? borderRadius;
-  final AnimtableShapeBorder? shape;
-  final AnimtableEdgeInsets? margin;
+  final AnimatableValue<BorderRadiusGeometry>? borderRadius;
+  final AnimatableValue<ShapeBorder>? shape;
+  final AnimatableValue<EdgeInsetsGeometry>? margin;
   final Clip clipBehavior;
   final bool borderOnForeground;
   final Widget? child;
   final CueMotion? motion;
-  final CueMotion? reverseMotion;
+  final ReverseBehavior<CardProps> reverse;
 
   const CardActor({
     super.key,
     this.color,
-    this.shadowColor,
+    this.shadowColor = const AnimatableValue.fixed(Color(0xFF000000)),
     this.surfaceTintColor,
     this.elevation,
     this.borderRadius,
@@ -264,7 +274,7 @@ class CardActor extends StatelessWidget {
     this.margin,
     this.child,
     this.motion,
-    this.reverseMotion,
+    this.reverse = const ReverseBehavior.mirror(),
   }) : assert(
          shape == null || borderRadius == null,
          'Cannot specify both shape and borderRadius. '
@@ -276,7 +286,7 @@ class CardActor extends StatelessWidget {
     return Actor(
       act: CardAct(
         color: color,
-        shadowColor: shadowColor ?? const AnimtableColor.fixed(Color(0xFF000000)),
+        shadowColor: shadowColor,
         surfaceTintColor: surfaceTintColor,
         elevation: elevation,
         borderRadius: borderRadius,
@@ -285,7 +295,7 @@ class CardActor extends StatelessWidget {
         borderOnForeground: borderOnForeground,
         margin: margin,
         motion: motion,
-        reverseMotion: reverseMotion,
+        reverse: reverse,
       ),
       child: child ?? const SizedBox.shrink(),
     );

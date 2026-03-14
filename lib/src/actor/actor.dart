@@ -1,5 +1,4 @@
 import 'package:cue/cue.dart';
-import 'package:cue/src/motion/cue_motion.dart';
 import 'package:flutter/widgets.dart';
 
 class Actor extends StatefulWidget {

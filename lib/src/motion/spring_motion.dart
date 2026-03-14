@@ -1,5 +1,5 @@
 import 'package:cue/src/motion/cue_motion.dart';
-import 'package:cue/src/motion/simulations.dart';
+import 'package:cue/src/motion/timeline.dart';
 import 'package:flutter/physics.dart';
 
 // holds default values for spring simulation
@@ -8,14 +8,38 @@ const double _kStandardIosDamping = 45.7099552;
 const Tolerance _kStandardIosTolerance = Tolerance(velocity: 0.03);
 const Tolerance _kDefaultTolerance = Tolerance(distance: 0.01, velocity: 0.03);
 
-final class Spring extends SimulationMotion<SpringSimulation> {
+class CueSpringSimulation extends SpringSimulation with CueSimulation {
+  CueSpringSimulation(
+    super.spring,
+    super.start,
+    super.end,
+    super.velocity, {
+    super.tolerance,
+    super.snapToEnd,
+  });
+
+  @override
+  int get phase => 0;
+
+  double _progress = 0.0;
+
+  @override
+  double get progress => _progress;
+
+  @override
+  double x(double time) {
+    return _progress = super.x(time);
+  }
+}
+
+final class Spring extends SimulationMotion<CueSpringSimulation> {
   final double mass;
   final double stiffness;
   final double damping;
   final Tolerance tolerance;
   final bool snapToEnd;
 
-  const Spring({
+  const Spring.custom({
     this.mass = 1.0,
     required this.stiffness,
     required this.damping,
@@ -30,8 +54,8 @@ final class Spring extends SimulationMotion<SpringSimulation> {
   );
 
   @override
-  SpringSimulation build(bool forward, double progress, double? velocity) {
-    return SpringSimulation(
+  CueSpringSimulation build(bool forward, int phase, double progress, double? velocity) {
+    return CueSpringSimulation(
       springDescription,
       progress,
       forward ? 1.0 : 0.0,
@@ -48,7 +72,7 @@ final class Spring extends SimulationMotion<SpringSimulation> {
     Tolerance? tolerance,
     bool? snapToEnd,
   }) {
-    return Spring(
+    return Spring.custom(
       mass: mass ?? this.mass,
       stiffness: stiffness ?? this.stiffness,
       damping: damping ?? this.damping,
@@ -137,7 +161,7 @@ final class Spring extends SimulationMotion<SpringSimulation> {
     this.snapToEnd = true,
   });
 
-  factory Spring.withDurationAndBounce({
+  factory Spring({
     Duration duration = const Duration(milliseconds: 500),
     double bounce = 0,
   }) {
@@ -145,7 +169,7 @@ final class Spring extends SimulationMotion<SpringSimulation> {
       duration: duration,
       bounce: bounce,
     );
-    return Spring(
+    return Spring.custom(
       mass: desc.mass,
       stiffness: desc.stiffness,
       damping: desc.damping,
@@ -154,7 +178,7 @@ final class Spring extends SimulationMotion<SpringSimulation> {
 
   @override
   BakedMotion bake({int samples = 60}) {
-    final sim = build(true, 0.0, 0.0);
+    final sim = build(true, 0, 0.0, 0.0);
     final settlingDuration = _calculateSettleDuration(sim);
 
     final values = List.generate(samples, (i) {
@@ -166,6 +190,13 @@ final class Spring extends SimulationMotion<SpringSimulation> {
       durationSeconds: settlingDuration,
       motion: this,
     );
+  }
+
+  @override
+  Duration get duration {
+    final sim = build(true, 0, 0.0, 0.0);
+    final settlingDuration = _calculateSettleDuration(sim);
+    return Duration(microseconds: (settlingDuration * Duration.microsecondsPerSecond).round());
   }
 
   double _calculateSettleDuration(SpringSimulation sim, {double stepSize = 1 / 60}) {

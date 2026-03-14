@@ -1,5 +1,5 @@
 import 'package:cue/src/motion/cue_motion.dart';
-import 'package:cue/src/motion/simulations.dart';
+import 'package:cue/src/motion/timeline.dart';
 import 'package:flutter/material.dart';
 
 class CueAnimationController extends AnimationController {
@@ -45,7 +45,7 @@ class CueAnimationController extends AnimationController {
        _lowerBound = lowerBound,
        _upperBound = upperBound,
        _timline = CueTimelineImpl(
-         CueSimulationAnimationImpl(
+         CueAnimationDriverImpl(
            motion,
            reverseMotion: reverseMotion,
          ),
@@ -71,7 +71,7 @@ class CueAnimationController extends AnimationController {
     if (from != null) {
       value = from;
     }
-    _timline.prepare(forward: true, velocity: velocity);
+    _timline.prepare(forward: true);
     return super.animateWith(_timline);
   }
 
@@ -90,7 +90,7 @@ class CueAnimationController extends AnimationController {
     if (from != null) {
       value = from;
     }
-    _timline.prepare(forward: false, velocity: velocity);
+    _timline.prepare(forward: false);
     return super.animateBackWith(_timline);
   }
 

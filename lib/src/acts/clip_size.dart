@@ -5,21 +5,21 @@ class SizedClipAct extends DeferredTweenAct<Size?> {
   final Clip clipBehavior;
   final NSize? from;
   final NSize? to;
-  final List<Keyframe<NSize>>? keyframes;
+  final List<KeyframeBase<NSize>>? keyframes;
 
   const SizedClipAct({
     this.from = NSize.childSize,
     this.to = NSize.childSize,
     super.motion,
-    super.reverseMotion,
+    super.reverse,
     this.alignment,
     this.clipBehavior = Clip.hardEdge,
   }) : keyframes = null;
 
   const SizedClipAct.keyframes(
-    List<Keyframe<NSize>> this.keyframes, {
+    List<KeyframeBase<NSize>> this.keyframes, {
     super.motion,
-    super.reverseMotion,
+    super.reverse,
     this.alignment,
     this.clipBehavior = Clip.hardEdge,
   }) : from = null,
@@ -67,7 +67,7 @@ class _AnimatedSizeClip extends SingleChildRenderObjectWidget {
   final DeferredCueAnimation<Size?> driver;
   final NSize? from;
   final NSize? to;
-  final List<Keyframe<NSize>>? sizeKeyframes;
+  final List<KeyframeBase<NSize>>? sizeKeyframes;
   final AlignmentGeometry alignment;
   final Clip clipBehavior;
 
@@ -105,7 +105,7 @@ class _RenderAnimatedSizeClip extends RenderAligningShiftedBox {
     required DeferredCueAnimation<Size?> driver,
     required NSize? fromSize,
     required NSize? toSize,
-    required List<Keyframe<NSize>>? sizeKeyframes,
+    required List<KeyframeBase<NSize>>? sizeKeyframes,
     super.alignment,
     super.textDirection,
     Clip clipBehavior = Clip.hardEdge,
@@ -145,9 +145,9 @@ class _RenderAnimatedSizeClip extends RenderAligningShiftedBox {
     _invalidateAnimationCache();
   }
 
-  List<Keyframe<NSize>>? _keyframes;
+  List<KeyframeBase<NSize>>? _keyframes;
 
-  set keyframes(List<Keyframe<NSize>>? value) {
+  set keyframes(List<KeyframeBase<NSize>>? value) {
     if (_keyframes == value) return;
     _keyframes = value;
     _invalidateAnimationCache();
@@ -236,48 +236,56 @@ class _RenderAnimatedSizeClip extends RenderAligningShiftedBox {
     );
   }
 
-  Size _calculateMaxSize(AnimtableSize animtable) {
-    final allValues = [
-      animtable.from,
-      animtable.to,
-      ...?animtable.keyframes?.map((kf) => kf.value),
-    ].whereType<Size>();
+  // Size _calculateMaxSize(AnimtableSize animtable) {
+  //   final allValues = [
+  //     animtable.from,
+  //     animtable.to,
+  //     ...?animtable.keyframes?.map((kf) => kf.value),
+  //   ].whereType<Size>();
 
-    double maxWidth = 0;
-    double maxHeight = 0;
-    for (final size in allValues) {
-      if (size.width > maxWidth) {
-        maxWidth = size.width;
-      }
-      if (size.height > maxHeight) {
-        maxHeight = size.height;
-      }
-    }
-    return Size(maxWidth, maxHeight);
-  }
+  //   double maxWidth = 0;
+  //   double maxHeight = 0;
+  //   for (final size in allValues) {
+  //     if (size.width > maxWidth) {
+  //       maxWidth = size.width;
+  //     }
+  //     if (size.height > maxHeight) {
+  //       maxHeight = size.height;
+  //     }
+  //   }
+  //   return Size(maxWidth, maxHeight);
+  // }
 
   void _buildAnimationIfNeeded(Size maxConstrains, Size childSize) {
     // Check if we need to rebuild the animation
     if (_driver.hasAnimatable && _lastConstraintSize == maxConstrains && _lastChildNaturalSize == childSize) {
       return; // Animation is already built and neither constraints nor child size changed
     }
-    // Build the tween from phases
-    final animtable = AnimtableSize(
-      from: _resolveSize(_from, maxConstrains, childSize),
-      to: _resolveSize(_to, maxConstrains, childSize),
-      keyframes: _keyframes != null
-          ? [
-              for (final kf in _keyframes!)
-                Keyframe<Size?>(
-                  _resolveSize(kf.value, maxConstrains, childSize),
-                  at: kf.at,
-                ),
-            ]
-          : null,
-    );
+
+    final iFrom = _driver.context.implicitFrom as Size?;
+    final from = iFrom ?? _resolveSize(_from, maxConstrains, childSize);
+    final to = _resolveSize(_to, maxConstrains, childSize);
+    final tween = SizeTween(begin: from, end: to);
+    //TODO: handle keyframes and max size calcuation
+
+    // // Build the tween from phases
+    // final animtable = AnimtableSize(
+    //   from: _resolveSize(_from, maxConstrains, childSize),
+    //   to: _resolveSize(_to, maxConstrains, childSize),
+    //   keyframes: _keyframes != null
+    //       ? [
+    //           for (final kf in _keyframes!)
+    //             Keyframe<Size?>(
+    //               _resolveSize(kf.value, maxConstrains, childSize),
+    //               at: kf.at,
+    //             ),
+    //         ]
+    //       : null,
+    // );
     // Build and cache the animation
-    _driver.setAnimatable(animtable.buildAnimtable(_driver.context));
-    _cachedMaxSize = _calculateMaxSize(animtable);
+    _driver.setAnimatable(TweenAnimtable(tween, motion: _driver.context.motion));
+    _cachedMaxSize = tween.end ?? Size.zero;
+    // _cachedMaxSize = _calculateMaxSize(animtable);
     _lastConstraintSize = maxConstrains;
     _lastChildNaturalSize = childSize;
   }

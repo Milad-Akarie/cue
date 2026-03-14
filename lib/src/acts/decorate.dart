@@ -1,11 +1,11 @@
 part of 'base/act.dart';
 
-class DecoratedBoxAct extends MulitTweenAct<BoxDecoration> {
-  final AnimtableColor? color;
-  final AnimtableBorderRadius? borderRadius;
-  final AnimtableBoxBorder? border;
-  final AnimtableBoxShadow? boxShadow;
-  final AnimtableGradient? gradient;
+class DecoratedBoxAct extends ActImpl<Decoration, Decoration> {
+  final AnimatableValue<Color>? color;
+  final AnimatableValue<BorderRadiusGeometry>? borderRadius;
+  final AnimatableValue<BoxBorder>? border;
+  final AnimatableValue<List<BoxShadow>>? boxShadow;
+  final AnimatableValue<Gradient>? gradient;
   final BoxShape shape;
   final DecorationPosition position;
 
@@ -16,31 +16,60 @@ class DecoratedBoxAct extends MulitTweenAct<BoxDecoration> {
     this.boxShadow,
     this.gradient,
     super.motion,
-    super.reverseMotion,
+    // super.reverse,
     this.position = DecorationPosition.background,
     this.shape = BoxShape.rectangle,
   });
 
   @override
-  CueAnimtable<BoxDecoration> buildTween(ActContext context) {
-    final iFrom = context.implicitFrom as BoxDecoration?;
-
-    ActContext withFrom(Object? from) {
-      return context.copyWith(implicitFrom: from);
-    }
-
-    return _DecorationTweenProxy(
-      color: color?.buildAnimtable(withFrom(iFrom?.color)),
-      borderRadius: borderRadius?.buildAnimtable(withFrom(iFrom?.borderRadius)),
-      border: border?.buildAnimtable(withFrom(iFrom?.border)),
-      boxShadow: boxShadow?.buildAnimtable(withFrom(iFrom?.boxShadow)),
-      gradient: gradient?.buildAnimtable(withFrom(iFrom?.gradient)),
+  (CueAnimtable<Decoration> animtable, CueAnimtable<Decoration>? reverseAnimtable) buildTweens(ActContext context) {
+    final iFrom = context.implicitFrom as Decoration?;
+    final from =
+        iFrom ??
+        BoxDecoration(
+          color: color?.from,
+          borderRadius: borderRadius?.from,
+          border: border?.from,
+          boxShadow: boxShadow?.from,
+          gradient: gradient?.from,
+          shape: shape,
+        );
+    final to = BoxDecoration(
+      color: color?.to,
+      borderRadius: borderRadius?.to,
+      border: border?.to,
+      boxShadow: boxShadow?.to,
+      gradient: gradient?.to,
       shape: shape,
     );
+
+    // CueAnimtable<Decoration>? reverseAnimtable;
+    // if (reverse.needsReverseTween) {
+    //   final rTo = reverse.to;
+    //   final effectiveRTo =
+    //       rTo ??
+    //       BoxDecoration(
+    //         color: color?.to,
+    //         borderRadius: borderRadius?.to,
+    //         border: border?.to,
+    //         boxShadow: boxShadow?.to,
+    //         gradient: gradient?.to,
+    //         shape: shape,
+    //       );
+    //   if (effectiveRTo != to) {
+    //     reverseAnimtable = TweenAnimtable<Decoration>(
+    //       DecorationTween(begin: to, end: effectiveRTo),
+    //       motion: reverse.motion ?? context.reverseMotion,
+    //     );
+    //   }
+    // }
+
+
+    return (TweenAnimtable(DecorationTween(begin: from, end: to), motion: motion ?? context.motion), null);
   }
 
   @override
-  Widget apply(BuildContext context, covariant Animation<BoxDecoration> animation, Widget child) {
+  Widget apply(BuildContext context, covariant Animation<Decoration> animation, Widget child) {
     return DecoratedBoxTransition(
       decoration: animation,
       position: position,
@@ -66,51 +95,12 @@ class DecoratedBoxAct extends MulitTweenAct<BoxDecoration> {
   int get hashCode => Object.hash(color, borderRadius, border, boxShadow, gradient, shape, position);
 }
 
-class _DecorationTweenProxy extends CueAnimtable<BoxDecoration> {
-  final CueAnimtable<Color?>? color;
-  final CueAnimtable<BorderRadiusGeometry?>? borderRadius;
-  final CueAnimtable<BoxBorder?>? border;
-  final CueAnimtable<List<BoxShadow>?>? boxShadow;
-  final CueAnimtable<Gradient?>? gradient;
-  final BoxShape shape;
-
-  @override
-  bool shouldNotify(AnimationStatus status) {
-    return (color?.shouldNotify(status) ?? false) ||
-        (borderRadius?.shouldNotify(status) ?? false) ||
-        (border?.shouldNotify(status) ?? false) ||
-        (boxShadow?.shouldNotify(status) ?? false) ||
-        (gradient?.shouldNotify(status) ?? false);
-  }
-
-  _DecorationTweenProxy({
-    this.color,
-    this.borderRadius,
-    this.border,
-    this.boxShadow,
-    this.gradient,
-    this.shape = BoxShape.rectangle,
-  });
-
-  @override
-  BoxDecoration transform(double t, AnimationStatus status) {
-    return BoxDecoration(
-      shape: shape,
-      color: color?.transform(t, status),
-      borderRadius: borderRadius?.transform(t, status),
-      border: border?.transform(t, status),
-      boxShadow: boxShadow?.transform(t, status),
-      gradient: gradient?.transform(t, status),
-    );
-  }
-}
-
 class DecoratedBoxActor extends StatelessWidget {
-  final AnimtableColor? color;
-  final AnimtableBorderRadius? borderRadius;
-  final AnimtableBoxBorder? border;
-  final AnimtableBoxShadow? boxShadow;
-  final AnimtableGradient? gradient;
+  final AnimatableValue<Color>? color;
+  final AnimatableValue<BorderRadiusGeometry>? borderRadius;
+  final AnimatableValue<BoxBorder>? border;
+  final AnimatableValue<List<BoxShadow>>? boxShadow;
+  final AnimatableValue<Gradient>? gradient;
   final BoxShape shape;
   final Widget? child;
   final CueMotion? motion;
@@ -142,8 +132,7 @@ class DecoratedBoxActor extends StatelessWidget {
         gradient: gradient,
         shape: shape,
         position: position,
-        motion:  motion,
-        reverseMotion: reverseMotion,
+        motion: motion,
       ),
       child: child ?? const SizedBox.shrink(),
     );

@@ -24,18 +24,20 @@ class _NotificationBellState extends State<NotificationBell> {
               clipBehavior: .none,
               children: [
                 Actor(
-                  act: RotateAct.keyframes(
-                    [
-                      .begin(0.0),
-                      .key(20, at: .2),
-                      .key(-18, at: .4),
-                      .key(14, at: .6),
-                      .key(-10, at: .8),
-                      .end(0.0),
-                    ],
-                    unit: .degrees,
-                    alignment: .topCenter,
-                  ),
+                  act: .compose([
+                  //   RotateAct.keyframes(
+                  //   [
+                  //     .begin(0.0),
+                  //     .key(20, at: .2),
+                  //     .key(-18, at: .4),
+                  //     .key(14, at: .6),
+                  //     .key(-10, at: .8),
+                  //     .end(0.0),
+                  //   ],
+                  //   unit: .degrees,
+                  //   alignment: .topCenter,
+                  // ),
+                  ]),
                   child: Icon(Iconsax.notification_bing4, size: 32),
                 ),
                 Positioned(
@@ -43,16 +45,16 @@ class _NotificationBellState extends State<NotificationBell> {
                   right: 2,
                   child: Actor(
                     act: .compose([
-                      PathMotionAct.arc(
-                        radius: 5,
-                        startAngle: -12,
-                        sweepAngle: 100,
-                      ),
-                      ScaleAct.keyframes([
-                        .begin(1),
-                        .key(1.3, at: .5),
-                        .end(1),
-                      ]),
+                      // PathMotionAct.arc(
+                      //   radius: 5,
+                      //   startAngle: -12,
+                      //   sweepAngle: 100,
+                      // ),
+                      // ScaleAct.keyframes([
+                      //   .begin(1),
+                      //   .key(1.3, at: .5),
+                      //   .end(1),
+                      // ]),
                     ]),
 
                     child: Container(

@@ -5,7 +5,7 @@ class _OnHoverCue extends SelfAnimatedCue {
     super.key,
     required super.child,
     super.debugLabel,
-    super.motion = const CueMotion.timed(Duration(milliseconds: 200)),
+    super.motion = const CueMotion.linear(Duration(milliseconds: 200)),
     this.cursor = MouseCursor.defer,
     this.opaque = false,
     super.act,

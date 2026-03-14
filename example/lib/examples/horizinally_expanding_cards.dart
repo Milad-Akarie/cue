@@ -54,6 +54,7 @@ class _HorizontallyExpandingCardsState extends State<HorizontallyExpandingCards>
                         act: .sizedClip(
                           from: .width(availableWidth * 0.16),
                           to: .width(availableWidth * 0.6),
+                          motion: .smooth(),
                         ),
                         child: DecoratedBox(
                           decoration: BoxDecoration(

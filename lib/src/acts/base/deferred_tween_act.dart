@@ -1,48 +1,14 @@
 import 'package:cue/cue.dart';
-import 'package:cue/src/motion/simulations.dart';
+import 'package:cue/src/acts/base/act_impl.dart';
+import 'package:cue/src/motion/animtable.dart';
 import 'package:flutter/widgets.dart';
 
-abstract class DeferredTweenAct<T extends Object?> extends Act {
-  final CueMotion? motion;
-  final CueMotion? reverseMotion;
-  final Duration? delay;
-  final Duration? reverseDelay;
-
-
+abstract class DeferredTweenAct<T extends Object?> extends ActImpl<T, T> {
   const DeferredTweenAct({
-    this.motion,
-    this.reverseMotion,
-    this.delay,
-    this.reverseDelay,
+    super.motion,
+    super.delay,
+    super.reverse = const ReverseBehavior.mirror(),
   });
-
-  @override
-  List<(Act, ActContext)> resolve(ActContext context) {
-    return [
-      (
-        this,
-        context.copyWith(
-          motion: motion,
-          reverseMotion: reverseMotion,
-          delay: delay,
-          reverseDelay: reverseDelay,
-        ),
-      ),
-    ];
-  }
-
-  @override
-  DeferredCueAnimation<T> buildAnimation(CueTimeline timline, ActContext context) {
-    final driver = timline.animationFor(
-      AnimationConfig(
-        motion: motion ?? context.motion,
-        reverseMotion: reverseMotion ?? context.reverseMotion,
-        delay: delay ?? context.delay,
-        reverseDelay: reverseDelay ?? context.reverseDelay,
-        ),
-    );
-    return DeferredCueAnimation(parent: driver, context: context);
-  }
 
   @override
   Widget build(BuildContext context, covariant Animation<Object?> animation, Widget child) {
@@ -53,19 +19,12 @@ abstract class DeferredTweenAct<T extends Object?> extends Act {
     return apply(context, animation as DeferredCueAnimation<T>, child);
   }
 
+  @override
   Widget apply(BuildContext context, covariant DeferredCueAnimation<T> animation, Widget child);
 
   @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    if (other.runtimeType != runtimeType) return false;
-    return other is DeferredTweenAct<T> &&
-        other.motion == motion &&
-        other.reverseMotion == reverseMotion &&
-        other.delay == delay &&
-        other.reverseDelay == reverseDelay;
+  (CueAnimtable<T> animtable, CueAnimtable<T>? reverseAnimtable) buildTweens(ActContext context, {ValueTransformer<T, T>? transform}) {
+    throw StateError('DeferredTweenAct does not build a tween directly. It should be used with a DeferredCueAnimation that will set the tween later.');
   }
-
-  @override
-  int get hashCode => Object.hash(motion, reverseMotion, delay, reverseDelay);
 }
+

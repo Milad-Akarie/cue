@@ -4,55 +4,59 @@ import 'package:cue/src/motion/cue_motion.dart';
 import 'package:flutter/material.dart';
 
 abstract class CueTimeline {
-  CueSimulationAnimation animationFor(AnimationConfig config);
-  void prepare({required bool forward, double velocity = 0.0});
-  void release(CueSimulationAnimation anim);
+  CueAnimationDriver animationFor(AnimationConfig config);
+  void prepare({required bool forward});
+  void release(CueAnimationDriver anim);
 }
 
 class CueTimelineImpl extends Simulation implements CueTimeline {
-  final Map<AnimationConfig, CueSimulationAnimation> _animations;
+  final Map<AnimationConfig, CueAnimationDriver> _animations;
 
-  CueTimelineImpl(CueSimulationAnimationImpl main)
+  CueTimelineImpl(CueAnimationDriverImpl main)
     : _animations = {
         AnimationConfig(motion: main.motion, reverseMotion: main.reverseMotion): main,
       };
 
   double _lastT = 0.0;
 
-  CueSimulationAnimation get mainAnimation => _animations.values.first;
+  CueAnimationDriver get mainAnimation => _animations.values.first;
 
   @override
-  CueSimulationAnimation animationFor(AnimationConfig config) {
+  CueAnimationDriver animationFor(AnimationConfig config) {
     final mainConfig = _animations.keys.first;
     final forwardMotion = config.motion ?? mainConfig.motion!;
     final reverseMotion = config.reverseMotion ?? mainConfig.reverseMotion;
     final key = config.copyWith(motion: forwardMotion, reverseMotion: reverseMotion);
     final animation = _animations.putIfAbsent(
       key,
-      () => CueSimulationAnimationImpl(
+      () => CueAnimationDriverImpl(
         forwardMotion,
         reverseMotion: reverseMotion,
         delay: config.delay ?? Duration.zero,
         reverseDelay: config.reverseDelay ?? Duration.zero,
       ),
     );
-    animation.prepare(
-      forward: mainAnimation.status.isForwardOrCompleted,
-      velocity: mainAnimation.velocity,
-    );
+
+    // if already animating eagerly prepare the new animation to match the current progress and velocity
+    if (mainAnimation.isAnimating) {
+      animation.prepare(
+        forward: mainAnimation.isForwardOrCompleted,
+        velocity: mainAnimation.velocity,
+      );
+    }
     return animation;
   }
 
   @override
-  void release(CueSimulationAnimation anim) {
+  void release(CueAnimationDriver anim) {
     assert(_animations.values.first != anim, "Cannot remove main animation from ProxySimulation");
   }
 
   @override
-  void prepare({required bool forward, double velocity = 0.0}) {
+  void prepare({required bool forward}) {
     _lastT = 0.0;
     for (final anim in _animations.values) {
-      anim.prepare(forward: forward, velocity: velocity);
+      anim.prepare(forward: forward);
     }
   }
 
@@ -75,8 +79,8 @@ class CueTimelineImpl extends Simulation implements CueTimeline {
   bool isDone(double time) => _animations.values.every((anim) => anim.isDone);
 }
 
-abstract class CueSimulationAnimation extends Animation<double> with AnimationLocalStatusListenersMixin {
-  void prepare({required bool forward, double velocity = 0.0});
+abstract class CueAnimationDriver extends Animation<double> with AnimationLocalStatusListenersMixin {
+  void prepare({required bool forward, double? velocity});
 
   void advance(double progress);
 
@@ -84,26 +88,30 @@ abstract class CueSimulationAnimation extends Animation<double> with AnimationLo
 
   double get velocity;
 
+  int get phase;
+
   @override
   void didRegisterListener() {}
 
   @override
   void didUnregisterListener() {}
+
+  bool get isReverseOrDismissed => status == AnimationStatus.reverse || status == AnimationStatus.dismissed;
 }
 
-class CueSimulationAnimationImpl extends CueSimulationAnimation with AnimationLocalListenersMixin {
+class CueAnimationDriverImpl extends CueAnimationDriver with AnimationLocalListenersMixin {
   final CueMotion motion;
   final CueMotion? reverseMotion;
   final Duration delay;
   final Duration reverseDelay;
 
-  Simulation? _sim;
+  CueSimulation? _sim;
   double _value = 0.0;
   double _localT = 0.0;
   double _delaySeconds = 0.0;
   bool _done = true; // idle until prepared
 
-   CueSimulationAnimationImpl(
+  CueAnimationDriverImpl(
     this.motion, {
     this.reverseMotion,
     this.delay = Duration.zero,
@@ -126,10 +134,10 @@ class CueSimulationAnimationImpl extends CueSimulationAnimation with AnimationLo
   bool _forward = true;
 
   @override
-  void prepare({required bool forward, double velocity = 0.0}) {
+  void prepare({required bool forward, double? velocity}) {
     _forward = forward;
     final active = forward ? motion : (reverseMotion ?? motion);
-    _sim = active.build(forward, _value, velocity);
+    _sim = active.build(forward, _sim?.phase ?? 0, _sim?.progress ?? _value, velocity ?? this.velocity);
     _delaySeconds = (forward ? delay : (reverseDelay)).inMicroseconds / Duration.microsecondsPerSecond;
     _localT = 0.0;
     _done = false;
@@ -163,9 +171,12 @@ class CueSimulationAnimationImpl extends CueSimulationAnimation with AnimationLo
     final t = (_localT - _delaySeconds).clamp(0.0, double.infinity);
     return _sim!.dx(t);
   }
+
+  @override
+  int get phase => _sim?.phase ?? 0;
 }
 
-class CueProgressAnimations extends CueSimulationAnimation with AnimationLocalListenersMixin implements CueTimeline {
+class CueProgressAnimations extends CueAnimationDriver with AnimationLocalListenersMixin implements CueTimeline {
   double _value;
   AnimationStatus _status;
 
@@ -176,7 +187,7 @@ class CueProgressAnimations extends CueSimulationAnimation with AnimationLocalLi
   final _linearMotion = const LinearSimulationMotion();
 
   @override
-  CueSimulationAnimation animationFor(AnimationConfig config) {
+  CueAnimationDriver animationFor(AnimationConfig config) {
     if (config.motion == null && config.reverseMotion == null) {
       return this;
     }
@@ -197,12 +208,12 @@ class CueProgressAnimations extends CueSimulationAnimation with AnimationLocalLi
   double get value => _value;
 
   @override
-  void prepare({required bool forward, double velocity = 0.0}) {
+  void prepare({required bool forward, double? velocity}) {
     // no-op
   }
 
   @override
-  void release(CueSimulationAnimation anim) {
+  void release(CueAnimationDriver anim) {
     // TODO: implement release
   }
 
@@ -232,9 +243,12 @@ class CueProgressAnimations extends CueSimulationAnimation with AnimationLocalLi
 
   @override
   double get velocity => 0.0;
+
+  @override
+  int get phase => 0;
 }
 
-class BakedSimulationAnimation extends CueSimulationAnimation with AnimationLocalListenersMixin {
+class BakedSimulationAnimation extends CueAnimationDriver with AnimationLocalListenersMixin {
   final BakedMotion motion;
   final BakedMotion? reverseMotion;
 
@@ -253,7 +267,7 @@ class BakedSimulationAnimation extends CueSimulationAnimation with AnimationLoca
   AnimationStatus get status => _status;
 
   @override
-  void prepare({required bool forward, double velocity = 0.0}) {
+  void prepare({required bool forward, double? velocity}) {
     // no-op we're using pre-baked values
   }
 
@@ -275,6 +289,9 @@ class BakedSimulationAnimation extends CueSimulationAnimation with AnimationLoca
 
   @override
   double get velocity => 0.0;
+
+  @override
+  int get phase => 0;
 }
 
 class BakedMotion {

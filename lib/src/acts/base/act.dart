@@ -3,10 +3,9 @@ import 'dart:ui';
 
 import 'package:cue/cue.dart';
 import 'package:cue/src/acts/base/deferred_tween_act.dart';
-import 'package:cue/src/acts/base/multi_tween_act.dart';
-import 'package:cue/src/acts/base/tween_act.dart';
-import 'package:cue/src/motion/cue_motion.dart';
-import 'package:cue/src/motion/simulations.dart';
+import 'package:cue/src/acts/base/act_impl.dart';
+import 'package:cue/src/motion/animtable.dart';
+import 'package:cue/src/motion/timeline.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -68,12 +67,12 @@ abstract class Act {
   const factory Act.fractionalSize({
     AnimatableValue<double>? widthFactor,
     AnimatableValue<double>? heightFactor,
-    AnimtableAlignment alignment,
+    AnimatableValue<AlignmentGeometry>? alignment,
     CueMotion? motion,
   }) = FractionalSizeAct;
 
   const factory Act.translate({
-     Offset from,
+    Offset from,
     Offset to,
     CueMotion? motion,
   }) = TranslateAct;
@@ -124,7 +123,7 @@ abstract class Act {
   }) = SlideAct.fromX;
 
   const factory Act.slideY({
-     double from,
+    double from,
     double to,
     CueMotion? motion,
     ReverseBehavior<double> reverse,
@@ -149,71 +148,70 @@ abstract class Act {
   const factory Act.opacity({
     required double from,
     required double to,
-      CueMotion? motion,
+    CueMotion? motion,
   }) = OpacityAct;
 
   const factory Act.fadeIn({
     double from,
     double to,
-      CueMotion? motion,
+    CueMotion? motion,
   }) = OpacityAct.fadeIn;
 
   const factory Act.fadeOut({
     double from,
     double to,
-      CueMotion? motion,
+    CueMotion? motion,
   }) = OpacityAct.fadeOut;
 
   const factory Act.align({
     AlignmentGeometry from,
     AlignmentGeometry to,
-      CueMotion? motion,
+    CueMotion? motion,
   }) = AlignAct;
 
   const factory Act.padding({
     EdgeInsetsGeometry from,
     EdgeInsetsGeometry to,
-      CueMotion? motion,
+    CueMotion? motion,
   }) = PaddingAct;
 
   const factory Act.blur({
     double from,
     double to,
-      CueMotion? motion,
+    CueMotion? motion,
   }) = BlurAct;
 
   const factory Act.focus({
     double from,
     double to,
-      CueMotion? motion,
+    CueMotion? motion,
   }) = BlurAct.focus;
 
   const factory Act.unfocus({
     double from,
     double to,
-      CueMotion? motion,
+    CueMotion? motion,
   }) = BlurAct.unfocus;
 
   const factory Act.backdropBlur({
     double from,
     double to,
-      CueMotion? motion,
+    CueMotion? motion,
     BlendMode blendMode,
   }) = BackdropBlurAct;
 
   const factory Act.colorTint({
     required Color from,
     required Color to,
-      CueMotion? motion,
+    CueMotion? motion,
   }) = ColorTintAct;
 
   const factory Act.sizedBox({
     AnimatableValue<double>? width,
     AnimatableValue<double>? height,
     AlignmentGeometry alignment,
-      CueMotion? motion,
-      Duration? delay,
-    
+    CueMotion? motion,
+    Duration? delay,
   }) = SizeAct;
 
   const factory Act.sizedClip({
@@ -228,7 +226,7 @@ abstract class Act {
     BorderRadiusGeometry borderRadius,
     AlignmentGeometry alignment,
     bool useSuperellipse,
-   CueMotion? motion,
+    CueMotion? motion,
   }) = ClipAct;
 
   const factory Act.clipHeight({
@@ -292,11 +290,11 @@ abstract class Act {
   }) = TransformAct;
 
   const factory Act.decorate({
-    AnimtableColor? color,
-    AnimtableBorderRadius borderRadius,
-    AnimtableBoxBorder? border,
-    AnimtableBoxShadow? boxShadow,
-    AnimtableGradient? gradient,
+    AnimatableValue<Color>? color,
+    AnimatableValue<BorderRadiusGeometry>? borderRadius,
+    AnimatableValue<BoxBorder>? border,
+    AnimatableValue<List<BoxShadow>>? boxShadow,
+    AnimatableValue<Gradient>? gradient,
     BoxShape shape,
     DecorationPosition position,
     CueMotion? motion,
@@ -335,7 +333,6 @@ class ComposeAct extends Act {
 
   @override
   List<(Act, ActContext)> resolve(ActContext base) {
-
     final result = <(Act, ActContext)>[];
     final context = base.copyWith(
       motion: motion,
@@ -366,6 +363,7 @@ class ComposeAct extends Act {
 
 class ActContext {
   final CueMotion? motion;
+  final Duration? parentDuration;
   final CueMotion? reverseMotion;
   final Duration? delay;
   final Duration? reverseDelay;
@@ -378,6 +376,7 @@ class ActContext {
     this.delay,
     this.reverseDelay,
     this.isBounded = true,
+    this.parentDuration,
     this.reverseMotion,
     this.textDirection = TextDirection.ltr,
     this.implicitFrom,
@@ -391,6 +390,7 @@ class ActContext {
     Object? implicitFrom,
     Duration? delay,
     Duration? reverseDelay,
+    Duration? parentDuration,
   }) {
     return ActContext(
       motion: motion ?? this.motion,
@@ -400,6 +400,7 @@ class ActContext {
       implicitFrom: implicitFrom ?? this.implicitFrom,
       delay: delay ?? this.delay,
       reverseDelay: reverseDelay ?? this.reverseDelay,
+      parentDuration: parentDuration ?? this.parentDuration,
     );
   }
 }

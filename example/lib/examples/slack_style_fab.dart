@@ -12,8 +12,8 @@ class SlackStyleFab extends StatelessWidget {
       barrierColor: Colors.transparent,
       alignment: .bottomRight,
       barrierDismissible: true,
-      motion: Spring.smooth(damping: 18),
-      reverseMotion: Spring.iosDefault(),
+      motion: .smooth(damping: 18),
+      reverseMotion: .iosDefaultSpring(),
       hideTriggerOnTransition: true,
       triggerBuilder: (_, showModal) {
         return CueModalTransition(
@@ -21,7 +21,7 @@ class SlackStyleFab extends StatelessWidget {
           barrierColor: Colors.black87,
           hideTriggerOnTransition: true,
           barrierDismissible: true,
-          motion: Spring.wobbly(),
+          motion: .wobbly(),
           triggerBuilder: (context, showModal2) {
             return GestureDetector(
               onLongPress: showModal2,
@@ -110,7 +110,11 @@ class SlackStyleFab extends StatelessWidget {
                         mainAxisAlignment: .center,
                         children: [
                           Actor(
-                            act: .compose([.focus(), .fadeIn(), .clipWidth()]),
+                            act: .compose([
+                              .focus(),
+                              .fadeIn(),
+                              .clipWidth(),
+                            ]),
                             child: Row(
                               mainAxisSize: .min,
                               mainAxisAlignment: .center,
@@ -126,8 +130,9 @@ class SlackStyleFab extends StatelessWidget {
                               [
                                 .unfocus(),
                                 .fadeOut(),
-                                .slideX(to: -2, from: 0),
+                                .slideX(to: -2, ),
                                 .rotate(to: 90),
+                                .fadeIn()
                               ],
                               delay: 100.ms,
                             ),
