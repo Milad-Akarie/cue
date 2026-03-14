@@ -72,7 +72,7 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends ActImp
     List<Keyframe<T>>? keyframes,
     List<FractionalKeyframe<T>>? fractionalKeyframes,
     Duration? fractionalKeyframesDuration,
-    CueMotion? motion,
+    required CueMotion motion,
   }) {
     if (keyframes != null) {
       assert(keyframes.isNotEmpty, 'Keyframes list cannot be empty');
@@ -86,10 +86,10 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends ActImp
       ]);
     } else if (fractionalKeyframes != null) {
       assert(fractionalKeyframes.isNotEmpty, 'Fractional keyframes list cannot be empty');
-      assert(fractionalKeyframesDuration != null, 'Duration must be provided for fractional keyframes');
+      final totalDuration = fractionalKeyframesDuration ?? motion.duration;
       final phases = Phase.resolveFractionalFrames<T, R>(
         fractionalKeyframes,
-        fractionalKeyframesDuration!,
+        totalDuration,
         (v) => transform(context, v),
       );
       return SegmentedAnimtable([
@@ -115,6 +115,7 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends ActImp
 
   @override
   (CueAnimtable<R> animtable, CueAnimtable<R>? reverseAnimtable) buildTweens(ActContext context) {
+
     final animtable = resolveTween(
       context,
       from: from,
@@ -125,9 +126,7 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends ActImp
       implicitFrom: context.implicitFrom as R?,
       motion: motion ?? context.motion,
     );
-    if (animtable is AlwaysStoppedAnimatable<R>) {
-      return (animtable, null);
-    }
+
     switch (reverse.type) {
       case ReverseBehaviorType.none:
       case ReverseBehaviorType.to:
@@ -140,7 +139,7 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends ActImp
             keyframes: reverse.keyframes,
             fractionalKeyframes: reverse.fractionalKeyframes,
             fractionalKeyframesDuration: reverse.fractionalKeyframesDuration,
-            motion: reverse.motion ?? context.reverseMotion,
+            motion: reverse.motion ?? context.reverseMotion ?? context.motion,
           );
           return (animtable, reverseAnimtable);
         }

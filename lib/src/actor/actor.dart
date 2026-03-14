@@ -66,7 +66,9 @@ class ActorState extends State<Actor> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.act != widget.act) {
       final scope = CueScope.of(context);
-      _acts = widget.act.resolve(ActContext(isBounded: scope.isBounded));
+      _acts = widget.act.resolve(
+        ActContext(motion: scope.timeline.mainMotion),
+      );
       _setupAnimations(scope);
     }
   }
@@ -82,7 +84,9 @@ class ActorState extends State<Actor> {
     super.didChangeDependencies();
     final scope = CueScope.of(context);
     if (_acts.isEmpty) {
-      _acts = widget.act.resolve(ActContext(isBounded: scope.isBounded));
+      _acts = widget.act.resolve(
+        ActContext(motion: scope.timeline.mainMotion),
+      );
     }
     if (_cachedScope?.willReanimateNotifier != scope.willReanimateNotifier) {
       _cachedScope?.willReanimateNotifier?.removeEventListener(_onWillReAnimate);

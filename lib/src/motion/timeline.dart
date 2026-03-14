@@ -7,6 +7,8 @@ abstract class CueTimeline {
   CueAnimationDriver animationFor(AnimationConfig config);
   void prepare({required bool forward});
   void release(CueAnimationDriver anim);
+
+  CueMotion get mainMotion;
 }
 
 class CueTimelineImpl extends Simulation implements CueTimeline {
@@ -77,6 +79,9 @@ class CueTimelineImpl extends Simulation implements CueTimeline {
 
   @override
   bool isDone(double time) => _animations.values.every((anim) => anim.isDone);
+
+  @override
+  CueMotion get mainMotion => _animations.keys.first.motion!;
 }
 
 abstract class CueAnimationDriver extends Animation<double> with AnimationLocalStatusListenersMixin {
@@ -246,6 +251,9 @@ class CueProgressAnimations extends CueAnimationDriver with AnimationLocalListen
 
   @override
   int get phase => 0;
+  
+  @override
+  CueMotion get mainMotion => const LinearSimulationMotion();
 }
 
 class BakedSimulationAnimation extends CueAnimationDriver with AnimationLocalListenersMixin {

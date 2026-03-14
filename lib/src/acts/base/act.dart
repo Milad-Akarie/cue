@@ -362,21 +362,17 @@ class ComposeAct extends Act {
 }
 
 class ActContext {
-  final CueMotion? motion;
-  final Duration? parentDuration;
+  final CueMotion motion;
   final CueMotion? reverseMotion;
   final Duration? delay;
   final Duration? reverseDelay;
-  final bool isBounded;
   final TextDirection textDirection;
   final Object? implicitFrom;
 
   const ActContext({
-    this.motion,
+    required this.motion,
     this.delay,
     this.reverseDelay,
-    this.isBounded = true,
-    this.parentDuration,
     this.reverseMotion,
     this.textDirection = TextDirection.ltr,
     this.implicitFrom,
@@ -390,17 +386,14 @@ class ActContext {
     Object? implicitFrom,
     Duration? delay,
     Duration? reverseDelay,
-    Duration? parentDuration,
   }) {
     return ActContext(
       motion: motion ?? this.motion,
       reverseMotion: reverseMotion ?? this.reverseMotion,
-      isBounded: isBounded ?? this.isBounded,
       textDirection: textDirection ?? this.textDirection,
       implicitFrom: implicitFrom ?? this.implicitFrom,
       delay: delay ?? this.delay,
       reverseDelay: reverseDelay ?? this.reverseDelay,
-      parentDuration: parentDuration ?? this.parentDuration,
     );
   }
 }
