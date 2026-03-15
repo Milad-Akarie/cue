@@ -6,26 +6,26 @@ class OpacityAct extends TweenAct<double> {
     super.to = 1.0,
     super.motion,
     super.reverse,
-  });
+  }) : super.tween();
 
   const OpacityAct.fadeIn({
     super.from = 0.0,
     super.to = 1.0,
     super.motion,
     super.reverse,
-  });
+  }) : super.tween();
   const OpacityAct.fadeOut({
     super.from = 1.0,
     super.to = 0.0,
     super.motion,
     super.reverse,
-  });
+  }) : super.tween();
 
-  const OpacityAct.keyframes(
-    super.keyframes, {
-    super.motion,
+  const OpacityAct.keyframed({
+    required super.frames,
+    super.delay,
     super.reverse,
-  }) : super.keyframes();
+  }) : super.keyframed();
 
   @override
   Widget apply(BuildContext context, Animation<double> animation, Widget child) {

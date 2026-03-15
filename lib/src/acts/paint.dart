@@ -4,12 +4,12 @@ class PaintAct extends TweenAct<double> {
   final EffectPainter painter;
   final bool paintOnTop;
 
-  PaintAct({
+  const PaintAct({
     required this.painter,
     this.paintOnTop = false,
     super.motion,
     super.reverse,
-  }) : super(from: 0.0, to: 1.0);
+  }) : super.tween(from: 0.0, to: 1.0);
 
   @override
   Widget apply(BuildContext context, Animation<double> animation, Widget child) {

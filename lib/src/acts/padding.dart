@@ -6,13 +6,13 @@ class PaddingAct extends TweenAct<EdgeInsetsGeometry> {
     super.to = EdgeInsets.zero,
     super.motion,
     super.reverse,
-  });
+  }) : super.tween();
 
-  const PaddingAct.keyframes(
-    super.keyframes, {
-    super.motion,
+  const PaddingAct.keyframed({
+    required super.frames,
+    super.delay,
     super.reverse,
-  }) : super.keyframes();
+  }) : super.keyframed();
 
   @override
   Animatable<EdgeInsetsGeometry> createSingleTween(EdgeInsetsGeometry from, EdgeInsetsGeometry to) {

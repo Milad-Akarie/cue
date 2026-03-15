@@ -25,7 +25,7 @@ class CardAct extends ActImpl<CardProps, CardProps> {
 
   CardAct({
     super.motion,
-    super.reverse,
+    ReverseBehavior<CardProps> super.reverse = const ReverseBehavior.mirror(),
     this.color,
     this.borderRadius,
     this.shadowColor = const AnimatableValue.fixed(Color(0xFF000000)),

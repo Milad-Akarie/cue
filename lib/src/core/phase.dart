@@ -68,15 +68,36 @@ sealed class Keyframes<T> {
 
   const factory Keyframes.fractional(
     List<FractionalKeyframe<T>> frames, {
-    required Duration duration,
+    Duration? duration,
   }) = FractionalKeyframes<T>;
 
   T get lastTarget;
+
+  Keyframes<E> mapValues<E>(E Function(T value) transform);
+
+  List<T> get values;
 }
 
 final class MotionKeyframes<T> implements Keyframes<T> {
   final List<Keyframe<T>> frames;
   const MotionKeyframes(this.frames);
+
+  @override
+  List<T> get values => List.unmodifiable(frames.map((f) => f.value));
+
+  @override
+  MotionKeyframes<E> mapValues<E>(E Function(T value) transform) {
+    return MotionKeyframes<E>(
+      List.unmodifiable(
+        frames.map(
+          (frame) => Keyframe<E>(
+            transform(frame.value),
+            motion: frame.motion,
+          ),
+        ),
+      ),
+    );
+  }
 
   @override
   T get lastTarget {
@@ -96,7 +117,26 @@ final class MotionKeyframes<T> implements Keyframes<T> {
 final class FractionalKeyframes<T> implements Keyframes<T> {
   final List<FractionalKeyframe<T>> frames;
   final Duration? duration;
-  const FractionalKeyframes(this.frames, {required this.duration});
+  const FractionalKeyframes(this.frames, {this.duration});
+
+  @override
+  List<T> get values => List.unmodifiable(frames.map((f) => f.value));
+
+  @override
+  FractionalKeyframes<E> mapValues<E>(E Function(T value) transform) {
+    return FractionalKeyframes<E>(
+      List.unmodifiable(
+        frames.map(
+          (frame) => FractionalKeyframe<E>(
+            transform(frame.value),
+            at: frame.at,
+            curve: frame.curve,
+          ),
+        ),
+      ),
+      duration: duration,
+    );
+  }
 
   @override
   T get lastTarget {
@@ -186,13 +226,15 @@ class Phase<T extends Object?> {
       ];
     }
 
-    // Calculate phases with weights based on time differences
+    // Calculate phases with weights based on time differences.
+    // Each frame's curve describes how to arrive at that frame (target curve).
+    // The first frame is the starting point; its curve is ignored.
     final List<Phase<R>> phases = [];
     for (int i = 0; i < sortedTimes.length - 1; i++) {
       final currentTime = sortedTimes[i];
       final nextTime = sortedTimes[i + 1];
       final weight = nextTime - currentTime;
-      final curve = frameCurves[currentTime] ?? Curves.linear;
+      final curve = frameCurves[nextTime] ?? Curves.linear;
 
       phases.add(
         Phase(
@@ -216,8 +258,8 @@ class Phase<T extends Object?> {
 
     final List<Phase<R>> phases = [];
 
-    // First frame is the starting point, its motion is ignored (it's where we start)
-    // Create phases for transitions from first frame onward
+    // Each frame's motion describes how to arrive at that frame (target motion).
+    // The first frame is the starting point; its motion is ignored.
     for (int i = 0; i < frames.length - 1; i++) {
       final currentFrame = frames[i];
       final nextFrame = frames[i + 1];
@@ -226,7 +268,7 @@ class Phase<T extends Object?> {
         Phase(
           begin: transform(currentFrame.value),
           end: transform(nextFrame.value),
-          motion: currentFrame.motion,
+          motion: nextFrame.motion,
         ),
       );
     }

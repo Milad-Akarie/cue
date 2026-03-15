@@ -21,6 +21,8 @@ sealed class CueMotion {
 
   const factory CueMotion.linear(Duration duration) = TimedMotion;
 
+  static const jump = TimedMotion(Duration.zero);
+
   static const CueMotion defaultDuration = TimedMotion(
     Duration(milliseconds: 300),
   );
@@ -194,7 +196,7 @@ class LinearSimulation extends Simulation with CueSimulation {
   double dx(double time) => 0.0;
 
   @override
-  bool isDone(double time) => false;
+  bool isDone(double time) => true;
 
   @override
   double x(double time) => _progress = time;

@@ -7,16 +7,16 @@ class ColorTintAct extends TweenAct<Color?> {
     super.motion,
     super.reverse,
     this.blendMode = BlendMode.srcIn,
-  });
+  }) : super.tween();
 
   final BlendMode blendMode;
 
-  const ColorTintAct.keyframes(
-    super.keyframes, {
-    super.motion,
+  const ColorTintAct.keyframed({
+    required super.frames,
     super.reverse,
+    super.delay,
     this.blendMode = BlendMode.srcIn,
-  }) : super.keyframes();
+  }) : super.keyframed();
 
   @override
   Animatable<Color?> createSingleTween(Color? from, Color? to) {

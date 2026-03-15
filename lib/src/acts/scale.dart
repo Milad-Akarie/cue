@@ -4,12 +4,12 @@ class ScaleAct extends TweenAct<double> {
   final AlignmentGeometry? alignment;
 
   const ScaleAct({
-    required super.from,
-    required super.to,
+    super.from = 1.0,
+    super.to = 1.0,
     super.motion,
     super.reverse,
     this.alignment,
-  });
+  }) : super.tween();
 
   const ScaleAct.zoomIn({
     super.from = 0.0,
@@ -17,7 +17,7 @@ class ScaleAct extends TweenAct<double> {
     super.motion,
     super.reverse,
     this.alignment,
-  });
+  }) : super.tween();
 
   const ScaleAct.zoomOut({
     super.from = 1.0,
@@ -25,14 +25,14 @@ class ScaleAct extends TweenAct<double> {
     super.motion,
     super.reverse,
     this.alignment,
-  });
+  }) : super.tween();
 
-  const ScaleAct.keyframes(
-    super.keyframes, {
-    super.motion,
+  const ScaleAct.keyframed({
+    required super.frames,
     super.reverse,
+    super.delay,
     this.alignment,
-  }) : super.keyframes();
+  }) : super.keyframed();
 
   @override
   Widget apply(BuildContext context, Animation<double> animation, Widget child) {

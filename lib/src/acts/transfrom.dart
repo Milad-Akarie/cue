@@ -8,18 +8,17 @@ class TransformAct extends TweenAct<Matrix4> {
     super.reverse,
     this.alignment,
     this.origin,
-  });
+  }) : super.tween();
 
   final AlignmentGeometry? alignment;
   final Offset? origin;
 
-  const TransformAct.keyframes(
-    super.keyframes, {
-    super.motion,
+  const TransformAct.keyframed({
+    required super.frames,  
     super.reverse,
     this.alignment,
     this.origin,
-  }) : super.keyframes();
+  }) : super.keyframed();
 
   @override
   Animatable<Matrix4> createSingleTween(Matrix4 from, Matrix4 to) {

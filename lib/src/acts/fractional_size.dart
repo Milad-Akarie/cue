@@ -10,6 +10,7 @@ class FractionalSizeAct extends ActImpl<FractionaSizeProps, FractionaSizeProps> 
     this.widthFactor,
     this.heightFactor,
     this.alignment = const AnimatableValue.fixed(Alignment.center),
+    ReverseBehavior<FractionaSizeProps> super.reverse = const ReverseBehavior.mirror(),
   });
 
   @override
@@ -34,6 +35,7 @@ class FractionalSizeAct extends ActImpl<FractionaSizeProps, FractionaSizeProps> 
     ActContext context, {
     ValueTransformer<FractionaSizeProps, FractionaSizeProps>? transform,
   }) {
+    //TODL: handle reverse motion
     final iFrom = context.implicitFrom as FractionaSizeProps?;
     final from =
         iFrom ??

@@ -5,24 +5,27 @@ class SizedClipAct extends DeferredTweenAct<Size?> {
   final Clip clipBehavior;
   final NSize? from;
   final NSize? to;
-  final List<KeyframeBase<NSize>>? keyframes;
+  final Keyframes<NSize>? frames;
+  final ReverseBehaviorBase<NSize> _reverse;
 
   const SizedClipAct({
     this.from = NSize.childSize,
     this.to = NSize.childSize,
     super.motion,
-    super.reverse,
     this.alignment,
     this.clipBehavior = Clip.hardEdge,
-  }) : keyframes = null;
+    ReverseBehavior<NSize> reverse = const ReverseBehavior.mirror(),
+  }) : frames = null,
+       _reverse = reverse;
 
-  const SizedClipAct.keyframes(
-    List<KeyframeBase<NSize>> this.keyframes, {
-    super.motion,
-    super.reverse,
+  const SizedClipAct.keyframed({
+    required Keyframes<NSize> this.frames,
+    super.delay,
     this.alignment,
     this.clipBehavior = Clip.hardEdge,
-  }) : from = null,
+    KFReverseBehavior<NSize> reverse = const KFReverseBehavior.mirror(),
+  }) : _reverse = reverse,
+       from = null,
        to = null;
 
   @override
@@ -34,10 +37,32 @@ class SizedClipAct extends DeferredTweenAct<Size?> {
           clipBehavior == other.clipBehavior &&
           from == other.from &&
           to == other.to &&
-          listEquals(keyframes, other.keyframes);
+          _reverse == other._reverse &&
+          frames == other.frames &&
+          delay == other.delay &&
+          _reverse == other._reverse;
 
   @override
-  int get hashCode => Object.hash(alignment, clipBehavior, from, to, Object.hashAll(keyframes ?? const []));
+  int get hashCode => Object.hash(alignment, clipBehavior, from, to, delay, _reverse, frames);
+
+  @override
+  (CueAnimtable<Size?>, CueAnimtable<Size?>?) buildTweens(ActContext context) {
+    // we build a fake tweens here just to extract motion
+    // the actual tween will be built later.
+    final builder = _NullableSizeActBuilder(
+      motion: motion ?? context.motion,
+      delay: delay ?? context.delay,
+      frames: frames?.mapValues((v) => null),
+      reverse: _reverse.mapValues((v) => null),
+    );
+    return builder.buildTweens(context);
+  }
+
+  @override
+  CueAnimation<Size> buildAnimation(CueTimeline timline, ActContext context) {
+    final superDriver = super.buildAnimation(timline, context);
+    return DeferredCueAnimation<Size>(parent: superDriver.parent, context: context);
+  }
 
   @override
   Widget apply(BuildContext context, DeferredCueAnimation<Size?> animation, Widget child) {
@@ -45,7 +70,8 @@ class SizedClipAct extends DeferredTweenAct<Size?> {
       driver: animation,
       from: from,
       to: to,
-      sizeKeyframes: keyframes,
+      frames: frames,
+      reverse: _reverse,
       alignment: alignment ?? Alignment.center,
       clipBehavior: clipBehavior,
       child: child,
@@ -58,16 +84,18 @@ class _AnimatedSizeClip extends SingleChildRenderObjectWidget {
     required this.driver,
     required this.from,
     required this.to,
-    required this.sizeKeyframes,
+    required this.frames,
+    required this.reverse,
     this.alignment = Alignment.center,
     this.clipBehavior = Clip.hardEdge,
     required super.child,
   });
 
   final DeferredCueAnimation<Size?> driver;
+  final ReverseBehaviorBase<NSize> reverse;
   final NSize? from;
   final NSize? to;
-  final List<KeyframeBase<NSize>>? sizeKeyframes;
+  final Keyframes<NSize>? frames;
   final AlignmentGeometry alignment;
   final Clip clipBehavior;
 
@@ -77,7 +105,8 @@ class _AnimatedSizeClip extends SingleChildRenderObjectWidget {
       driver: driver,
       fromSize: from,
       toSize: to,
-      sizeKeyframes: sizeKeyframes,
+      frames: frames,
+      reverse: reverse,
       alignment: alignment,
       textDirection: Directionality.maybeOf(context),
       clipBehavior: clipBehavior,
@@ -93,7 +122,8 @@ class _AnimatedSizeClip extends SingleChildRenderObjectWidget {
       ..driver = driver
       ..fromSize = from
       ..toSize = to
-      ..keyframes = sizeKeyframes
+      ..frames = frames
+      ..reverse = reverse
       ..alignment = alignment
       ..textDirection = Directionality.maybeOf(context)
       ..clipBehavior = clipBehavior;
@@ -105,21 +135,21 @@ class _RenderAnimatedSizeClip extends RenderAligningShiftedBox {
     required DeferredCueAnimation<Size?> driver,
     required NSize? fromSize,
     required NSize? toSize,
-    required List<KeyframeBase<NSize>>? sizeKeyframes,
+    required Keyframes<NSize>? frames,
+    required ReverseBehaviorBase<NSize> reverse,
     super.alignment,
     super.textDirection,
     Clip clipBehavior = Clip.hardEdge,
   }) : _driver = driver,
        _from = fromSize,
        _to = toSize,
-       _keyframes = sizeKeyframes,
+       _frames = frames,
+       _reverse = reverse,
        _clipBehavior = clipBehavior {
-    _addintionalConstrains = _calculateAddintionalContrains();
+    _addintionalConstrains = _calculateAddintionalConstrains();
   }
 
   DeferredCueAnimation<Size?> _driver;
-
-  DeferredCueAnimation<Size?> get driver => _driver;
 
   set driver(DeferredCueAnimation<Size?> newDriver) {
     if (_driver == newDriver) return;
@@ -145,11 +175,18 @@ class _RenderAnimatedSizeClip extends RenderAligningShiftedBox {
     _invalidateAnimationCache();
   }
 
-  List<KeyframeBase<NSize>>? _keyframes;
+  Keyframes<NSize>? _frames;
 
-  set keyframes(List<KeyframeBase<NSize>>? value) {
-    if (_keyframes == value) return;
-    _keyframes = value;
+  set frames(Keyframes<NSize>? value) {
+    if (_frames == value) return;
+    _frames = value;
+    _invalidateAnimationCache();
+  }
+
+  ReverseBehaviorBase<NSize> _reverse;
+  set reverse(ReverseBehaviorBase<NSize> value) {
+    if (_reverse == value) return;
+    _reverse = value;
     _invalidateAnimationCache();
   }
 
@@ -176,11 +213,11 @@ class _RenderAnimatedSizeClip extends RenderAligningShiftedBox {
   void _invalidateAnimationCache() {
     _driver.setAnimatable(null);
     _cachedMaxSize = null;
-    _addintionalConstrains = _calculateAddintionalContrains();
+    _addintionalConstrains = _calculateAddintionalConstrains();
     markNeedsLayout();
   }
 
-  BoxConstraints _calculateAddintionalContrains() {
+  BoxConstraints _calculateAddintionalConstrains() {
     double? maxWidth;
     double? maxHeight;
 
@@ -201,15 +238,21 @@ class _RenderAnimatedSizeClip extends RenderAligningShiftedBox {
         maxHeight = null;
       }
     }
-
-    if (_keyframes != null) {
-      for (final kf in _keyframes!) {
-        checkNSize(kf.value);
+    if (_frames != null) {
+      for (final value in _frames!.values) {
+        checkNSize(value);
+      }
+      if (_reverse.frames != null) {
+        for (final value in _reverse.frames!.values) {
+          checkNSize(value);
+        }
       }
     } else {
       checkNSize(_from);
       checkNSize(_to);
+      checkNSize(_reverse.to);
     }
+
     return BoxConstraints.tightFor(width: maxWidth, height: maxHeight);
   }
 
@@ -229,32 +272,33 @@ class _RenderAnimatedSizeClip extends RenderAligningShiftedBox {
       }
       return value;
     }
-
     return Size(
       resolveAxis(nsize.w, maxConstraint.width, childSize.width),
       resolveAxis(nsize.h, maxConstraint.height, childSize.height),
     );
   }
 
-  // Size _calculateMaxSize(AnimtableSize animtable) {
-  //   final allValues = [
-  //     animtable.from,
-  //     animtable.to,
-  //     ...?animtable.keyframes?.map((kf) => kf.value),
-  //   ].whereType<Size>();
+  Size _calculateMaxSize(_NullableSizeActBuilder builder) {
+    final allValues = [
+      builder.from,
+      builder.to,
+      ...?builder.frames?.values,
+      ...?builder.reverse.frames?.values,
+      builder.reverse.to,
+    ].whereType<Size>();
 
-  //   double maxWidth = 0;
-  //   double maxHeight = 0;
-  //   for (final size in allValues) {
-  //     if (size.width > maxWidth) {
-  //       maxWidth = size.width;
-  //     }
-  //     if (size.height > maxHeight) {
-  //       maxHeight = size.height;
-  //     }
-  //   }
-  //   return Size(maxWidth, maxHeight);
-  // }
+    double maxWidth = 0;
+    double maxHeight = 0;
+    for (final size in allValues) {
+      if (size.width > maxWidth) {
+        maxWidth = size.width;
+      }
+      if (size.height > maxHeight) {
+        maxHeight = size.height;
+      }
+    }
+    return Size(maxWidth, maxHeight);
+  }
 
   void _buildAnimationIfNeeded(Size maxConstrains, Size childSize) {
     // Check if we need to rebuild the animation
@@ -266,26 +310,26 @@ class _RenderAnimatedSizeClip extends RenderAligningShiftedBox {
     final from = iFrom ?? _resolveSize(_from, maxConstrains, childSize);
     final to = _resolveSize(_to, maxConstrains, childSize);
     final tween = SizeTween(begin: from, end: to);
-    //TODO: handle keyframes and max size calcuation
 
     // // Build the tween from phases
-    // final animtable = AnimtableSize(
-    //   from: _resolveSize(_from, maxConstrains, childSize),
-    //   to: _resolveSize(_to, maxConstrains, childSize),
-    //   keyframes: _keyframes != null
-    //       ? [
-    //           for (final kf in _keyframes!)
-    //             Keyframe<Size?>(
-    //               _resolveSize(kf.value, maxConstrains, childSize),
-    //               at: kf.at,
-    //             ),
-    //         ]
-    //       : null,
-    // );
+    final builder = _NullableSizeActBuilder(
+      from: _resolveSize(_from, maxConstrains, childSize),
+      to: _resolveSize(_to, maxConstrains, childSize),
+      frames: _frames?.mapValues((v) => _resolveSize(v, maxConstrains, childSize)),
+      reverse: _reverse.mapValues((v) => _resolveSize(v, maxConstrains, childSize)),
+    );
+
+    final (animtable, reverseAnimtable) = builder.buildTweens(_driver.context);
+
+    final effectiveAnimatable = reverseAnimtable == null
+        ? animtable
+        : DualAnimatable(forward: animtable, reverse: reverseAnimtable);
+
+    _driver.setAnimatable(effectiveAnimatable);
+
     // Build and cache the animation
-    _driver.setAnimatable(TweenAnimtable(tween, motion: _driver.context.motion));
     _cachedMaxSize = tween.end ?? Size.zero;
-    // _cachedMaxSize = _calculateMaxSize(animtable);
+    _cachedMaxSize = _calculateMaxSize(builder);
     _lastConstraintSize = maxConstrains;
     _lastChildNaturalSize = childSize;
   }
@@ -415,4 +459,27 @@ class NSize {
 
   @override
   String toString() => 'NSize(width: $w, height: $h)';
+}
+
+class _NullableSizeActBuilder extends TweenAct<Size?> {
+  const _NullableSizeActBuilder({
+    super.motion,
+    super.delay,
+    super.from,
+    super.to,
+    super.frames,
+    super.reverse,
+  }) : super();
+
+  @override
+  Animatable<Size?> createSingleTween(Size? from, Size? to) {
+    return SizeTween(begin: from, end: to);
+  }
+
+  @override
+  Widget apply(BuildContext context, covariant CueAnimation<Size?> animation, Widget child) {
+    throw UnimplementedError(
+      'This class is only used to build the animatable for SizeAct and should never be built itself.',
+    );
+  }
 }

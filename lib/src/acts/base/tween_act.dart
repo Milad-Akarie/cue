@@ -162,6 +162,16 @@ class ReverseBehaviorBase<T> {
 
   bool get needsReverseTween => type == ReverseBehaviorType.to;
 
+  ReverseBehaviorBase<E> mapValues<E>(E Function(T value) transform) {
+    return ReverseBehaviorBase<E>._(
+      type: type,
+      to: to == null ? null : transform(to as T),
+      frames: frames?.mapValues(transform),
+      motion: motion,
+      delay: delay,
+    );
+  }
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;

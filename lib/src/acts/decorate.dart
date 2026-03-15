@@ -16,7 +16,7 @@ class DecoratedBoxAct extends ActImpl<Decoration, Decoration> {
     this.boxShadow,
     this.gradient,
     super.motion,
-    // super.reverse,
+    ReverseBehavior<Decoration> super.reverse = const ReverseBehavior.mirror(),
     this.position = DecorationPosition.background,
     this.shape = BoxShape.rectangle,
   });
@@ -64,8 +64,13 @@ class DecoratedBoxAct extends ActImpl<Decoration, Decoration> {
     //   }
     // }
 
-
-    return (TweenAnimtable(DecorationTween(begin: from, end: to), motion: motion ?? context.motion), null);
+    return (
+      TweenAnimtable(
+        DecorationTween(begin: from, end: to),
+        motion: motion ?? context.motion,
+      ),
+      null,
+    );
   }
 
   @override

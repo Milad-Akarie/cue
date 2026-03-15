@@ -9,28 +9,30 @@ class RotateLayoutAct extends TweenAct<double> {
     super.motion,
     super.reverse,
     this.unit = RotateUnit.degrees,
-  });
+  }) : super.tween();
 
-  const RotateLayoutAct.keyframes(
-    super.keyframes, {
-    super.motion,
+  const RotateLayoutAct.keyframed({
+    required super.frames,
     super.reverse,
+    super.delay,
     this.unit = RotateUnit.radians,
-  }) : super.keyframes();
+  }) : super.keyframed();
 
   const RotateLayoutAct.degrees({
     super.from = 0,
     super.to = 0,
     super.motion,
     super.reverse,
-  }) : unit = RotateUnit.degrees;
+  }) : unit = RotateUnit.degrees,
+       super.tween();
 
   const RotateLayoutAct.turns({
     super.from = 0,
     super.to = 0,
     super.motion,
     super.reverse,
-  }) : unit = RotateUnit.quarterTurns;
+  }) : unit = RotateUnit.quarterTurns,
+       super.tween();
 
   @override
   double transform(_, double value) {

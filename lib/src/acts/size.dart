@@ -4,9 +4,7 @@ class SizedBoxAct extends DeferredTweenAct<Size> {
   final AnimatableValue<double>? width;
   final AnimatableValue<double>? height;
   final AlignmentGeometry alignment;
-  final List<Keyframe<Size>>? keyframes;
-  final List<FractionalKeyframe<Size>>? fractionalKeyframes;
-  final Duration? fractionalKeyframesDuration;
+  final Keyframes<Size>? frames;
 
   const SizedBoxAct({
     super.motion,
@@ -14,32 +12,16 @@ class SizedBoxAct extends DeferredTweenAct<Size> {
     this.width,
     this.height,
     this.alignment = Alignment.center,
-    super.reverse,
-  }) : keyframes = null,
-       fractionalKeyframes = null,
-       fractionalKeyframesDuration = null;
+    ReverseBehavior<Size> super.reverse = const ReverseBehavior.mirror(),
+  }) : frames = null;
 
-  const SizedBoxAct.keyframes(
-    this.keyframes, {
+  const SizedBoxAct.keyframed({
+    required Keyframes<Size> this.frames,
     super.delay,
     this.alignment = Alignment.center,
-    super.reverse,
+    KFReverseBehavior<Size> super.reverse = const KFReverseBehavior.mirror(),
   }) : width = null,
-       height = null,
-       fractionalKeyframes = null,
-       fractionalKeyframesDuration = null;
-
-  const SizedBoxAct.fractionalKeyframes(
-    List<FractionalKeyframe<Size>> this.fractionalKeyframes, {
-    super.motion,
-    super.delay,
-    this.alignment = Alignment.center,
-    Duration? duration,
-    super.reverse,
-  }) : width = null,
-       height = null,
-       keyframes = null,
-       fractionalKeyframesDuration = duration;
+       height = null;
 
   @override
   (CueAnimtable<Size>, CueAnimtable<Size>?) buildTweens(ActContext context) {
@@ -48,11 +30,7 @@ class SizedBoxAct extends DeferredTweenAct<Size> {
     final builder = _SizeActBuilder(
       motion: motion,
       delay: delay,
-      from: Size.zero,
-      to: Size.infinite,
-      frames: keyframes,
-      fractionalKeyframes: fractionalKeyframes,
-      fractionalKeyframesDuration: fractionalKeyframesDuration,
+      frames: frames,
       reverse: reverse,
     );
     return builder.buildTweens(context);
@@ -71,9 +49,7 @@ class SizedBoxAct extends DeferredTweenAct<Size> {
       width: width,
       height: height,
       alignment: alignment,
-      keyframes: keyframes,
-      fractionalKeyframes: fractionalKeyframes,
-      fractionalKeyframesDuration: fractionalKeyframesDuration,
+      keyframes: frames,
       reverse: reverse,
       child: child,
     );
@@ -87,18 +63,17 @@ class SizedBoxAct extends DeferredTweenAct<Size> {
           width == other.width &&
           height == other.height &&
           alignment == other.alignment &&
-          listEquals(keyframes, other.keyframes) &&
-          listEquals(fractionalKeyframes, other.fractionalKeyframes) &&
-          fractionalKeyframesDuration == other.fractionalKeyframesDuration;
+          frames == other.frames &&
+          reverse == other.reverse;
 
   @override
   int get hashCode => Object.hash(
     super.hashCode,
     width,
     height,
-    Object.hashAll(keyframes ?? []),
-    Object.hashAll(fractionalKeyframes ?? []),
-    fractionalKeyframesDuration,
+    alignment,
+    frames,
+    reverse,
   );
 }
 
@@ -110,8 +85,6 @@ class _AnimatedSizedBox extends SingleChildRenderObjectWidget {
     this.height,
     this.alignment = Alignment.center,
     this.keyframes,
-    this.fractionalKeyframes,
-    this.fractionalKeyframesDuration,
     required this.reverse,
   });
 
@@ -119,10 +92,8 @@ class _AnimatedSizedBox extends SingleChildRenderObjectWidget {
   final DeferredCueAnimation<Size> driver;
   final AnimatableValue<double>? width;
   final AnimatableValue<double>? height;
-  final List<Keyframe<Size>>? keyframes;
-  final List<FractionalKeyframe<Size>>? fractionalKeyframes;
-  final Duration? fractionalKeyframesDuration;
-  final ReverseBehavior<Size> reverse;
+  final Keyframes<Size>? keyframes;
+  final ReverseBehaviorBase<Size> reverse;
 
   @override
   _AnimtableRenderConstrainedBox createRenderObject(BuildContext context) {
@@ -132,8 +103,6 @@ class _AnimatedSizedBox extends SingleChildRenderObjectWidget {
       heightInput: height,
       alignment: alignment.resolve(Directionality.maybeOf(context)),
       keyframes: keyframes,
-      fractionalKeyframes: fractionalKeyframes,
-      fractionalKeyframesDuration: fractionalKeyframesDuration,
       reverse: reverse,
     );
   }
@@ -149,8 +118,6 @@ class _AnimatedSizedBox extends SingleChildRenderObjectWidget {
       ..width = width
       ..height = height
       ..keyframes = keyframes
-      ..fractionalKeyframes = fractionalKeyframes
-      ..fractionalKeyframesDuration = fractionalKeyframesDuration
       ..reverse = reverse;
   }
 }
@@ -161,17 +128,13 @@ class _AnimtableRenderConstrainedBox extends RenderConstrainedBox {
     AnimatableValue<double>? widthInput,
     AnimatableValue<double>? heightInput,
     Alignment alignment = Alignment.center,
-    List<Keyframe<Size>>? keyframes,
-    List<FractionalKeyframe<Size>>? fractionalKeyframes,
-    Duration? fractionalKeyframesDuration,
-    required ReverseBehavior<Size> reverse,
+    Keyframes<Size>? keyframes,
+    required ReverseBehaviorBase<Size> reverse,
   }) : _driver = driver,
        _alignment = alignment,
        _width = widthInput,
        _height = heightInput,
        _keyframes = keyframes,
-       _fractionalKeyframes = fractionalKeyframes,
-       _fractionalKeyframesDuration = fractionalKeyframesDuration,
        _reverse = reverse,
        super(additionalConstraints: BoxConstraints());
 
@@ -209,9 +172,9 @@ class _AnimtableRenderConstrainedBox extends RenderConstrainedBox {
     _invalidateAnimationCache();
   }
 
-  List<Keyframe<Size>>? _keyframes;
+  Keyframes<Size>? _keyframes;
 
-  set keyframes(List<Keyframe<Size>>? value) {
+  set keyframes(Keyframes<Size>? value) {
     if (_keyframes == value) return;
     _keyframes = value;
   }
@@ -230,9 +193,9 @@ class _AnimtableRenderConstrainedBox extends RenderConstrainedBox {
     _fractionalKeyframesDuration = value;
   }
 
-  ReverseBehavior<Size> _reverse;
+  ReverseBehaviorBase<Size> _reverse;
 
-  set reverse(ReverseBehavior<Size> value) {
+  set reverse(ReverseBehaviorBase<Size> value) {
     if (_reverse == value) return;
     _reverse = value;
   }
@@ -251,8 +214,7 @@ class _AnimtableRenderConstrainedBox extends RenderConstrainedBox {
     return value;
   }
 
-  Size? _normalizeSize(Size? size, BoxConstraints constraints) {
-    if (size == null) return null;
+  Size _normalizeSize(Size size, BoxConstraints constraints) {
     return Size(
       _normalize(size.width, constraints.maxWidth),
       _normalize(size.height, constraints.maxHeight),
@@ -280,27 +242,13 @@ class _AnimtableRenderConstrainedBox extends RenderConstrainedBox {
       );
     }
 
-    final resolvedKeyframes = _keyframes
-        ?.map(
-          (k) => k.copyWith(
-            value: _normalizeSize(k.value, constraints),
-          ),
-        )
-        .toList();
-
-    final resolvedFractionalKeyframes = _fractionalKeyframes
-        ?.map((k) => k.copyWith(value: _normalizeSize(k.value, constraints)))
-        .toList();
-
     final actBuilder = _SizeActBuilder(
       motion: _driver.context.motion,
       delay: _driver.context.delay,
       from: from,
       to: to,
-      frames: resolvedKeyframes,
-      fractionalKeyframes: resolvedFractionalKeyframes,
-      fractionalKeyframesDuration: _fractionalKeyframesDuration,
-      reverse: _reverse,
+      frames: _keyframes?.mapValues((v) => _normalizeSize(v, constraints)),
+      reverse: _reverse.mapValues((v) => _normalizeSize(v, constraints)),
     );
 
     final (animtable, reverseAnimtable) = actBuilder.buildTweens(_driver.context);
@@ -365,10 +313,8 @@ class _SizeActBuilder extends TweenAct<Size> {
     super.from,
     super.to,
     super.frames,
-    super.fractionalKeyframes,
-    super.fractionalKeyframesDuration,
     super.reverse,
-  }) : super.internal();
+  }) : super();
 
   @override
   Animatable<Size> createSingleTween(Size from, Size to) {

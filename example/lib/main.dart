@@ -72,11 +72,11 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
                 child: Column(
                   children: [
                     Actor(
-                      act: SizedBoxAct.keyframes([
-                        .key(Size(100, 100), motion: .linear(300.ms)),
+                      act: SizedBoxAct.keyframed(frames: Keyframes([
+                        .key(Size(100, 100), motion: .jump),
                         .key(Size(50, 50), motion: .wobbly()),
-                        .key(Size(150, 150), motion: .linear(300.ms)),
-                      ], reverse: .to(  Size(100, 100))),
+                        .key(Size(150, 150), motion: .smooth()),
+                      ])),
                       // act: SlideAct.fractionalKeyframes([
                       //   .key(Offset(0, 0), at: 0.0),
                       //   .key(Offset(1, .2), at: 0.5, curve: Curves.elasticOut),

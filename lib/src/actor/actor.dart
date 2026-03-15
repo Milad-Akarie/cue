@@ -129,7 +129,7 @@ abstract class SingleActorBase<T> extends StatelessWidget {
   final Widget child;
   final ReverseBehavior<T> reverse;
   final CueMotion? motion;
-  final List<Keyframe<T>>? frames;
+  final Keyframes<T>? frames;
   final T? _from;
   final T? _to;
 
@@ -148,7 +148,7 @@ abstract class SingleActorBase<T> extends StatelessWidget {
        _to = to;
 
   const SingleActorBase.keyframes({
-    required List<Keyframe<T>> this.frames,
+    required Keyframes<T> this.frames,
     super.key,
     required this.child,
     this.reverse = const ReverseBehavior.mirror(),

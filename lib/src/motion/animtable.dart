@@ -28,17 +28,17 @@ class ReversedAnimtable<T> extends TweenAnimtable<T> {
 
 class DualAnimatable<T> extends CueAnimtable<T> {
   final CueAnimtable<T> forward;
-  final CueAnimtable<T> _reverse;
+  final CueAnimtable<T> reverse;
 
   DualAnimatable({
     required this.forward,
-    CueAnimtable<T>? reverse,
-  }) : _reverse = reverse ?? forward;
+    required this.reverse,
+  });
 
   @override
   T evaluate(CueAnimationDriver animtion) {
     final isReversing = animtion.isReverseOrDismissed;
-    return isReversing ? _reverse.evaluate(animtion) : forward.evaluate(animtion);
+    return isReversing ? reverse.evaluate(animtion) : forward.evaluate(animtion);
   }
 }
 

@@ -2,17 +2,17 @@ part of 'base/act.dart';
 
 abstract class TranslateAct extends Act {
   const factory TranslateAct({
-     Offset from,
+    Offset from,
     Offset to,
     CueMotion? motion,
     ReverseBehavior<Offset> reverse,
   }) = _TranslateOffset;
 
-  const factory TranslateAct.keyframes(
-    List<Keyframe<Offset>> keyframes, {
-    CueMotion? motion,
-    ReverseBehavior<Offset> reverse,
-  }) = _TranslateOffset.keyframes;
+  const factory TranslateAct.keyframed({
+    required Keyframes<Offset> frames,
+    KFReverseBehavior<Offset> reverse,
+    Duration? delay,
+  }) = _TranslateOffset.keyframed;
 
   const factory TranslateAct.fromX({
     double from,
@@ -21,11 +21,11 @@ abstract class TranslateAct extends Act {
     ReverseBehavior<double> reverse,
   }) = _AxisTranslate.horizontal;
 
-  const factory TranslateAct.keyframesX(
-    List<Keyframe<double>> keyframes, {
-    CueMotion? motion,
-    ReverseBehavior<double> reverse,
-  }) = _AxisTranslate.keyframesX;
+  const factory TranslateAct.keyframedX({
+    required Keyframes<double> frames,
+    KFReverseBehavior<double> reverse,
+    Duration? delay,
+  }) = _AxisTranslate.keyframedX;
 
   const factory TranslateAct.y({
     double from,
@@ -34,11 +34,11 @@ abstract class TranslateAct extends Act {
     ReverseBehavior<double> reverse,
   }) = _AxisTranslate.vertical;
 
-  const factory TranslateAct.keyframesY(
-    List<Keyframe<double>> keyframes, {
-    CueMotion? motion,
-    ReverseBehavior<double> reverse,
-  }) = _AxisTranslate.keyframesY;
+  const factory TranslateAct.keyframedY({
+    required Keyframes<double> frames,
+    KFReverseBehavior<double> reverse,
+    Duration? delay,
+  }) = _AxisTranslate.keyframedY;
 
   const factory TranslateAct.fromGlobal({
     required Offset offset,
@@ -63,17 +63,17 @@ abstract class TranslateAct extends Act {
 
 class _TranslateOffset extends TweenAct<Offset> implements TranslateAct {
   const _TranslateOffset({
-     super.from = Offset.zero,
+    super.from = Offset.zero,
     super.to = Offset.zero,
     super.motion,
     super.reverse,
-  });
+  }) : super.tween();
 
-  const _TranslateOffset.keyframes(
-    super.keyframes, {
-    super.motion,
+  const _TranslateOffset.keyframed({
+    required super.frames,
     super.reverse,
-  }) : super.keyframes();
+    super.delay,
+  }) : super.keyframed();
 
   @override
   Widget apply(BuildContext context, CueAnimation<Offset> animation, Widget child) {
@@ -89,28 +89,30 @@ class _AxisTranslate extends TweenActBase<double, Offset> implements TranslateAc
     super.to = 0,
     super.motion,
     super.reverse,
-  }) : _axis = Axis.vertical;
+  }) : _axis = Axis.vertical,
+       super.tween();
 
   const _AxisTranslate.horizontal({
     super.from = 0,
     super.to = 0,
     super.motion,
     super.reverse,
-  }) : _axis = Axis.horizontal;
+  }) : _axis = Axis.horizontal,
+       super.tween();
 
-  const _AxisTranslate.keyframesY(
-    super.keyframes, {
-    super.motion,
+  const _AxisTranslate.keyframedY({
+    required super.frames,
+    super.delay,
     super.reverse,
   }) : _axis = Axis.vertical,
-       super.keyframes();
+       super.keyframed();
 
-  const _AxisTranslate.keyframesX(
-    super.keyframes, {
-    super.motion,
+  const _AxisTranslate.keyframedX({
+    required super.frames,
+    super.delay,
     super.reverse,
   }) : _axis = Axis.horizontal,
-       super.keyframes();
+       super.keyframed();
 
   @override
   Offset transform(_, double value) {
@@ -164,7 +166,7 @@ class _TranslateFromGlobalEffect extends TweenAct<double> implements TranslateAc
   }) : rect = null,
        alignment = null,
        globalKey = null,
-       super(from: 0, to: 1);
+       super.tween(from: 0, to: 1);
 
   const _TranslateFromGlobalEffect.fromRect(
     this.rect, {
@@ -173,7 +175,7 @@ class _TranslateFromGlobalEffect extends TweenAct<double> implements TranslateAc
     super.motion,
   }) : offset = null,
        globalKey = null,
-       super(from: 0, to: 1);
+       super.tween(from: 0, to: 1);
 
   const _TranslateFromGlobalEffect.fromKey(
     GlobalKey this.globalKey, {
@@ -182,7 +184,7 @@ class _TranslateFromGlobalEffect extends TweenAct<double> implements TranslateAc
     super.motion,
   }) : offset = null,
        rect = null,
-       super(from: 0, to: 1);
+       super.tween(from: 0, to: 1);
 
   @override
   Widget apply(BuildContext context, Animation<double> animation, Widget child) {

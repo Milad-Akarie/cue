@@ -1,10 +1,11 @@
 import 'dart:ui';
 
+import 'package:cue/src/acts/base/tween_act.dart';
 import 'package:cue/src/motion/cue_motion.dart';
 import 'package:flutter/material.dart';
 
 abstract class CueTimeline {
-  CueAnimationDriver animationFor(AnimationConfig config);
+  CueAnimationDriver driverFor(DriverConfig config);
   void prepare({required bool forward});
   void release(CueAnimationDriver anim);
 
@@ -12,11 +13,11 @@ abstract class CueTimeline {
 }
 
 class CueTimelineImpl extends Simulation implements CueTimeline {
-  final Map<AnimationConfig, CueAnimationDriver> _animations;
+  final Map<DriverConfig, CueAnimationDriver> _animations;
 
   CueTimelineImpl(CueAnimationDriverImpl main)
     : _animations = {
-        AnimationConfig(motion: main.motion, reverseMotion: main.reverseMotion): main,
+        DriverConfig(motion: main.motion, reverseMotion: main.reverseMotion): main,
       };
 
   double _lastT = 0.0;
@@ -24,7 +25,7 @@ class CueTimelineImpl extends Simulation implements CueTimeline {
   CueAnimationDriver get mainAnimation => _animations.values.first;
 
   @override
-  CueAnimationDriver animationFor(AnimationConfig config) {
+  CueAnimationDriver driverFor(DriverConfig config) {
     final mainConfig = _animations.keys.first;
     final forwardMotion = config.motion ?? mainConfig.motion!;
     final reverseMotion = config.reverseMotion ?? mainConfig.reverseMotion;
@@ -36,6 +37,7 @@ class CueTimelineImpl extends Simulation implements CueTimeline {
         reverseMotion: reverseMotion,
         delay: config.delay ?? Duration.zero,
         reverseDelay: config.reverseDelay ?? Duration.zero,
+        reverseType: config.reverseType,
       ),
     );
 
@@ -109,6 +111,7 @@ class CueAnimationDriverImpl extends CueAnimationDriver with AnimationLocalListe
   final CueMotion? reverseMotion;
   final Duration delay;
   final Duration reverseDelay;
+  final ReverseBehaviorType reverseType;
 
   CueSimulation? _sim;
   double _value = 0.0;
@@ -121,6 +124,7 @@ class CueAnimationDriverImpl extends CueAnimationDriver with AnimationLocalListe
     this.reverseMotion,
     this.delay = Duration.zero,
     this.reverseDelay = Duration.zero,
+    this.reverseType = ReverseBehaviorType.mirror,
   });
 
   @override
@@ -141,6 +145,16 @@ class CueAnimationDriverImpl extends CueAnimationDriver with AnimationLocalListe
   @override
   void prepare({required bool forward, double? velocity}) {
     _forward = forward;
+
+    if (forward && reverseType == ReverseBehaviorType.exclusive) {
+      // this drive should only drive reverse animation
+      return;
+    }
+    if (!forward && reverseType == ReverseBehaviorType.none) {
+      // this drive should not drive reverse animation
+      return;
+    }
+
     final active = forward ? motion : (reverseMotion ?? motion);
     _sim = active.build(forward, _sim?.phase ?? 0, _sim?.progress ?? _value, velocity ?? this.velocity);
     _delaySeconds = (forward ? delay : (reverseDelay)).inMicroseconds / Duration.microsecondsPerSecond;
@@ -187,12 +201,12 @@ class CueProgressAnimations extends CueAnimationDriver with AnimationLocalListen
 
   CueProgressAnimations(this._value, {AnimationStatus status = AnimationStatus.completed}) : _status = status;
 
-  final Map<AnimationConfig, BakedSimulationAnimation> _animations = {};
+  final Map<DriverConfig, BakedSimulationAnimation> _animations = {};
 
   final _linearMotion = const LinearSimulationMotion();
 
   @override
-  CueAnimationDriver animationFor(AnimationConfig config) {
+  CueAnimationDriver driverFor(DriverConfig config) {
     if (config.motion == null && config.reverseMotion == null) {
       return this;
     }
@@ -251,7 +265,7 @@ class CueProgressAnimations extends CueAnimationDriver with AnimationLocalListen
 
   @override
   int get phase => 0;
-  
+
   @override
   CueMotion get mainMotion => const LinearSimulationMotion();
 }
@@ -325,43 +339,48 @@ class BakedMotion {
   double valueAt(double progress) => valueGetter(progress, samples);
 }
 
-class AnimationConfig {
+class DriverConfig {
   final CueMotion? motion;
   final CueMotion? reverseMotion;
   final Duration? delay;
   final Duration? reverseDelay;
+  final ReverseBehaviorType reverseType;
 
-  const AnimationConfig({
+  const DriverConfig({
     this.motion,
     this.reverseMotion,
     this.delay = Duration.zero,
     this.reverseDelay = Duration.zero,
+    this.reverseType = ReverseBehaviorType.mirror,
   });
 
-  AnimationConfig copyWith({
+  DriverConfig copyWith({
     CueMotion? motion,
     CueMotion? reverseMotion,
     Duration? delay,
     Duration? reverseDelay,
+    ReverseBehaviorType? reverseType,
   }) {
-    return AnimationConfig(
+    return DriverConfig(
       motion: motion ?? this.motion,
       reverseMotion: reverseMotion ?? this.reverseMotion,
       delay: delay ?? this.delay,
       reverseDelay: reverseDelay ?? this.reverseDelay,
+      reverseType: reverseType ?? this.reverseType,
     );
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    return other is AnimationConfig &&
+    return other is DriverConfig &&
         other.motion == motion &&
         other.reverseMotion == reverseMotion &&
         other.delay == delay &&
+        other.reverseType == reverseType &&
         other.reverseDelay == reverseDelay;
   }
 
   @override
-  int get hashCode => Object.hash(motion, reverseMotion, delay, reverseDelay);
+  int get hashCode => Object.hash(motion, reverseMotion, delay, reverseDelay, reverseType);
 }

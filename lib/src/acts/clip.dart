@@ -38,7 +38,7 @@ class _AxisClipEffect extends TweenAct<double> implements ClipAct {
     this.alignment = AlignmentDirectional.centerStart,
     super.motion,
   }) : _axis = Axis.horizontal,
-       super();
+       super.tween();
 
   const _AxisClipEffect.vertical({
     super.from = 0,
@@ -46,7 +46,7 @@ class _AxisClipEffect extends TweenAct<double> implements ClipAct {
     this.alignment = AlignmentDirectional.topCenter,
     super.motion,
   }) : _axis = Axis.vertical,
-       super();
+       super.tween();
 
   @override
   Widget apply(BuildContext context, Animation<double> animation, Widget child) {
@@ -81,7 +81,7 @@ class _ClipEffect extends TweenAct<double> implements ClipAct {
     this.useSuperellipse = false,
     super.from = 0,
     super.to = 1,
-  });
+  }) : super.tween();
 
   const _ClipEffect.circular({
     this.alignment,
@@ -89,7 +89,8 @@ class _ClipEffect extends TweenAct<double> implements ClipAct {
     super.from = 0,
     super.to = 1,
   }) : borderRadius = null,
-       useSuperellipse = false;
+       useSuperellipse = false,
+       super.tween();
 
   @override
   Widget apply(

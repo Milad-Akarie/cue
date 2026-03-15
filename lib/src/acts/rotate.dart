@@ -13,7 +13,7 @@ class RotateAct extends TweenAct<double> {
     this.axis = RotateAxis.z,
     this.alignment = Alignment.center,
     this.unit = RotateUnit.degrees,
-  });
+  }) : super.tween();
 
   const RotateAct.flipX({
     super.motion,
@@ -21,7 +21,7 @@ class RotateAct extends TweenAct<double> {
     this.alignment = Alignment.center,
   }) : unit = RotateUnit.radians,
        axis = RotateAxis.x,
-       super(from: 0, to: math.pi);
+       super.tween(from: 0, to: math.pi);
 
   const RotateAct.flipY({
     super.motion,
@@ -29,16 +29,16 @@ class RotateAct extends TweenAct<double> {
     this.alignment = Alignment.center,
   }) : unit = RotateUnit.radians,
        axis = RotateAxis.y,
-       super(from: 0, to: math.pi);
+       super.tween(from: 0, to: math.pi);
 
-  const RotateAct.keyframes(
-    super.keyframes, {
-    super.motion,
+  const RotateAct.keyframed({
+    required super.frames,
     super.reverse,
+    super.delay,
     this.alignment = Alignment.center,
     this.axis = RotateAxis.z,
     this.unit = RotateUnit.radians,
-  }) : super.keyframes();
+  }) : super.keyframed();
 
   const RotateAct.radians({
     super.from = 0,
@@ -47,7 +47,8 @@ class RotateAct extends TweenAct<double> {
     super.reverse,
     this.axis = RotateAxis.z,
     this.alignment = Alignment.center,
-  }) : unit = RotateUnit.radians;
+  }) : unit = RotateUnit.radians,
+       super.tween();
 
   const RotateAct.degrees({
     super.from = 0,
@@ -56,7 +57,8 @@ class RotateAct extends TweenAct<double> {
     super.reverse,
     this.alignment = Alignment.center,
     this.axis = RotateAxis.z,
-  }) : unit = RotateUnit.degrees;
+  }) : unit = RotateUnit.degrees,
+       super.tween();
 
   const RotateAct.turns({
     super.from = 0,
@@ -65,7 +67,8 @@ class RotateAct extends TweenAct<double> {
     super.reverse,
     this.axis = RotateAxis.z,
     this.alignment = Alignment.center,
-  }) : unit = RotateUnit.quarterTurns;
+  }) : unit = RotateUnit.quarterTurns,
+       super.tween();
 
   @override
   double transform(_, double value) {

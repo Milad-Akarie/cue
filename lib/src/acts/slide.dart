@@ -28,16 +28,11 @@ abstract class SlideAct extends Act {
     ReverseBehavior<Offset> reverse,
   }) = _SlideEffect.fromTrailing;
 
-  const factory SlideAct.keyframes(
-    List<Keyframe<Offset>> keyframes, {
-    CueMotion? motion,
-  }) = _SlideEffect.keyframes;
-
-  const factory SlideAct.fractionalKeyframes(
-    List<FractionalKeyframe<Offset>> keyframes, {
-    Duration? duration,
-    ReverseBehavior<Offset> reverse,
-  }) = _SlideEffect.fractionalKeyframes;
+  const factory SlideAct.keyframed({
+    required Keyframes<Offset> frames,
+    KFReverseBehavior<Offset> reverse,
+    Duration? delay,
+  }) = _SlideEffect.keyframed;
 
   const factory SlideAct.fromY({
     double from,
@@ -46,11 +41,11 @@ abstract class SlideAct extends Act {
     ReverseBehavior<double> reverse,
   }) = _AxisSlideEffect.tweenY;
 
-  const factory SlideAct.keyframesY(
-    List<Keyframe<double>> keyframes, {
-    CueMotion? motion,
-    ReverseBehavior<double> reverse,
-  }) = _AxisSlideEffect.keyframesY;
+  const factory SlideAct.keyframedY({
+    required Keyframes<double> frames,
+    KFReverseBehavior<double> reverse,
+    Duration? delay,
+  }) = _AxisSlideEffect.keyframedY;
 
   const factory SlideAct.fromX({
     double from,
@@ -59,11 +54,11 @@ abstract class SlideAct extends Act {
     ReverseBehavior<double> reverse,
   }) = _AxisSlideEffect.tweenX;
 
-  const factory SlideAct.keyframesX(
-    List<Keyframe<double>> keyframes, {
-    CueMotion? motion,
-    ReverseBehavior<double> reverse,
-  }) = _AxisSlideEffect.keyframesX;
+  const factory SlideAct.keyframedX({
+    required Keyframes<double> frames,
+    KFReverseBehavior<double> reverse,
+    Duration? delay,
+  }) = _AxisSlideEffect.keyframedX;
 }
 
 class _SlideEffect extends TweenAct<Offset> implements SlideAct {
@@ -72,12 +67,12 @@ class _SlideEffect extends TweenAct<Offset> implements SlideAct {
     super.to = Offset.zero,
     super.motion,
     super.reverse,
-  });
+  }) : super.tween();
 
   const _SlideEffect.fromBottom({
     super.motion,
     super.reverse,
-  }) : super(
+  }) : super.tween(
          from: const Offset(0, 1),
          to: Offset.zero,
        );
@@ -85,7 +80,7 @@ class _SlideEffect extends TweenAct<Offset> implements SlideAct {
   const _SlideEffect.fromTop({
     super.motion,
     super.reverse,
-  }) : super(
+  }) : super.tween(
          from: const Offset(0, -1),
          to: Offset.zero,
        );
@@ -93,7 +88,7 @@ class _SlideEffect extends TweenAct<Offset> implements SlideAct {
   const _SlideEffect.fromLeading({
     super.motion,
     super.reverse,
-  }) : super(
+  }) : super.tween(
          from: const Offset(-1, 0),
          to: Offset.zero,
        );
@@ -101,22 +96,16 @@ class _SlideEffect extends TweenAct<Offset> implements SlideAct {
   const _SlideEffect.fromTrailing({
     super.motion,
     super.reverse,
-  }) : super(
+  }) : super.tween(
          from: const Offset(1, 0),
          to: Offset.zero,
        );
 
-  const _SlideEffect.keyframes(
-    super.keyframes, {
-    super.motion,
+  const _SlideEffect.keyframed({
+    required super.frames,
     super.reverse,
-  }) : super.keyframes();
-
-  const _SlideEffect.fractionalKeyframes(
-    super.keyframes, {
-    super.duration,
-    super.reverse,
-  }) : super.fractionalKeyframes();
+    super.delay,
+  }) : super.keyframed();
 
   @override
   Widget apply(BuildContext context, Animation<Offset> animation, Widget child) {
@@ -132,28 +121,30 @@ class _AxisSlideEffect extends TweenActBase<double, Offset> implements SlideAct 
     super.to = 0,
     super.motion,
     super.reverse,
-  }) : _axis = Axis.horizontal;
+  }) : _axis = Axis.horizontal,
+       super.tween();
 
   const _AxisSlideEffect.tweenY({
     super.from = 0,
     super.to = 0,
     super.motion,
     super.reverse,
-  }) : _axis = Axis.vertical;
-
-  const _AxisSlideEffect.keyframesX(
-    super.keyframes, {
-    super.motion,
-    super.reverse,
-  }) : _axis = Axis.horizontal,
-       super.keyframes();
-
-  const _AxisSlideEffect.keyframesY(
-    super.keyframes, {
-    super.motion,
-    super.reverse,
   }) : _axis = Axis.vertical,
-       super.keyframes();
+       super.tween();
+
+  const _AxisSlideEffect.keyframedX({
+    required super.frames,
+    super.reverse,
+    super.delay,
+  }) : _axis = Axis.horizontal,
+       super.keyframed();
+
+  const _AxisSlideEffect.keyframedY({
+    required super.frames,
+    super.reverse,
+    super.delay,
+  }) : _axis = Axis.vertical,
+       super.keyframed();
 
   @override
   Offset transform(_, double value) {

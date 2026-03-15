@@ -8,7 +8,8 @@ class PositionAct extends TweenAct<Position> {
     required super.to,
     super.motion,
     super.reverse,
-  }) : _relativeTo = null;
+  }) : _relativeTo = null,
+       super.tween();
 
   const PositionAct.relative({
     required super.from,
@@ -16,7 +17,8 @@ class PositionAct extends TweenAct<Position> {
     required Size size,
     super.motion,
     super.reverse,
-  }) : _relativeTo = size;
+  }) : _relativeTo = size,
+       super.tween();
 
   @internal
   const PositionAct.internal({
@@ -26,16 +28,15 @@ class PositionAct extends TweenAct<Position> {
     super.reverse,
     Size? relativeTo,
     super.frames,
-  }) : _relativeTo = relativeTo,
-       super.internal();
+  }) : _relativeTo = relativeTo;
 
-  const PositionAct.keyframes(
-    super.keyframes, {
-    super.motion,
+  const PositionAct.keyframed({
+    required super.frames,
     super.reverse,
+    super.delay,
     Size? relativeTo,
   }) : _relativeTo = relativeTo,
-       super.keyframes();
+       super.keyframed();
 
   @override
   Animatable<Position> createSingleTween(Position from, Position to) {
@@ -137,7 +138,7 @@ class PositionActor extends SingleActorBase<Position> {
     super.reverse,
   }) : _relativeTo = null;
 
-  const PositionActor.keyframes({
+  const PositionActor.keyframed({
     super.key,
     required super.frames,
     required super.child,
