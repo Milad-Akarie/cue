@@ -1,4 +1,5 @@
 import 'package:cue/cue.dart';
+import 'package:example/examples/delete_confirmation.dart';
 import 'package:example/examples/expanding_cards.dart';
 import 'package:example/examples/slack_style_fab.dart';
 
@@ -62,8 +63,8 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
             // crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               // ExpandingCards(),
-              // SlackStyleFab(),
-              // DeleteConfirmationDialog(),
+              SlackStyleFab(),
+              DeleteConfirmationDialog(),
               Cue.onToggle(
                 toggled: checked,
                 motion: .curved(500.ms, curve: Curves.elasticOut),

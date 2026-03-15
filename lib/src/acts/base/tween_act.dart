@@ -40,10 +40,10 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends ActImp
 
   CueAnimtable<R> resolveTween(
     ActContext context, {
-    T? from,
-    T? to,
+    required T? from,
+    required T? to,
     R? implicitFrom,
-    Keyframes<T>? keyframes,
+    required Keyframes<T>? keyframes,
     required CueMotion motion,
   }) {
     if (keyframes != null) {
@@ -66,13 +66,13 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends ActImp
           ),
       ]);
     } else {
-      final effectiveFrom = implicitFrom ?? (from != null ? transform(context, from as T) : null);
+      final effectiveFrom = implicitFrom ?? transform(context, from as T);
       assert(effectiveFrom != null && to != null, 'From and to values must be provided when not using keyframes');
       if (effectiveFrom == to) {
-        return AlwaysStoppedAnimatable<R>(effectiveFrom as R);
+        return AlwaysStoppedAnimatable<R>(effectiveFrom);
       } else {
         return TweenAnimtable<R>(
-          createSingleTween(effectiveFrom as R, transform(context, to as T)),
+          createSingleTween(effectiveFrom, transform(context, to as T)),
           motion: motion,
         );
       }
@@ -84,6 +84,7 @@ abstract class TweenActBase<T extends Object?, R extends Object?> extends ActImp
     final animtable = resolveTween(
       context,
       to: to,
+      from: from,
       keyframes: frames,
       implicitFrom: context.implicitFrom as R?,
       motion: motion ?? context.motion,

@@ -30,6 +30,8 @@ class SizedBoxAct extends DeferredTweenAct<Size> {
     final builder = _SizeActBuilder(
       motion: motion,
       delay: delay,
+      from: Size.zero,
+      to: Size.infinite,
       frames: frames,
       reverse: reverse,
     );

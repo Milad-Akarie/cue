@@ -52,16 +52,18 @@ class SizedClipAct extends DeferredTweenAct<Size?> {
     final builder = _NullableSizeActBuilder(
       motion: motion ?? context.motion,
       delay: delay ?? context.delay,
-      frames: frames?.mapValues((v) => null),
-      reverse: _reverse.mapValues((v) => null),
+      from: Size.zero,
+      to: Size.infinite,
+      frames: frames?.mapValues((v) => Size.zero),
+      reverse: _reverse.mapValues((v) => Size.zero),
     );
     return builder.buildTweens(context);
   }
 
   @override
-  CueAnimation<Size> buildAnimation(CueTimeline timline, ActContext context) {
+  CueAnimation<Size?> buildAnimation(CueTimeline timline, ActContext context) {
     final superDriver = super.buildAnimation(timline, context);
-    return DeferredCueAnimation<Size>(parent: superDriver.parent, context: context);
+    return DeferredCueAnimation<Size?>(parent: superDriver.parent, context: context);
   }
 
   @override

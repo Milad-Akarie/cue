@@ -34,8 +34,19 @@ class ActorState extends State<Actor> {
     _cachedScope = scope;
     assert(() {
       if (_acts.map((e) => e.runtimeType).toSet().length != _acts.length) {
+
+         final duplicates = _acts
+            .map((e) => e.runtimeType)
+            .fold<Map<Type, int>>({}, (acc, type) {
+              acc[type] = (acc[type] ?? 0) + 1;
+              return acc;
+            })
+            .entries
+            .where((entry) => entry.value > 1)
+            .map((entry) => entry.key)
+            .toList();
         throw StateError(
-          'Multiple effects of the same type are not supported. Please ensure all effects in the list are of different types.',
+          'Multiple effects of the same type are not supported. Please ensure all effects in the list are of different types. Duplicates found: $duplicates',
         );
       }
       return true;

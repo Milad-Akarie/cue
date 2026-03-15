@@ -132,7 +132,6 @@ class SlackStyleFab extends StatelessWidget {
                                 .fadeOut(),
                                 .slideX(to: -2, ),
                                 .rotate(to: 90),
-                                .fadeIn()
                               ],
                               delay: 100.ms,
                             ),
