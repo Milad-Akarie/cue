@@ -53,6 +53,8 @@ abstract class SelfAnimatedState<T extends SelfAnimatedCue> extends _CueState<T>
 
   CueMotion get motion => widget.motion;
 
+  CueMotion? get reverseMotion => widget.reverseMotion;
+
   @override
   CueTimeline get timeline => controller.timeline;
 
@@ -75,8 +77,9 @@ abstract class SelfAnimatedState<T extends SelfAnimatedCue> extends _CueState<T>
   @override
   void didUpdateWidget(covariant SelfAnimatedCue oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.motion != motion) {
-      controller.motion = motion;
+    if (oldWidget.motion != motion || oldWidget.reverseMotion != reverseMotion) {
+      controller.updateMotion(motion, newReverseMotion: reverseMotion);
+    
     }
   }
 

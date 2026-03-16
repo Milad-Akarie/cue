@@ -14,7 +14,11 @@ class CueDebugTools extends StatefulWidget {
     return context.findAncestorWidgetOfExactType<CueDebugTools>() != null;
   }
 
-  static VoidCallback? attachDebugTarget(BuildContext context, {required String id, required CueAnimationDriver driver}) {
+  static VoidCallback? attachDebugTarget(
+    BuildContext context, {
+    required String id,
+    required CueAnimationDriver driver,
+  }) {
     final provider = context.findAncestorStateOfType<_CueDebugToolsState>();
     return provider?.attachDebugTarget(context, id: id, driver: driver);
   }
@@ -64,15 +68,20 @@ class _CueDebugToolsState extends State<CueDebugTools> with SingleTickerProvider
       _controller.forward(from: startValue);
     }
   }
+    
+  VoidCallback attachDebugTarget(BuildContext context, {required String id, required CueAnimationDriver driver}) {
 
-  VoidCallback attachDebugTarget(
-    BuildContext context, {
-    required String id,
-    required CueAnimationDriver driver,
-  }) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _overlayData.value = _overlayData.value.copyWith(activeTargetId: id);
-      _controller.timeline.updateMainDriver(driver);
+      _controller.timeline.reset(
+        DriverConfig(
+          motion: driver.motion,
+          reverseMotion: driver.reverseMotion,
+          delay: driver.delay,
+          reverseDelay: driver.reverseDelay,
+        ),
+      );
+      _controller.seek(1.0);
     });
 
     void deattachCallback() {
@@ -239,7 +248,7 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                             duration: const Duration(milliseconds: 200),
                             alignment: .topLeft,
                             child: ListenableBuilder(
-                              listenable: _controller ,
+                              listenable: _controller,
                               builder: (context, _) {
                                 if (_data.isMinimized) {
                                   return IconButton(
@@ -397,7 +406,7 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                                             thumbColor: theme.colorScheme.primary,
                                             overlayColor: WidgetStatePropertyAll(Colors.transparent),
                                             onChanged: _onSliderChanged,
-                                          )
+                                          ),
                                         ),
                                       ),
                                     ],

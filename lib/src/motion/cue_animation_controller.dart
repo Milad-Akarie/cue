@@ -19,9 +19,13 @@ class CueAnimationController extends CueAnimationControllerBase<CuePlaybackTimel
 
   CueMotion get motion => timeline.mainDriver.motion;
 
-  set motion(CueMotion newMotion) {
-    // (timeline.mainDriver).motion = newMotion;
+  void updateMotion(CueMotion newMotion, {CueMotion? newReverseMotion}) {
+    final mainDriver = timeline.mainDriver;
+    if (newMotion != mainDriver.motion || newReverseMotion != mainDriver.reverseMotion) {
+      timeline.reset(DriverConfig(motion: newMotion, reverseMotion: newReverseMotion));
+    }
   }
+ 
 }
 
 class CueSeekableAnimationController extends CueAnimationControllerBase<CueSeekableTimeline> {
@@ -31,8 +35,6 @@ class CueSeekableAnimationController extends CueAnimationControllerBase<CueSeeka
     double initialProgress = 0.0,
     AnimationStatus status = AnimationStatus.forward,
   }) : super(timeline: CueSeekableTimeline(initialProgress, status: status));
-  
-
 
   void seek(double progress, {AnimationStatus status = AnimationStatus.forward}) {
     timeline.seek(progress, status: status);
@@ -77,6 +79,12 @@ abstract class CueAnimationControllerBase<Timeline extends CueTimeline> extends 
   }
 
   @override
+  set value(double newValue) {
+    super.value = newValue;
+    timeline.setValue(newValue);
+  }
+
+  @override
   Animation<double> get view => _timeline.mainDriver;
 
   @override
@@ -95,7 +103,7 @@ abstract class CueAnimationControllerBase<Timeline extends CueTimeline> extends 
       assert(from >= 0.0 && from <= 1.0, 'The "from" value must be between 0.0 and 1.0.');
       value = from;
     }
-    _timeline.prepare(forward: false, from: from);
+    _timeline.prepare(forward: false, from: value);
     return super.animateBackWith(_timeline);
   }
 

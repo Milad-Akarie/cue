@@ -62,7 +62,7 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
             // crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               // ExpandingCards(),
-              SlackStyleFab(),
+              // SlackStyleFab(),
               // DeleteConfirmationDialog(),
               // HorizontallyExpandingCards(),
               Cue.onToggle(
@@ -72,7 +72,7 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
                   children: [
                     Actor(
                       act: .compose([
-                        .slideX(to: 1, from: 0),
+                        .slideX(to: 1),
                       ]),
                       // act: SlideAct.fractionalKeyframes([
                       //   .key(Offset(0, 0), at: 0.0),

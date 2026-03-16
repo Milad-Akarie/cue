@@ -34,8 +34,7 @@ class ActorState extends State<Actor> {
     _cachedScope = scope;
     assert(() {
       if (_acts.map((e) => e.runtimeType).toSet().length != _acts.length) {
-
-         final duplicates = _acts
+        final duplicates = _acts
             .map((e) => e.runtimeType)
             .fold<Map<Type, int>>({}, (acc, type) {
               acc[type] = (acc[type] ?? 0) + 1;
@@ -103,9 +102,7 @@ class ActorState extends State<Actor> {
       scope.willReanimateNotifier?.addEventListener(_onWillReAnimate);
     }
     if (_cachedScope == null || scope.updateShouldNotify(_cachedScope!)) {
-      if (_cachedScope?.timeline != scope.timeline) {
-        _clearCache();
-      }
+      _clearCache();
       _setupAnimations(scope);
     }
   }

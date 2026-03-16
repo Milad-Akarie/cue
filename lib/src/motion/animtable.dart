@@ -5,7 +5,7 @@ import 'package:flutter/widgets.dart';
 abstract class CueAnimtable<T> {
   const CueAnimtable();
   CueMotion? get motion => null;
-  T evaluate(CueAnimationDriver animtion);
+  T evaluate(CueAnimationDriver driver);
 }
 
 class TweenAnimtable<T> extends CueAnimtable<T> {
@@ -16,14 +16,16 @@ class TweenAnimtable<T> extends CueAnimtable<T> {
   const TweenAnimtable(this.tween, {required this.motion});
 
   @override
-  T evaluate(CueAnimationDriver animtion) => tween.transform(animtion.value);
+  T evaluate(CueAnimationDriver driver) {
+    return tween.transform(driver.value);
+  }
 }
 
 class ReversedAnimtable<T> extends TweenAnimtable<T> {
   const ReversedAnimtable(super.tween, {super.motion});
 
   @override
-  T evaluate(CueAnimationDriver animtion) => tween.transform(1.0 - animtion.value);
+  T evaluate(CueAnimationDriver driver) => tween.transform(1.0 - driver.value);
 }
 
 class DualAnimatable<T> extends CueAnimtable<T> {
@@ -36,9 +38,9 @@ class DualAnimatable<T> extends CueAnimtable<T> {
   });
 
   @override
-  T evaluate(CueAnimationDriver animtion) {
-    final isReversing = animtion.isReverseOrDismissed;
-    return isReversing ? reverse.evaluate(animtion) : forward.evaluate(animtion);
+  T evaluate(CueAnimationDriver driver) {
+    final isReversing = driver.isReverseOrDismissed;
+    return isReversing ? reverse.evaluate(driver) : forward.evaluate(driver);
   }
 }
 
@@ -48,7 +50,7 @@ class AlwaysStoppedAnimatable<T> extends CueAnimtable<T> {
   const AlwaysStoppedAnimatable(this.value);
 
   @override
-  T evaluate(CueAnimationDriver animtion) => value;
+  T evaluate(CueAnimationDriver driver) => value;
 }
 
 class AnimatableSegment<T> extends Animatable<T> {
@@ -73,7 +75,7 @@ class SegmentedAnimtable<T> extends CueAnimtable<T> {
   CueMotion? get motion => SegmentedMotion(List.unmodifiable(segments.map((e) => e.motion)));
 
   @override
-  T evaluate(CueAnimationDriver animtion) {
-    return segments[animtion.phase].transform(animtion.value);
+  T evaluate(CueAnimationDriver driver) {
+    return segments[driver.phase].transform(driver.value);
   }
 }
