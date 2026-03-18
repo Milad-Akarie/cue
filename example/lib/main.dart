@@ -77,12 +77,12 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
               Cue.onToggle(
                 toggled: checked,
                 motion: .linear(300.ms),
-                // motion: .wobbly(),
+                // motion: .smooth(),
                 child: Column(
                   children: [
                     Actor(
                       act: .compose([
-                        .slideX(to: 1),
+                        .slideX(to: 1, delay: 300.ms),
                       ]),
                       child: Container(
                         height: 100,
@@ -92,7 +92,7 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
                     ),
                     Actor(
                       act: .compose([
-                        .slideX(to: 1, delay: 300.ms),
+                        .slideX(to: 1),
                       ]),
                       child: Container(
                         height: 100,
