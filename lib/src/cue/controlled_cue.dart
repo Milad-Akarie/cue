@@ -18,8 +18,6 @@ class _ControlledCue extends Cue {
 }
 
 class _ControlledCueState extends _CueState<_ControlledCue> {
-  @override
-  bool get isBounded => widget.isBounded;
 
   @override
   String get debugName => 'ControlledCue';
