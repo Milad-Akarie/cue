@@ -69,7 +69,7 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
                 toggled: checked,
                 // loop: true,
                 // reverseOnLoop: true,
-                motion: .gentle(),
+                motion: .linear(300.ms),
                 child: Column(
                   children: [
                     // Actor(
@@ -91,7 +91,7 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
                     Actor(
                       act: .slideX(
                         to: slide,
-                        reverse: .mirror(motion: .wobbly()),
+                        delay: 300.ms,
                       ),
                       child: Container(
                         height: 100,
