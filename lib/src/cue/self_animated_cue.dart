@@ -39,7 +39,9 @@ class SelfAnimatedCueState extends SelfAnimatedState<SelfAnimatedCue> {
   @override
   void didUpdateWidget(covariant SelfAnimatedCue oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.loop != oldWidget.loop || widget.reverseOnLoop != oldWidget.reverseOnLoop || widget.loopCount != oldWidget.loopCount) {
+    if (widget.loop != oldWidget.loop ||
+        widget.reverseOnLoop != oldWidget.reverseOnLoop ||
+        widget.loopCount != oldWidget.loopCount) {
       controller.stop();
       if (widget.loop) {
         controller.repeat(reverse: widget.reverseOnLoop, count: widget.loopCount);
@@ -77,11 +79,21 @@ abstract class SelfAnimatedState<T extends SelfAnimatedCue> extends _CueState<T>
   }
 
   @override
-  void didUpdateWidget(covariant SelfAnimatedCue oldWidget) {
+  void didUpdateWidget(covariant T oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.motion != motion || oldWidget.reverseMotion != reverseMotion) {
       controller.updateMotion(motion, newReverseMotion: reverseMotion);
-    
+      if (kDebugMode) {
+        final debugToolScope = CueDebugTools.maybeOf(context);
+        if (debugToolScope != null) {
+          debugToolScope.timeline.resetTracks(
+            TrackConfig(
+              motion: motion,
+              reverseMotion: reverseMotion ?? motion,
+            ),
+          );
+        }
+      }
     }
   }
 

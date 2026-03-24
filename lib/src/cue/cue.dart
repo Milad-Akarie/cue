@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:cue/cue.dart';
-import 'package:cue/src/timeline/track/track.dart';
 import 'package:cue/src/timeline/track/track_config.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +8,6 @@ import 'package:flutter/rendering.dart';
 import 'dart:math' as math;
 part 'indexed_cue.dart';
 part 'on_change_cue.dart';
-// part 'route_transition_cue.dart';
 part 'self_animated_cue.dart';
 part 'on_hover_cue.dart';
 part 'on_toggle_cue.dart';
@@ -38,13 +36,6 @@ abstract class Cue extends StatefulWidget {
     required CueTimeline timeline,
     required Widget child,
   }) = _ControlledCue;
-
-  // const factory Cue.onTransition({
-  //   Key? key,
-  //   String? debugLabel,
-  //   required Widget child,
-  //   Act? act,
-  // }) = _RouteTransitionStage;
 
   const factory Cue.onMount({
     Key? key,
@@ -136,6 +127,8 @@ abstract class _CueState<T extends Cue> extends State<Cue> {
 
   late final _debugId = '$debugName-${widget.debugLabel ?? ''}${identityHashCode(widget)}';
 
+
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -152,13 +145,13 @@ abstract class _CueState<T extends Cue> extends State<Cue> {
             });
           }
         }
-
         timeline.removeStatusListener(statusListener);
         timeline.addStatusListener(statusListener);
       }
     }
   }
 
+ 
   @override
   void dispose() {
     _deattachDebugOverlay?.call();
@@ -176,15 +169,18 @@ abstract class _CueState<T extends Cue> extends State<Cue> {
       if (debugToolsScope != null) {
         final isActive = debugToolsScope.activeTargetId == _debugId;
         final useDebugAnimation = !debugToolsScope.isMinimized && isActive;
+        final timeline = useDebugAnimation ? debugToolsScope.timeline : this.timeline;
         return CueScope(
           reanimateFromCurrent: reanimateFromCurrent,
-          timeline: useDebugAnimation ? debugToolsScope.timeline : timeline,
+          timeline: timeline,
+          mainConfig: timeline.mainTrackConfig,
           child: child,
         );
       }
     }
     return CueScope(
       timeline: timeline,
+      mainConfig: timeline.mainTrackConfig,
       reanimateFromCurrent: reanimateFromCurrent,
       child: child,
     );

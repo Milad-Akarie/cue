@@ -1,4 +1,5 @@
 import 'package:cue/src/motion/simulation.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'spring_motion.dart';
 
@@ -112,52 +113,18 @@ class TimedMotion extends CueMotion {
       to: data.endValue,
     );
   }
-}
-
-class IntervalMotion extends CueMotion {
-  final double start;
-  final double end;
-  final Curve? curve;
-
-  const IntervalMotion({this.start = 0.0, this.end = 1.0, this.curve});
 
   @override
-  Duration get baseDuration {
-    throw UnimplementedError(
-      'IntervalMotion does not have a base duration. It must be used with a SegmentedMotion or DelayedMotion to specify timing.',
-    );
-  }
-
-  @override
-  CueSimulation build(SimulationBuildData data) {
-    throw UnimplementedError(
-      'IntervalMotion cannot be built directly. It must be used with a SegmentedMotion or DelayedMotion to specify timing.',
-    );
-  }
-
-  CueMotion resolve(Duration totalDuration) {
-    final startTime = totalDuration * start;
-    final endTime = totalDuration * end;
-    final duration = endTime - startTime;
-    final motion = TimedMotion.curved(duration, curve: curve ?? Curves.linear);
-    if (startTime > Duration.zero) {
-      return DelayedMotion(motion, startTime);
+  String toString() {
+    if (curve == null) {
+      return 'TimedMotion(duration: $baseDuration)';
+    } else {
+      return 'TimedMotion(duration: $baseDuration, curve: $curve)'; 
     }
-    return motion;
   }
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is IntervalMotion &&
-          runtimeType == other.runtimeType &&
-          start == other.start &&
-          end == other.end &&
-          curve == other.curve;
-
-  @override
-  int get hashCode => Object.hash(start, end, curve);
 }
+
+
 
 abstract class SimulationMotion<S extends CueSimulation> extends CueMotion {
   const SimulationMotion();
@@ -186,6 +153,16 @@ class SegmentedMotion extends CueMotion {
       velocity: data.velocity ?? 0.0,
     );
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SegmentedMotion &&
+          runtimeType == other.runtimeType &&
+          listEquals(motions, other.motions);
+
+  @override
+  int get hashCode => Object.hashAll(motions);
 }
 
 class DelayedMotion extends CueMotion {
@@ -219,6 +196,11 @@ class DelayedMotion extends CueMotion {
 
   @override
   int get hashCode => Object.hash(base, delay);
+
+ 
+
+  @override
+  String toString() => 'DelayedMotion(base: $base, delay: $delay)';
 }
 
 class SimulationBuildData {

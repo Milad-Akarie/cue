@@ -31,11 +31,6 @@ class _ToggledStageState extends SelfAnimatedState<_TogglableCue> {
     } else {
       _toggle();
     }
-
-    // controller.addListener((){
-    //   print('value: ${controller.value}, status: ${controller.status.name}');
-    // });
-   
   }
 
   @override

@@ -26,8 +26,7 @@ class Actor extends StatefulWidget {
 }
 
 class ActorState extends State<Actor> {
-  final _animations = <ActKey, CueAnimation<Object?>>{};
-  final _cache = <Act, CueAnimation<Object?>>{};
+  final _animations = <ActKey, _CacheEntry>{};
   final _animationSnapshots = <ActKey, Object?>{};
   CueScope? _cachedScope;
 
@@ -59,68 +58,58 @@ class ActorState extends State<Actor> {
 
     final acts = _acts.map((e) => e.$1);
     final actKeys = acts.map((e) => e.key).toSet();
-    final toRelease = <TrackConfig>{};
-    for (final entry in List.of(_cache.entries)) {
-      if (!acts.contains(entry.key)) {
-        toRelease.add(entry.value.trackConfig);
-        _cache.remove(entry.key);
-      }
-    }
-    for (final entry in  List.of(_animations.entries)) {
+
+    for (final entry in List.of(_animations.entries)) {
       if (!actKeys.contains(entry.key)) {
-        toRelease.add(entry.value.trackConfig);
-        _animations.remove(entry.key);
+        if (_animations.remove(entry.key) case final cacheEntry?) {
+          scope.timeline.release(cacheEntry.trackConfig);
+        }
       }
-    }
-    for (final config in toRelease) {
-      scope.timeline.release(config);
     }
 
-    print('Setting up animations for acts: $actKeys');
-  
     final textDirection = Directionality.maybeOf(context) ?? TextDirection.ltr;
     for (final entry in _acts) {
       final (act, actContext) = entry;
-      if (!_cache.containsKey(act)) {
-        final implicitFrom = scope.reanimateFromCurrent ? _animationSnapshots[act.key] : null;
-        final animation = act.buildAnimation(
-          scope.timeline,
-          actContext.copyWith(
-            textDirection: textDirection,
-            implicitFrom: implicitFrom,
-          ),
-        );
-        _animations[act.key] = animation;
-        _cache[act] = animation;
+      final existing = _animations[act.key];
+      if (existing?.act == act) continue;
+      final implicitFrom = scope.reanimateFromCurrent ? _animationSnapshots[act.key] : null;
+      final animation = act.buildAnimation(
+        scope.timeline,
+        actContext.copyWith(
+          textDirection: textDirection,
+          implicitFrom: implicitFrom,
+        ),
+      );
+      if (existing?.trackConfig case final trackConfig?) {
+        scope.timeline.release(trackConfig);
       }
+      _animations[act.key] = _CacheEntry(act, animation);
     }
   }
 
   @override
   void didUpdateWidget(covariant Actor oldWidget) {
     super.didUpdateWidget(oldWidget);
-    print('Acts same : ${listEquals(widget.acts, oldWidget.acts)}');
     if (!listEquals(widget.acts, oldWidget.acts) ||
         widget.delay != oldWidget.delay ||
         widget.reverseDelay != oldWidget.reverseDelay ||
         widget.motion != oldWidget.motion ||
         widget.reverseMotion != oldWidget.reverseMotion) {
       final scope = CueScope.of(context);
-      print('Actor widget updated. Re-evaluating animations.');
-      _setupActs(scope.timeline.mainTrackConfig);
+      _resolveActs(scope.mainConfig);
       _setupAnimations(scope);
     }
   }
 
-  void _setupActs(TrackConfig mainTrack) {
+  void _resolveActs(TrackConfig mainConfig) {
     _acts = [
       for (final act in widget.acts)
         (
           act,
           act.resolve(
             ActContext(
-              motion: widget.motion ?? mainTrack.motion,
-              reverseMotion: widget.reverseMotion ?? mainTrack.reverseMotion,
+              motion: widget.motion ?? mainConfig.motion,
+              reverseMotion: widget.reverseMotion ?? mainConfig.reverseMotion,
               delay: widget.delay,
               reverseDelay: widget.reverseDelay,
             ),
@@ -134,7 +123,6 @@ class ActorState extends State<Actor> {
       scope.timeline.release(animation.trackConfig);
     }
     _animations.clear();
-    _cache.clear();
     _animationSnapshots.clear();
   }
 
@@ -145,13 +133,14 @@ class ActorState extends State<Actor> {
     super.didChangeDependencies();
     final scope = CueScope.of(context);
     if (_acts.isEmpty) {
-      _setupActs(scope.timeline.mainTrackConfig);
+      _resolveActs(scope.mainConfig);
     }
-    if (_cachedScope == null || scope.updateShouldNotify(_cachedScope!)) {
-      if (_cachedScope?.timeline != scope.timeline) {
-        _eventsDisposer?.call();
-        _eventsDisposer = scope.timeline.addEventListener<TimelineEvent>((_) => _onWillAnimate());
-      }
+    if (_cachedScope?.timeline != scope.timeline) {
+      _eventsDisposer?.call();
+      _eventsDisposer = scope.timeline.addEventListener<TimelineEvent>((_) => _onWillAnimate());
+    }
+    if ( _cachedScope?.timeline != scope.timeline ||_cachedScope?.mainConfig != scope.mainConfig) {
+      _resolveActs(scope.mainConfig);
       _clearCache(scope);
       _setupAnimations(scope);
     }
@@ -163,11 +152,11 @@ class ActorState extends State<Actor> {
     Widget current = widget.child;
     for (final entry in _acts.reversed) {
       final (act, _) = entry;
-      if (_animations[act.key] case final animation?) {
+      if (_animations[act.key]?.animation case final animation?) {
         current = act.build(context, animation, current);
       } else {
         throw StateError(
-          'Animation for effect $act not found. This should not happen as animations are set up in initState and didUpdateWidget.',
+          'Animation for act $act not found. This should not happen as animations are set up in initState and didUpdateWidget.',
         );
       }
     }
@@ -183,6 +172,14 @@ class ActorState extends State<Actor> {
       _clearCache(scope);
     }
   }
+}
+
+class _CacheEntry {
+  final Act act;
+  final CueAnimation<Object?> animation;
+  _CacheEntry(this.act, this.animation);
+  TrackConfig get trackConfig => animation.trackConfig;
+  Object? get value => animation.value;
 }
 
 abstract class SingleActorBase<T> extends StatelessWidget {

@@ -71,7 +71,7 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
                 toggled: checked,
                 // loop: true,
                 // reverseOnLoop: true,
-                motion: .linear(300.ms),
+                motion: .smooth(),
                 child: Column(
                   children: [
                     // Actor(
@@ -92,7 +92,7 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
                     // ),
                     Actor(
                       acts: [
-                        .slideX(to: 2, motion: .smooth()),
+                        .slideX(to: 1),
                         //  SlideAct.keyframedX(
                         //     frames: Keyframes([
                         //      .key(1, motion: .linear(150.ms)),

@@ -5,10 +5,12 @@ class CueScope extends InheritedWidget {
     super.key,
     required super.child,
     required this.timeline,
+    required this.mainConfig,
     required this.reanimateFromCurrent,
   });
 
   final CueTimeline timeline;
+  final TrackConfig mainConfig;
   final bool reanimateFromCurrent;
 
   static CueScope of(BuildContext context) {
@@ -20,7 +22,7 @@ class CueScope extends InheritedWidget {
   @override
   bool updateShouldNotify(covariant CueScope oldWidget) {
     return timeline != oldWidget.timeline ||
-        timeline.mainTrack != oldWidget.timeline.mainTrack ||
+        mainConfig != oldWidget.mainConfig ||
         reanimateFromCurrent != oldWidget.reanimateFromCurrent;
   }
 }

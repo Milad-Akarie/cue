@@ -436,4 +436,7 @@ class ActKey {
 
   @override
   int get hashCode => key.hashCode;
+
+  @override
+  String toString() => 'ActKey($key${desc != null ? ', $desc' : ''})';
 }

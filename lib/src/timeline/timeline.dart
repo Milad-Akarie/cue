@@ -60,10 +60,7 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
 
   @override
   CueTrack trackFor(TrackConfig config) {
-    if (config == mainTrackConfig) {
-      return mainTrack;
-    }
-    print('Requesting track for $config');
+    if (config == mainTrackConfig) return mainTrack;
     _trackRefs[config] = (_trackRefs[config] ?? 0) + 1;
     final animation = tracks.putIfAbsent(config, () => buildTrack(config));
     animation.prepare(
@@ -77,8 +74,11 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
   @override
   void release(TrackConfig config) {
     if (config == mainTrackConfig) return;
-    print('Releasing track for $config');
     final next = (_trackRefs[config] ?? 1) - 1;
+    assert(
+      next >= 0,
+      'Track reference count for $config went below zero. This indicates a bug in the reference counting logic.',
+    );
     if (next <= 0) {
       _trackRefs.remove(config);
       tracks.remove(config);
@@ -87,7 +87,7 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
     }
   }
 
-   @override
+  @override
   AnimationStatus get status => _status;
 
   AnimationStatus _status = AnimationStatus.dismissed;

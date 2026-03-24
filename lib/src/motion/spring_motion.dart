@@ -44,21 +44,6 @@ final class Spring extends SimulationMotion<CueSpringSimulation> {
     );
   }
 
-  Spring copyWith({
-    double? mass,
-    double? stiffness,
-    double? damping,
-    Tolerance? tolerance,
-    bool? snapToEnd,
-  }) {
-    return Spring.custom(
-      mass: mass ?? this.mass,
-      stiffness: stiffness ?? this.stiffness,
-      damping: damping ?? this.damping,
-      tolerance: tolerance ?? this.tolerance,
-      snapToEnd: snapToEnd ?? this.snapToEnd,
-    );
-  }
 
   @override
   bool operator ==(Object other) {
@@ -74,6 +59,11 @@ final class Spring extends SimulationMotion<CueSpringSimulation> {
   @override
   int get hashCode {
     return Object.hash(mass, stiffness, damping, tolerance, snapToEnd);
+  }
+
+  @override
+  String toString() {
+    return 'Spring(mass: $mass, stiffness: $stiffness, damping: $damping, tolerance: $tolerance, snapToEnd: $snapToEnd)';
   }
 
   const Spring.iosDefault({
