@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cue/cue.dart';
 import 'package:example/examples/delete_confirmation.dart';
 import 'package:example/examples/expanding_cards.dart';
@@ -62,49 +64,10 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
       backgroundColor: theme.colorScheme.surfaceContainer,
       appBar: AppBar(),
       body: SizedBox.expand(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
           child: Column(
-            mainAxisAlignment: .center,
-            crossAxisAlignment: .center,
             children: [
-              Cue.onMount(
-                child: Column(
-                  children: [
-                    TweenActor.keyframed(
-                      frames: Keyframes([
-                        .key(AnimatedValues(scale: .5, opacity: .0), motion: .none), // first frame, no motion
-                        .key(AnimatedValues(scale: 1.2, opacity: 1.0), motion: .wobbly()),
-                        .key(AnimatedValues(scale: 1.0, opacity: 1.0), motion: .curved(.3, curve: Curves.easeIn)),
-                      ]),
-                      builder: (context, animation) {
-                        return FadeTransition(
-                          opacity: animation.map((v) => v.opacity),
-                          child: ScaleTransition(
-                            scale: animation.map((v) => v.scale),
-                            child: Box(
-                              color: Colors.red,
-                              size: Size.square(50),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                    TweenActor(
-                      from: 0.0,
-                      to: 1.5,
-                      builder: (context, animation) {
-                        return SlideTransition(
-                          position: animation.map((v) => Offset(v, 0)),
-                          child: Box(color: Colors.blue, size: Size.square(50)),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ),
-
               // ElevatedButton(
               //   onPressed: () {
               //     showCueModalBottomSheet(
@@ -167,31 +130,31 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
               //       },
               //     ),
               //   ),
-              // for (var i = 0; i < 100; i++)
-              //   Cue.onScrollVisible(
-              //     child: Actor(
-              //       acts: [
-              //         .slideX(from: -1, reverse: .to(1)),
-              //         .scale(from: .5, to: 1.0),
-              //       ],
-              //       child: Container(
-              //         height: 220,
-              //         margin:  const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-              //         width: double.infinity,
-              //         decoration: BoxDecoration(
-              //           color: Colors.white,
-              //           borderRadius: BorderRadius.circular(12.0),
-              //           boxShadow: [
-              //             BoxShadow(
-              //               color: Colors.black.withOpacity(0.1),
-              //               blurRadius: 8,
-              //               offset: const Offset(0, 4),
-              //             ),
-              //           ],
-              //         ),
-              //       ),
-              //     ),
-              //   ),
+              for (var i = 0; i < 100; i++)
+                Cue.onScrollVisible(
+                  child: Actor(
+                    acts: [
+                      .slideX(from: -1, reverse: .to(1)),
+                      .scale(from: .5, to: 1.0),
+                    ],
+                    child: Container(
+                      height: 220,
+                      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12.0),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
             ],
           ),
         ),
