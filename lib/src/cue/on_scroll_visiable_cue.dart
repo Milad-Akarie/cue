@@ -39,7 +39,9 @@ class _OnVisibleCueState extends _CueState<_OnScrollVisibleCue> with SingleTicke
     _cachedRevealedOffset = null;
     if (!widget.enabled) return;
 
-    _subscribeToScrollPosition();
+    if (mounted) {
+      _subscribeToScrollPosition();
+    }
   }
 
   void _subscribeToScrollPosition() {
@@ -47,14 +49,12 @@ class _OnVisibleCueState extends _CueState<_OnScrollVisibleCue> with SingleTicke
     if (position == null) {
       throw FlutterError('Cue.onScrollVisible must be used inside a scrollable widget');
     }
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _trackViiblity();
-    });
     if (_scrollPosition != position) {
       _scrollPosition?.removeListener(_trackViiblity);
       _scrollPosition = position;
       _scrollPosition!.addListener(_trackViiblity);
     }
+    _trackViiblity();
   }
 
   @override
@@ -78,8 +78,8 @@ class _OnVisibleCueState extends _CueState<_OnScrollVisibleCue> with SingleTicke
 
   bool _isFirstFrame = true;
 
-  AnimationStatus? _committedStatus;
   void _trackViiblity() async {
+    if (!context.mounted) return;
     final renderObject = context.findRenderObject();
     if (renderObject is! RenderBox) return;
     if (!renderObject.attached || _scrollPosition == null) return;
@@ -99,40 +99,16 @@ class _OnVisibleCueState extends _CueState<_OnScrollVisibleCue> with SingleTicke
     final visibleEnd = math.min(revealedOffset + itemExtent, scrollOffset + viewportDimension);
     final visibleExtent = visibleEnd - visibleStart;
 
-    // Widget is considered visible when the visible fraction meets or exceeds the threshold.
-    // A threshold of 0.0 means any overlap counts as visible.
-
     final visibleFraction = itemExtent > 0 ? (visibleExtent / itemExtent) : 0.0;
+    final forward = scrollOffset + viewportDimension / 2 > revealedOffset;
 
-    final scrollDirection = _scrollPosition!.userScrollDirection;
-    final isScrollingForward = scrollDirection == ScrollDirection.forward || (scrollDirection == ScrollDirection.idle);
-
-    print(
-      'isScrollingForward: $isScrollingForward, scrollDirection: $scrollDirection, visibleFraction: $visibleFraction, scrollOffset: $scrollOffset, revealedOffset: $revealedOffset',
-    );
-    AnimationStatus status = _controller.status;
-
-    if (visibleFraction == 0.0 || visibleFraction == 1.0) {
-      _committedStatus = null;
-      status = AnimationStatus.completed;
-    } else if (_committedStatus == null) {
-      // First frame mid-transition — commit direction now
-      if (visibleFraction > _controller.value) {
-        _committedStatus = isScrollingForward ? AnimationStatus.reverse : AnimationStatus.forward;
-      } else if (visibleFraction < _controller.value) {
-        _committedStatus = isScrollingForward ? AnimationStatus.forward : AnimationStatus.reverse;
-      }
-      status = _committedStatus ?? _controller.status;
-    } else {
-      status = _committedStatus!;
-    }
     final target = visibleFraction.clamp(0.0, 1.0);
 
     if (target != 1 && target != 0.0 && _isFirstFrame) {
       _isFirstFrame = false;
-      _controller.animateTo(target, forward: status.isForwardOrCompleted);
+      _controller.animateTo(target, forward: forward);
     } else {
-      _controller.setProgress(target, forward: status.isForwardOrCompleted);
+      _controller.setProgress(target, forward: forward);
     }
   }
 }

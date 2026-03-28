@@ -21,6 +21,7 @@ class MyApp extends StatelessWidget {
           brightness: Brightness.dark,
         ),
       ),
+      themeMode: .light,
       theme: ThemeData(
         splashFactory: NoSplash.splashFactory,
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
@@ -123,11 +124,11 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
                 for (var i = 0; i < 100; i++)
                   Cue.onScrollVisible(
                     key: ValueKey(i),
-                   
                     child: Actor(
-                      motion: .smooth(),
+                      // motion: .smooth(),
                       acts: [
                         .slideX(from: -1, reverse: .to(1)),
+                        .scale(from: .5, to: 1.0),
                       ],
                       child: Container(
                         height: 220,
