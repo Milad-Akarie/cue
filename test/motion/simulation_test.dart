@@ -528,14 +528,14 @@ void main() {
   group('CurvedSimulation duration', () {
     // Linear curve
     test('linear curve 300ms', () {
-      final motion = CueMotion.linear(Duration(milliseconds: 300));
+      final motion = CueMotion.linear(0.3);
       final curved = motion.build(SimulationBuildData.forward(startValue: 0.0));
       
       expect(refDuration(curved), closeTo(curved.duration, 1 / 60));
     });
 
     test('linear curve 500ms', () {
-      final motion = CueMotion.linear(Duration(milliseconds: 500));
+      final motion = CueMotion.linear(0.5);
       final curved = motion.build(SimulationBuildData.forward(startValue: 0.0));
       
       expect(refDuration(curved), closeTo(curved.duration, 1 / 60));
@@ -544,7 +544,7 @@ void main() {
     // Ease in curve
     test('easeIn curve', () {
       final motion = CueMotion.curved(
-        Duration(milliseconds: 300),
+        0.3,
         curve: Curves.easeIn,
       );
       final curved = motion.build(SimulationBuildData.forward(startValue: 0.0));
@@ -555,7 +555,7 @@ void main() {
     // Ease out curve
     test('easeOut curve', () {
       final motion = CueMotion.curved(
-        Duration(milliseconds: 300),
+        0.3,
         curve: Curves.easeOut,
       );
       final curved = motion.build(SimulationBuildData.forward(startValue: 0.0));
@@ -566,7 +566,7 @@ void main() {
     // Ease in-out curve
     test('easeInOut curve', () {
       final motion = CueMotion.curved(
-        Duration(milliseconds: 300),
+        0.3,
         curve: Curves.easeInOut,
       );
       final curved = motion.build(SimulationBuildData.forward(startValue: 0.0));
@@ -577,7 +577,7 @@ void main() {
     // Elastic curve
     test('elasticIn curve', () {
       final motion = CueMotion.curved(
-        Duration(milliseconds: 500),
+        0.5,
         curve: Curves.elasticIn,
       );
       final curved = motion.build(SimulationBuildData.forward(startValue: 0.0));
@@ -588,7 +588,7 @@ void main() {
     // Bounce curve
     test('bounceOut curve', () {
       final motion = CueMotion.curved(
-        Duration(milliseconds: 400),
+        0.4,
         curve: Curves.bounceOut,
       );
       final curved = motion.build(SimulationBuildData.forward(startValue: 0.0));
@@ -598,7 +598,7 @@ void main() {
 
     // Zero duration curve (edge case)
     test('zero duration curve', () {
-      final motion = CueMotion.linear(Duration.zero);
+      final motion = CueMotion.linear(0.0);
       final curved = motion.build(SimulationBuildData.forward(startValue: 0.0));
       
       expect(curved.duration, lessThanOrEqualTo(0.01));
@@ -607,7 +607,7 @@ void main() {
 
     // Very long duration curve
     test('very long duration curve (2s)', () {
-      final motion = CueMotion.linear(Duration(seconds: 2));
+      final motion = CueMotion.linear(2.0);
       final curved = motion.build(SimulationBuildData.forward(startValue: 0.0));
       
       expect(refDuration(curved), closeTo(curved.duration, 1 / 60));
@@ -616,7 +616,7 @@ void main() {
     // Different starting values
     test('curved motion with non-zero start value', () {
       final motion = CueMotion.curved(
-        Duration(milliseconds: 300),
+        0.3,
         curve: Curves.easeOut,
       );
       final curved = motion.build(SimulationBuildData.forward(startValue: 0.5));
@@ -659,7 +659,7 @@ void main() {
     // Delayed curved motion
     test('delayed curved motion', () {
       final motion = CueMotion.curved(
-        Duration(milliseconds: 300),
+        0.3,
         curve: Curves.easeOut,
       );
       final curved = motion.build(SimulationBuildData.forward(startValue: 0.0));
@@ -671,7 +671,7 @@ void main() {
     // Delayed + delayed curved motion
     test('double delayed curved motion', () {
       final motion = CueMotion.curved(
-        Duration(milliseconds: 300),
+        0.3,
         curve: Curves.easeInOut,
       );
       final curved = motion.build(SimulationBuildData.forward(startValue: 0.0));

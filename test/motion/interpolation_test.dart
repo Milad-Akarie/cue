@@ -75,7 +75,7 @@ void main() {
   // -------------------------------------------------------------------------
   group('TimedMotion (linear) — interpolation', () {
     test('forward 0→1 with SimulationBuildData.forward', () {
-      final motion = CueMotion.linear(const Duration(milliseconds: 300));
+      final motion = CueMotion.linear(0.3);
       _assertInterpolation(
         motion,
         const SimulationBuildData.forward(startValue: 0.0),
@@ -84,7 +84,7 @@ void main() {
     });
 
     test('reverse 1→0 with SimulationBuildData.reverse', () {
-      final motion = CueMotion.linear(const Duration(milliseconds: 300));
+      final motion = CueMotion.linear(0.3);
       _assertInterpolation(
         motion,
         const SimulationBuildData.reverse(startValue: 1.0),
@@ -93,7 +93,7 @@ void main() {
     });
 
     test('partial forward 0.3→1 (interrupted mid-animation)', () {
-      final motion = CueMotion.linear(const Duration(milliseconds: 300));
+      final motion = CueMotion.linear(0.3);
       _assertInterpolation(
         motion,
         const SimulationBuildData.forward(startValue: 0.3),
@@ -102,7 +102,7 @@ void main() {
     });
 
     test('partial reverse 0.6→0 (interrupted mid-animation)', () {
-      final motion = CueMotion.linear(const Duration(milliseconds: 300));
+      final motion = CueMotion.linear(0.3);
       _assertInterpolation(
         motion,
         const SimulationBuildData.reverse(startValue: 0.6),
@@ -111,7 +111,7 @@ void main() {
     });
 
     test('explicit endValue override', () {
-      final motion = CueMotion.linear(const Duration(milliseconds: 300));
+      final motion = CueMotion.linear(0.3);
       _assertInterpolation(
         motion,
         const SimulationBuildData(forward: true, startValue: 0.2, endValue: 0.8),
@@ -120,7 +120,7 @@ void main() {
     });
 
     test('zero duration linear (instant snap)', () {
-      final motion = CueMotion.linear(Duration.zero);
+      final motion = CueMotion.linear(0.0);
       // Duration 0 means the simulation is immediately at the end.
       final sim = motion.build(const SimulationBuildData.forward(startValue: 0.0));
       final (valueAtEnd, _) = sim.valueAtProgress(1.0);
@@ -148,7 +148,7 @@ void main() {
       final curve = entry.value;
 
       test('$curveName forward 0→1', () {
-        final motion = CueMotion.curved(const Duration(milliseconds: 400), curve: curve);
+        final motion = CueMotion.curved(0.4, curve: curve);
         _assertInterpolation(
           motion,
           const SimulationBuildData.forward(startValue: 0.0),
@@ -157,7 +157,7 @@ void main() {
       });
 
       test('$curveName reverse 1→0', () {
-        final motion = CueMotion.curved(const Duration(milliseconds: 400), curve: curve);
+        final motion = CueMotion.curved(0.4, curve: curve);
         _assertInterpolation(
           motion,
           const SimulationBuildData.reverse(startValue: 1.0),
@@ -166,7 +166,7 @@ void main() {
       });
 
       test('$curveName partial forward 0.4→1', () {
-        final motion = CueMotion.curved(const Duration(milliseconds: 400), curve: curve);
+        final motion = CueMotion.curved(0.4, curve: curve);
         _assertInterpolation(
           motion,
           const SimulationBuildData.forward(startValue: 0.4),
@@ -177,7 +177,7 @@ void main() {
 
     test('curved explicit endValue 0.1→0.9', () {
       final motion = CueMotion.curved(
-        const Duration(milliseconds: 300),
+        0.3,
         curve: Curves.easeInOut,
       );
       _assertInterpolation(
@@ -310,7 +310,7 @@ void main() {
     });
 
     test('Spring (duration/bounce factory) forward 0→1 with bounce', () {
-      final motion = Spring(duration: const Duration(milliseconds: 500), bounce: 0.3);
+      final motion = Spring(duration: 0.5, bounce: 0.3);
       _assertInterpolation(
         motion,
         const SimulationBuildData.forward(startValue: 0.0),
@@ -377,8 +377,8 @@ void main() {
   // -------------------------------------------------------------------------
   group('DelayedMotion — interpolation', () {
     test('delayed linear: value stays at startValue during delay', () {
-      final base = CueMotion.linear(const Duration(milliseconds: 300));
-      final motion = base.delayed(const Duration(milliseconds: 100));
+      final base = CueMotion.linear(0.3);
+      final motion = base.delayed(0.1);
       // Total = 400ms; delay fraction = 100/400 = 0.25
 
       final sim = motion.build(const SimulationBuildData.forward(startValue: 0.0));
@@ -400,10 +400,10 @@ void main() {
 
     test('delayed curved (easeOut) forward 0→1', () {
       final base = CueMotion.curved(
-        const Duration(milliseconds: 300),
+        0.3,
         curve: Curves.easeOut,
       );
-      final motion = base.delayed(const Duration(milliseconds: 150));
+      final motion = base.delayed(0.15);
       _assertInterpolation(
         motion,
         const SimulationBuildData.forward(startValue: 0.0),
@@ -413,7 +413,7 @@ void main() {
 
     test('delayed spring (smooth) forward 0→1', () {
       final base = const Spring.smooth();
-      final motion = base.delayed(const Duration(milliseconds: 100));
+      final motion = base.delayed(0.1);
       _assertInterpolation(
         motion,
         const SimulationBuildData.forward(startValue: 0.0),
@@ -424,7 +424,7 @@ void main() {
 
     test('delayed spring (bouncy) forward 0→1 — overshoot still valid', () {
       final base = const Spring.bouncy();
-      final motion = base.delayed(const Duration(milliseconds: 100));
+      final motion = base.delayed(0.1);
       _assertInterpolation(
         motion,
         const SimulationBuildData.forward(startValue: 0.0),
@@ -434,8 +434,8 @@ void main() {
     });
 
     test('delayed linear reverse 1→0', () {
-      final base = CueMotion.linear(const Duration(milliseconds: 300));
-      final motion = base.delayed(const Duration(milliseconds: 100));
+      final base = CueMotion.linear(0.3);
+      final motion = base.delayed(0.1);
       _assertInterpolation(
         motion,
         const SimulationBuildData.reverse(startValue: 1.0),
@@ -444,8 +444,8 @@ void main() {
     });
 
     test('delayed with zero delay is equivalent to base motion', () {
-      final base = CueMotion.linear(const Duration(milliseconds: 300));
-      final delayed = base.delayed(Duration.zero);
+      final base = CueMotion.linear(0.3);
+      final delayed = base.delayed(0.0);
 
       final baseSim = base.build(const SimulationBuildData.forward(startValue: 0.0));
       final delayedSim = delayed.build(const SimulationBuildData.forward(startValue: 0.0));
@@ -458,12 +458,11 @@ void main() {
     });
 
     test('delay longer than base animation (extreme ratio)', () {
-      // delay 400ms, base 100ms
       final base = CueMotion.curved(
-        const Duration(milliseconds: 100),
+        0.1,
         curve: Curves.easeIn,
       );
-      final motion = base.delayed(const Duration(milliseconds: 400));
+      final motion = base.delayed(0.4);
       _assertInterpolation(
         motion,
         const SimulationBuildData.forward(startValue: 0.0),
@@ -478,8 +477,8 @@ void main() {
   group('SegmentedMotion — interpolation', () {
     test('two linear segments forward 0→1', () {
       final motion = SegmentedMotion([
-        CueMotion.linear(const Duration(milliseconds: 200)),
-        CueMotion.linear(const Duration(milliseconds: 300)),
+        CueMotion.linear(0.2),
+        CueMotion.linear(0.3),
       ]);
       _assertInterpolation(
         motion,
@@ -490,8 +489,8 @@ void main() {
 
     test('two curved segments forward 0→1', () {
       final motion = SegmentedMotion([
-        CueMotion.curved(const Duration(milliseconds: 200), curve: Curves.easeIn),
-        CueMotion.curved(const Duration(milliseconds: 300), curve: Curves.easeOut),
+        CueMotion.curved(0.2, curve: Curves.easeIn),
+        CueMotion.curved(0.3, curve: Curves.easeOut),
       ]);
       _assertInterpolation(
         motion,
@@ -502,9 +501,9 @@ void main() {
 
     test('three linear segments forward 0→1', () {
       final motion = SegmentedMotion([
-        CueMotion.linear(const Duration(milliseconds: 100)),
-        CueMotion.linear(const Duration(milliseconds: 200)),
-        CueMotion.linear(const Duration(milliseconds: 200)),
+        CueMotion.linear(0.1),
+        CueMotion.linear(0.2),
+        CueMotion.linear(0.2),
       ]);
       _assertInterpolation(
         motion,
@@ -516,7 +515,7 @@ void main() {
     test('mixed spring + linear segments forward 0→1', () {
       final motion = SegmentedMotion([
         const Spring.smooth(),
-        CueMotion.linear(const Duration(milliseconds: 200)),
+        CueMotion.linear(0.2),
       ]);
       _assertInterpolation(
         motion,
@@ -541,8 +540,8 @@ void main() {
 
     test('two linear segments reverse 1→0', () {
       final motion = SegmentedMotion([
-        CueMotion.linear(const Duration(milliseconds: 200)),
-        CueMotion.linear(const Duration(milliseconds: 300)),
+        CueMotion.linear(0.2),
+        CueMotion.linear(0.3),
       ]);
       _assertInterpolation(
         motion,
@@ -552,15 +551,9 @@ void main() {
     });
 
     test('partial start — segmented linear with phase=1 has finite values', () {
-      // SegmentedSimulation.valueAtProgress uses pre-built seekable segments
-      // from buildBase() (always 0→1 range), so startValue in SimulationBuildData
-      // affects the real-time x(t) path but not the seekable progress mapping.
-      // We therefore only assert that all values at every progress are finite and
-      // that the boundary values are internally consistent (progress 0.0→first
-      // segment start, progress 1.0→last segment end).
       final motion = SegmentedMotion([
-        CueMotion.linear(const Duration(milliseconds: 200)),
-        CueMotion.linear(const Duration(milliseconds: 300)),
+        CueMotion.linear(0.2),
+        CueMotion.linear(0.3),
       ]);
       final sim = motion.build(
         const SimulationBuildData(forward: true, startValue: 0.5, phase: 1),
@@ -571,15 +564,14 @@ void main() {
         expect(v.isFinite, isTrue, reason: 'Segmented partial start: value at $p must be finite');
       }
 
-      // At full progress the seekable segments always end at the last segment's endValue (1.0).
       final (vEnd, _) = sim.valueAtProgress(1.0);
       expect(vEnd, closeTo(1.0, 0.001), reason: 'Segmented partial start: value at progress 1.0 should be 1.0');
     });
 
     test('two-segment motion with elastic curves — overshoot valid', () {
       final motion = SegmentedMotion([
-        CueMotion.curved(const Duration(milliseconds: 300), curve: Curves.elasticOut),
-        CueMotion.curved(const Duration(milliseconds: 300), curve: Curves.elasticIn),
+        CueMotion.curved(0.3, curve: Curves.elasticOut),
+        CueMotion.curved(0.3, curve: Curves.elasticIn),
       ]);
       _assertInterpolation(
         motion,
@@ -588,13 +580,11 @@ void main() {
       );
     });
 
-    // The intermediate value range is deliberately unclamped — just assert
-    // that both the segment-level values and the simulation are finite.
     test('segmented motion produces finite values at all progress points', () {
       final motion = SegmentedMotion([
-        CueMotion.curved(const Duration(milliseconds: 200), curve: Curves.bounceOut),
-        CueMotion.curved(const Duration(milliseconds: 200), curve: Curves.elasticOut),
-        CueMotion.linear(const Duration(milliseconds: 100)),
+        CueMotion.curved(0.2, curve: Curves.bounceOut),
+        CueMotion.curved(0.2, curve: Curves.elasticOut),
+        CueMotion.linear(0.1),
       ]);
       final sim = motion.build(const SimulationBuildData.forward(startValue: 0.0));
 
@@ -644,7 +634,7 @@ void main() {
     });
 
     test('linear motion with non-standard range (0.25→0.75) via explicit endValue', () {
-      final motion = CueMotion.linear(const Duration(milliseconds: 300));
+      final motion = CueMotion.linear(0.3);
       _assertInterpolation(
         motion,
         const SimulationBuildData(forward: true, startValue: 0.25, endValue: 0.75),
@@ -654,7 +644,7 @@ void main() {
 
     test('curved motion with non-standard range (0.1→0.9)', () {
       final motion = CueMotion.curved(
-        const Duration(milliseconds: 300),
+        0.3,
         curve: Curves.easeInOut,
       );
       _assertInterpolation(
@@ -675,7 +665,7 @@ void main() {
     });
 
     test('reverse motion with explicit endValue override (1.0→0.3)', () {
-      final motion = CueMotion.linear(const Duration(milliseconds: 300));
+      final motion = CueMotion.linear(0.3);
       _assertInterpolation(
         motion,
         const SimulationBuildData(forward: false, startValue: 1.0, endValue: 0.3),

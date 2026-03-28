@@ -8,7 +8,7 @@ void main() {
   group('CueTimeline', () {
     group('Timeline initialization', () {
       test('Timeline initializes with correct main track', () {
-        final motion = CueMotion.linear(Duration(milliseconds: 300));
+        final motion = CueMotion.linear(0.3);
         final config = TrackConfig(motion: motion, reverseMotion: motion);
         final timeline = CueTimelineImpl(config);
 
@@ -18,7 +18,7 @@ void main() {
       });
 
       test('Timeline can be created from motion', () {
-        final motion = CueMotion.linear(Duration(milliseconds: 300));
+        final motion = CueMotion.linear(0.3);
         final timeline = CueTimelineImpl.fromMotion(motion);
 
         expect(timeline.mainTrack, isNotNull);
@@ -27,8 +27,8 @@ void main() {
       });
 
       test('Timeline can be created with different reverse motion', () {
-        final motion = CueMotion.linear(Duration(milliseconds: 300));
-        final reverseMotion = CueMotion.linear(Duration(milliseconds: 500));
+        final motion = CueMotion.linear(0.3);
+        final reverseMotion = CueMotion.linear(0.5);
         final timeline = CueTimelineImpl.fromMotion(motion, reverseMotion: reverseMotion);
 
         expect(timeline.mainTrack, isNotNull);
@@ -39,57 +39,46 @@ void main() {
 
     group('Timeline duration calculation', () {
       test('forwardDuration returns longest track duration', () {
-        final fastMotion = CueMotion.linear(Duration(milliseconds: 200));
-        final slowMotion = CueMotion.linear(Duration(milliseconds: 400));
+        final fastMotion = CueMotion.linear(0.2);
+        final slowMotion = CueMotion.linear(0.4);
 
-        // Create timeline with fast motion as main track
         final fastConfig = TrackConfig(motion: fastMotion, reverseMotion: fastMotion);
         final timeline = CueTimelineImpl(fastConfig);
 
-        // Initial duration should match the main track
-        expect(timeline.forwardDuration, equals(200 / 1000));
+        expect(timeline.forwardDuration, equals(0.2));
 
-        // Add a slower track
         final slowConfig = TrackConfig(motion: slowMotion, reverseMotion: slowMotion);
         timeline.trackFor(slowConfig);
 
-        // Duration should now be the slower track's duration
-        expect(timeline.forwardDuration, equals(400 / 1000));
+        expect(timeline.forwardDuration, equals(0.4));
       });
 
       test('reverseDuration returns longest track reverse duration', () {
-        final fastReverseMotion = CueMotion.linear(Duration(milliseconds: 200));
-        final slowReverseMotion = CueMotion.linear(Duration(milliseconds: 400));
+        final fastReverseMotion = CueMotion.linear(0.2);
+        final slowReverseMotion = CueMotion.linear(0.4);
 
-        // Create timeline with fast reverse motion as main track
         final fastConfig = TrackConfig(motion: fastReverseMotion, reverseMotion: fastReverseMotion);
         final timeline = CueTimelineImpl(fastConfig);
 
-        // Initial duration should match the main track
-        expect(timeline.reverseDuration, equals(200 / 1000));
+        expect(timeline.reverseDuration, equals(0.2));
 
-        // Add a slower reverse track
         final slowConfig = TrackConfig(motion: slowReverseMotion, reverseMotion: slowReverseMotion);
         timeline.trackFor(slowConfig);
 
-        // Reverse duration should now be the slower track's duration
-        expect(timeline.reverseDuration, equals(400 / 1000));
+        expect(timeline.reverseDuration, equals(0.4));
       });
     });
 
     group('Track coordination', () {
       test('trackFor adds a new track to the timeline', () {
-        // Create timeline
-        final mainMotion = CueMotion.linear(Duration(milliseconds: 300));
+        final mainMotion = CueMotion.linear(0.3);
         final mainConfig = TrackConfig(motion: mainMotion, reverseMotion: mainMotion);
         final timeline = CueTimelineImpl(mainConfig);
 
-        // Add new track
-        final newMotion = CueMotion.curved(Duration(milliseconds: 500), curve: Curves.easeInOut);
+        final newMotion = CueMotion.curved(0.5, curve: Curves.easeInOut);
         final newConfig = TrackConfig(motion: newMotion, reverseMotion: newMotion);
         final (track, token) = timeline.trackFor(newConfig);
 
-        // Verify track was added
         expect(timeline.tracks.length, equals(2));
         expect(timeline.tracks.containsKey(newConfig), isTrue);
         expect(track, isNotNull);
@@ -97,269 +86,207 @@ void main() {
       });
 
       test('release removes track when no tokens remain', () {
-        // Create timeline
-        final mainMotion = CueMotion.linear(Duration(milliseconds: 300));
+        final mainMotion = CueMotion.linear(0.3);
         final mainConfig = TrackConfig(motion: mainMotion, reverseMotion: mainMotion);
         final timeline = CueTimelineImpl(mainConfig);
 
-        // Add new track and get token
-        final newMotion = CueMotion.curved(Duration(milliseconds: 500), curve: Curves.easeInOut);
+        final newMotion = CueMotion.curved(0.5, curve: Curves.easeInOut);
         final newConfig = TrackConfig(motion: newMotion, reverseMotion: newMotion);
         final (_, token) = timeline.trackFor(newConfig);
 
-        // Release the token
         timeline.release(token);
 
-        // Track should be removed
-        expect(timeline.tracks.length, equals(1)); // Only main track remains
+        expect(timeline.tracks.length, equals(1));
         expect(timeline.tracks.containsKey(newConfig), isFalse);
       });
 
       test('trackFor with main track config returns main track and does not create duplicate', () {
-        // Create timeline
-        final mainMotion = CueMotion.linear(Duration(milliseconds: 300));
+        final mainMotion = CueMotion.linear(0.3);
         final mainConfig = TrackConfig(motion: mainMotion, reverseMotion: mainMotion);
         final timeline = CueTimelineImpl(mainConfig);
 
-        // Request track for main config
         final (track, token) = timeline.trackFor(mainConfig);
 
-        // Should return the main track, not create a new one
         expect(track, equals(timeline.mainTrack));
-        expect(timeline.tracks.length, equals(1)); // Still only one track
+        expect(timeline.tracks.length, equals(1));
         expect(token.config, equals(mainConfig));
       });
 
       test('releasing main track token does nothing', () {
-        // Create timeline
-        final mainMotion = CueMotion.linear(Duration(milliseconds: 300));
+        final mainMotion = CueMotion.linear(0.3);
         final mainConfig = TrackConfig(motion: mainMotion, reverseMotion: mainMotion);
         final timeline = CueTimelineImpl(mainConfig);
 
-        // Get token for main track
         final (_, token) = timeline.trackFor(mainConfig);
 
-        // Release the main track token
         timeline.release(token);
 
-        // Main track should still exist
         expect(timeline.tracks.length, equals(1));
         expect(timeline.tracks.containsKey(mainConfig), isTrue);
         expect(timeline.mainTrack, isNotNull);
       });
 
       test('multiple tokens prevent track from being released', () {
-        // Create timeline
-        final mainMotion = CueMotion.linear(Duration(milliseconds: 300));
+        final mainMotion = CueMotion.linear(0.3);
         final mainConfig = TrackConfig(motion: mainMotion, reverseMotion: mainMotion);
         final timeline = CueTimelineImpl(mainConfig);
 
-        // Add new track and get multiple tokens
-        final newMotion = CueMotion.curved(Duration(milliseconds: 500), curve: Curves.easeInOut);
+        final newMotion = CueMotion.curved(0.5, curve: Curves.easeInOut);
         final newConfig = TrackConfig(motion: newMotion, reverseMotion: newMotion);
         final (track1, token1) = timeline.trackFor(newConfig);
         final (track2, token2) = timeline.trackFor(newConfig);
         final (track3, token3) = timeline.trackFor(newConfig);
 
-        // All should return the same track instance
         expect(track1, equals(track2));
         expect(track2, equals(track3));
-        expect(timeline.tracks.length, equals(2)); // Main + new track
+        expect(timeline.tracks.length, equals(2));
 
-        // Release first token
         timeline.release(token1);
-        expect(timeline.tracks.length, equals(2)); // Track still exists (2 tokens remain)
+        expect(timeline.tracks.length, equals(2));
         expect(timeline.tracks.containsKey(newConfig), isTrue);
 
-        // Release second token
         timeline.release(token2);
-        expect(timeline.tracks.length, equals(2)); // Track still exists (1 token remains)
+        expect(timeline.tracks.length, equals(2));
         expect(timeline.tracks.containsKey(newConfig), isTrue);
 
-        // Release third token
         timeline.release(token3);
-        expect(timeline.tracks.length, equals(1)); // Track removed (no tokens remain)
+        expect(timeline.tracks.length, equals(1));
         expect(timeline.tracks.containsKey(newConfig), isFalse);
       });
 
       test('releasing invalid token does nothing', () {
-        // Create timeline
-        final mainMotion = CueMotion.linear(Duration(milliseconds: 300));
+        final mainMotion = CueMotion.linear(0.3);
         final mainConfig = TrackConfig(motion: mainMotion, reverseMotion: mainMotion);
         final timeline = CueTimelineImpl(mainConfig);
 
-        // Add a track
-        final newMotion = CueMotion.curved(Duration(milliseconds: 500), curve: Curves.easeInOut);
+        final newMotion = CueMotion.curved(0.5, curve: Curves.easeInOut);
         final newConfig = TrackConfig(motion: newMotion, reverseMotion: newMotion);
         timeline.trackFor(newConfig);
 
-        // Create a token for a config that doesn't exist in timeline
-        final otherMotion = CueMotion.linear(Duration(milliseconds: 400));
+        final otherMotion = CueMotion.linear(0.4);
         final otherConfig = TrackConfig(motion: otherMotion, reverseMotion: otherMotion);
         final invalidToken = ReleaseToken(otherConfig);
 
-        // Release invalid token - should not throw, should do nothing
         timeline.release(invalidToken);
 
-        // Timeline should be unchanged
-        expect(timeline.tracks.length, equals(2)); // Main + new track
+        expect(timeline.tracks.length, equals(2));
       });
 
       test('releasing same token multiple times is safe', () {
-        // Create timeline
-        final mainMotion = CueMotion.linear(Duration(milliseconds: 300));
+        final mainMotion = CueMotion.linear(0.3);
         final mainConfig = TrackConfig(motion: mainMotion, reverseMotion: mainMotion);
         final timeline = CueTimelineImpl(mainConfig);
 
-        // Add new track
-        final newMotion = CueMotion.curved(Duration(milliseconds: 500), curve: Curves.easeInOut);
+        final newMotion = CueMotion.curved(0.5, curve: Curves.easeInOut);
         final newConfig = TrackConfig(motion: newMotion, reverseMotion: newMotion);
         final (_, token) = timeline.trackFor(newConfig);
 
-        // Release the same token multiple times
         timeline.release(token);
-        expect(timeline.tracks.length, equals(1)); // Track removed
+        expect(timeline.tracks.length, equals(1));
 
-        // Releasing again should be safe (no error)
         timeline.release(token);
         timeline.release(token);
-        expect(timeline.tracks.length, equals(1)); // Still just main track
+        expect(timeline.tracks.length, equals(1));
       });
 
       test('trackFor prepares the new track with timeline progress', () {
-        // Create timeline and set progress on main track
-        final mainMotion = CueMotion.linear(Duration(milliseconds: 300));
+        final mainMotion = CueMotion.linear(0.3);
         final mainConfig = TrackConfig(motion: mainMotion, reverseMotion: mainMotion);
         final timeline = CueTimelineImpl(mainConfig);
         timeline.setProgress(0.5, forward: true);
 
-        // Add new track
-        final newMotion = CueMotion.curved(Duration(milliseconds: 500), curve: Curves.easeInOut);
+        final newMotion = CueMotion.curved(0.5, curve: Curves.easeInOut);
         final newConfig = TrackConfig(motion: newMotion, reverseMotion: newMotion);
         final (track, _) = timeline.trackFor(newConfig);
 
-        // New track should have same direction as main track
         expect(track.status.isForwardOrCompleted, isTrue);
 
-        // For a forward timeline with progress 0.5, the track's progress should be normalized
-        // according to relative duration
         final expected = timeline.progress;
         expect(track.progress, equals(expected));
       });
 
       test('multiple tracks with different durations synchronize correctly', () {
-        // Create timeline
-        final fastMotion = CueMotion.linear(Duration(milliseconds: 200));
-        final mediumMotion = CueMotion.linear(Duration(milliseconds: 400));
-        final slowMotion = CueMotion.linear(Duration(milliseconds: 600));
+        final fastMotion = CueMotion.linear(0.2);
+        final mediumMotion = CueMotion.linear(0.4);
+        final slowMotion = CueMotion.linear(0.6);
 
         final fastConfig = TrackConfig(motion: fastMotion, reverseMotion: fastMotion);
         final mediumConfig = TrackConfig(motion: mediumMotion, reverseMotion: mediumMotion);
         final slowConfig = TrackConfig(motion: slowMotion, reverseMotion: slowMotion);
 
-        // Create timeline with medium speed as main track
         final timeline = CueTimelineImpl(mediumConfig);
 
-        // Add fast and slow tracks
         final (fastTrack, _) = timeline.trackFor(fastConfig);
         final (slowTrack, _) = timeline.trackFor(slowConfig);
 
-        // Set timeline progress to 0.5 (means 300ms into 600ms total duration)
         timeline.setProgress(0.5, forward: true);
 
-        // Timeline's forwardDuration should be the slowest track's duration
-        expect(timeline.forwardDuration, equals(600 / 1000));
+        expect(timeline.forwardDuration, equals(0.6));
 
-        // Timeline progress reflects the longest track's progress
         expect(timeline.progress, equals(0.5));
 
-        // Medium track (main): 0.5 * 600 / 400 = 0.75
         expect(timeline.mainTrack.progress, closeTo(0.75, 0.001));
 
-        // Fast track: 0.5 * 600 / 200 = 1.5, clamped to 1.0
         expect(fastTrack.progress, equals(1.0));
 
-        // Slow track: 0.5 * 600 / 600 = 0.5
         expect(slowTrack.progress, equals(0.5));
       });
     });
 
     group('Forward progress normalization', () {
       test('_setForwardProgress normalizes progress correctly for tracks with different durations', () {
-        // Setup timeline with tracks of different durations
-        final fastMotion = CueMotion.linear(Duration(milliseconds: 100));
-        final mediumMotion = CueMotion.linear(Duration(milliseconds: 200));
-        final slowMotion = CueMotion.linear(Duration(milliseconds: 400));
+        final fastMotion = CueMotion.linear(0.1);
+        final mediumMotion = CueMotion.linear(0.2);
+        final slowMotion = CueMotion.linear(0.4);
 
         final fastConfig = TrackConfig(motion: fastMotion, reverseMotion: fastMotion);
         final mediumConfig = TrackConfig(motion: mediumMotion, reverseMotion: mediumMotion);
         final slowConfig = TrackConfig(motion: slowMotion, reverseMotion: slowMotion);
 
-        // Create timeline with medium speed as main track
         final timeline = CueTimelineImpl(mediumConfig);
 
-        // Add fast and slow tracks
         final (fastTrack, _) = timeline.trackFor(fastConfig);
         final (slowTrack, _) = timeline.trackFor(slowConfig);
 
-        // Test various progress points
         final testPoints = [0.0, 0.25, 0.5, 0.75, 1.0];
 
         for (final progress in testPoints) {
           timeline.setProgress(progress, forward: true);
 
-          // Timeline duration is 400ms (slowest track)
-          // Timeline's progress returns the longest track's progress (slow track)
           expect(timeline.progress, closeTo(progress, 0.0001));
 
-          // Medium track (main): progress * 400 / 200 = progress * 2 (clamped)
-          // Formula: progress * timelineDuration / trackDuration
-          final expectedMediumProgress = (progress * 400 / 200).clamp(0.0, 1.0);
+          final expectedMediumProgress = (progress * 0.4 / 0.2).clamp(0.0, 1.0);
           expect(timeline.mainTrack.progress, closeTo(expectedMediumProgress, 0.0001));
 
-          // Fast track: progress * 400 / 100 = progress * 4 (clamped)
-          // Formula: progress * timelineDuration / trackDuration
-          final expectedFastProgress = (progress * 400 / 100).clamp(0.0, 1.0);
+          final expectedFastProgress = (progress * 0.4 / 0.1).clamp(0.0, 1.0);
           expect(fastTrack.progress, closeTo(expectedFastProgress, 0.001));
 
-          // Slow track: progress * 400 / 400 = progress
-          // Formula: progress * timelineDuration / trackDuration
-          final expectedSlowProgress = (progress * 400 / 400).clamp(0.0, 1.0);
+          final expectedSlowProgress = (progress * 0.4 / 0.4).clamp(0.0, 1.0);
           expect(slowTrack.progress, closeTo(expectedSlowProgress, 0.001));
         }
       });
 
       test('setProgress with forward=true correctly updates all tracks', () {
-        // Create a timeline with tracks of different durations
-        final fastMotion = CueMotion.linear(Duration(milliseconds: 100));
-        final slowMotion = CueMotion.linear(Duration(milliseconds: 300));
+        final fastMotion = CueMotion.linear(0.1);
+        final slowMotion = CueMotion.linear(0.3);
 
         final fastConfig = TrackConfig(motion: fastMotion, reverseMotion: fastMotion);
         final slowConfig = TrackConfig(motion: slowMotion, reverseMotion: slowMotion);
 
-        // Use the fast track as main track
         final timeline = CueTimelineImpl(fastConfig);
         final (slowTrack, _) = timeline.trackFor(slowConfig);
 
-        // Set progress to 0.5
         timeline.setProgress(0.5, forward: true);
 
-        // Timeline duration is 300ms (slowest track)
-        // Main track (fast, 100ms): 0.5 * 300 / 100 = 1.5, clamped to 1.0
         expect(timeline.mainTrack.progress, equals(1.0));
 
-        // Slow track: 0.5 * 300 / 300 = 0.5
-        // The timeline duration is determined by the slowest track (300ms)
-        expect(slowTrack.progress, equals(0.5 * 300 / 300));
+        expect(slowTrack.progress, equals(0.5 * 0.3 / 0.3));
 
-        // Set progress to 1.0
         timeline.setProgress(1.0, forward: true);
 
-        // All tracks should be at their max progress
         expect(timeline.mainTrack.progress, equals(1.0));
         expect(slowTrack.progress, equals(1.0));
 
-        // Main track should be completed
         expect(timeline.mainTrack.status, equals(AnimationStatus.completed));
         expect(slowTrack.status, equals(AnimationStatus.completed));
       });
@@ -367,36 +294,24 @@ void main() {
 
     group('Reverse progress normalization', () {
       test('_setReverseProgress normalizes progress correctly for tracks with different durations', () {
-        // Setup timeline with tracks of different reverse durations
-        final fastReverseMotion = CueMotion.linear(Duration(milliseconds: 100));
-        final mediumReverseMotion = CueMotion.linear(Duration(milliseconds: 200));
-        final slowReverseMotion = CueMotion.linear(Duration(milliseconds: 400));
+        final fastReverseMotion = CueMotion.linear(0.1);
+        final mediumReverseMotion = CueMotion.linear(0.2);
+        final slowReverseMotion = CueMotion.linear(0.4);
 
         final fastConfig = TrackConfig(motion: fastReverseMotion, reverseMotion: fastReverseMotion);
         final mediumConfig = TrackConfig(motion: mediumReverseMotion, reverseMotion: mediumReverseMotion);
         final slowConfig = TrackConfig(motion: slowReverseMotion, reverseMotion: slowReverseMotion);
 
-        // Create timeline with medium speed as main track
         final timeline = CueTimelineImpl(mediumConfig);
 
-        // Add fast and slow tracks
         final (fastTrack, _) = timeline.trackFor(fastConfig);
         final (slowTrack, _) = timeline.trackFor(slowConfig);
 
-        // Test various progress points
         final testPoints = [0.0, 0.25, 0.5, 0.75, 1.0];
 
         for (final progress in testPoints) {
           timeline.setProgress(progress, forward: false);
 
-          // For tracks with lower duration, they'll be idle for some time
-          // This creates a more complex normalization
-
-          // Fast track normalization:
-          // idleRatio = 1.0 - (fastTrack.reverseDuration / timelineDuration) = 1.0 - (100 / 400) = 0.75
-          // If progress < idleRatio, the track should be at progress 0.0 (idle)
-          // If progress >= idleRatio, the track should be at normalized progress:
-          //   normalized = (progress - idleRatio) / (fastTrack.reverseDuration / timelineDuration)
           final fastIdleRatio = 1.0 - (fastTrack.reverseDuration / timeline.reverseDuration);
           double expectedFastProgress;
           if (progress < fastIdleRatio) {
@@ -415,7 +330,6 @@ void main() {
             reason: 'Fast track progress at timeline progress $progress should be $expectedFastProgress',
           );
 
-          // Slow track is the timeline duration determiner, so its progress should match the timeline progress
           expect(
             slowTrack.progress,
             closeTo(progress, 0.001),
@@ -425,50 +339,34 @@ void main() {
       });
 
       test('setProgress with forward=false correctly updates all tracks', () {
-        // Create a timeline with tracks of different reverse durations
-        final fastReverseMotion = CueMotion.linear(Duration(milliseconds: 100));
-        final slowReverseMotion = CueMotion.linear(Duration(milliseconds: 300));
+        final fastReverseMotion = CueMotion.linear(0.1);
+        final slowReverseMotion = CueMotion.linear(0.3);
 
         final fastConfig = TrackConfig(motion: fastReverseMotion, reverseMotion: fastReverseMotion);
         final slowConfig = TrackConfig(motion: slowReverseMotion, reverseMotion: slowReverseMotion);
 
-        // Use the fast track as main track
         final timeline = CueTimelineImpl(fastConfig);
         final (slowTrack, _) = timeline.trackFor(slowConfig);
 
-        // Initialize tracks to completed state first
         timeline.setProgress(1.0, forward: true);
 
-        // Set reverse progress to 0.5
         timeline.setProgress(0.5, forward: false);
 
-        // Main track (fast) should be at progress 0.0 until its turn to animate
-        // The fast track would be idle for the first 2/3 of the animation
-        // idleRatio = 1.0 - (100/300) = 0.67
-        // At timeline progress 0.5, the fast track should still be idle
-        // because 0.5 < idleRatio (0.67)
         expect(timeline.mainTrack.progress, equals(0.0));
 
-        // Slow track's progress should be 0.5
         expect(slowTrack.progress, equals(0.5));
 
-        // Set reverse progress to 0.8, which should start animating the fast track
         timeline.setProgress(0.8, forward: false);
 
-        // Fast track should now have started animating
-        // adjustedProgress = 0.8 - 0.67 = 0.13
-        // normalized = 0.13 / (100/300) = 0.39
-        final fastIdleRatio = 1.0 - (100 / 300);
+        final fastIdleRatio = 1.0 - (0.1 / 0.3);
         final adjustedProgress = 0.8 - fastIdleRatio;
-        final expectedFastProgress = (adjustedProgress / (100 / 300)).clamp(0.0, 1.0);
+        final expectedFastProgress = (adjustedProgress / (0.1 / 0.3)).clamp(0.0, 1.0);
 
         expect(timeline.mainTrack.progress, closeTo(expectedFastProgress, 0.001));
         expect(slowTrack.progress, equals(0.8));
 
-        // Set reverse progress to 1.0
         timeline.setProgress(1.0, forward: false);
 
-        // All tracks should be at their max reverse progress
         expect(timeline.mainTrack.progress, equals(1.0));
         expect(slowTrack.progress, equals(1.0));
       });
@@ -476,38 +374,31 @@ void main() {
 
     group('Timeline status tracking', () {
       test('status is updated correctly based on track statuses', () {
-        // Create a timeline with two tracks
-        final motion = CueMotion.linear(Duration(milliseconds: 300));
+        final motion = CueMotion.linear(0.3);
         final config = TrackConfig(motion: motion, reverseMotion: motion);
         final timeline = CueTimelineImpl(config);
 
         final secondConfig = TrackConfig(motion: motion, reverseMotion: motion);
         timeline.trackFor(secondConfig);
 
-        // Initial status should be dismissed
         expect(timeline.status, equals(AnimationStatus.dismissed));
 
-        // Set progress to 0.5 (forward), status should be forward
         timeline.setProgress(0.5, forward: true);
         expect(timeline.status, equals(AnimationStatus.forward));
 
-        // Set progress to 1.0 (forward), status should be completed
         timeline.setProgress(1.0, forward: true);
         expect(timeline.status, equals(AnimationStatus.completed));
 
-        // Set progress to 0.5 (reverse), status should be reverse
         timeline.setProgress(0.5, forward: false);
         expect(timeline.status, equals(AnimationStatus.reverse));
 
-        // Set progress to 0.0 (reverse), status should be dismissed
         timeline.setProgress(0.0, forward: false);
         expect(timeline.status, equals(AnimationStatus.dismissed));
       });
 
       test('_updateStatus updates status correctly when some tracks are complete', () {
-        // Create timeline with two tracks of different durations
-        final fastMotion = CueMotion.linear(Duration(milliseconds: 100));
-        final slowMotion = CueMotion.linear(Duration(milliseconds: 300));
+        final fastMotion = CueMotion.linear(0.1);
+        final slowMotion = CueMotion.linear(0.3);
 
         final fastConfig = TrackConfig(motion: fastMotion, reverseMotion: fastMotion);
         final slowConfig = TrackConfig(motion: slowMotion, reverseMotion: slowMotion);
@@ -515,26 +406,20 @@ void main() {
         final timeline = CueTimelineImpl(fastConfig);
         timeline.trackFor(slowConfig);
 
-        // Set timeline to 50% progress
         timeline.setProgress(0.5, forward: true);
 
-        // The fast track should be completed (since 0.5 * 300 / 100 > 1.0)
         expect(timeline.mainTrack.status, equals(AnimationStatus.completed));
 
-        // But the timeline status should still be forward because the slow track is still animating
         expect(timeline.status, equals(AnimationStatus.forward));
 
-        // Set timeline to 100% progress
         timeline.setProgress(1.0, forward: true);
 
-        // Now all tracks should be completed
         expect(timeline.status, equals(AnimationStatus.completed));
       });
 
       test('isDone returns correct value based on track completion', () {
-        // Create timeline with two tracks of different durations
-        final fastMotion = CueMotion.linear(Duration(milliseconds: 100));
-        final slowMotion = CueMotion.linear(Duration(milliseconds: 300));
+        final fastMotion = CueMotion.linear(0.1);
+        final slowMotion = CueMotion.linear(0.3);
 
         final fastConfig = TrackConfig(motion: fastMotion, reverseMotion: fastMotion);
         final slowConfig = TrackConfig(motion: slowMotion, reverseMotion: slowMotion);
@@ -542,83 +427,68 @@ void main() {
         final timeline = CueTimelineImpl(fastConfig);
         final (slowTrack, _) = timeline.trackFor(slowConfig);
 
-        // Prepare timeline for animation
         timeline.prepare(forward: true);
 
-        // At t=0, no track should be done
         expect(timeline.isDone(0.0), isFalse);
 
-        // Advance to t=0.1 (100ms) - fast track duration
         timeline.x(0.1);
-        expect(timeline.mainTrack.isDone, isTrue); // Fast track completed
-        expect(slowTrack.isDone, isFalse); // Slow track still animating
-        expect(timeline.isDone(0.1), isFalse); // Timeline not done yet
+        expect(timeline.mainTrack.isDone, isTrue);
+        expect(slowTrack.isDone, isFalse);
+        expect(timeline.isDone(0.1), isFalse);
 
-        // Advance to t=0.3 (300ms) - after all tracks complete
         timeline.x(0.3);
         expect(timeline.mainTrack.isDone, isTrue);
         expect(slowTrack.isDone, isTrue);
-        expect(timeline.isDone(0.3), isTrue); // Now timeline is done
+        expect(timeline.isDone(0.3), isTrue);
       });
     });
 
     group('Timeline repeat behavior', () {
       test('prepareForRepeat sets up tracks correctly', () {
-        final motion = CueMotion.linear(Duration(milliseconds: 300));
+        final motion = CueMotion.linear(0.3);
         final config = TrackConfig(motion: motion, reverseMotion: motion);
         final timeline = CueTimelineImpl(config);
 
-        // Initially at 0.0 progress
         expect(timeline.progress, equals(0.0));
 
-        // Set progress to 1.0 to complete the animation
         timeline.setProgress(1.0);
         expect(timeline.progress, equals(1.0));
 
-        // Prepare for repeat with 3 repetitions
         final repeatConfig = RepeatConfig(count: 3, reverse: false);
         timeline.prepareForRepeat(repeatConfig);
 
-        // Progress should be reset to 0.0
         expect(timeline.progress, equals(0.0));
 
-        // Status should be reset to forward
         expect(timeline.status, equals(AnimationStatus.forward));
       });
 
       test('isDone handles repetitions correctly', () {
-        final motion = CueMotion.linear(Duration(milliseconds: 300));
+        final motion = CueMotion.linear(0.3);
         final config = TrackConfig(motion: motion, reverseMotion: motion);
         final timeline = CueTimelineImpl(config);
 
-        // Prepare for repeat with 3 repetitions
         final repeatConfig = RepeatConfig(count: 3, reverse: false);
         timeline.prepareForRepeat(repeatConfig);
 
-        // First cycle - animate to 0.3s (300ms - one full cycle)
         expect(timeline.isDone(0.0), isFalse);
         timeline.x(0.3);
-        expect(timeline.isDone(0.3), isFalse); // First cycle completed, but 2 more repeats remain
+        expect(timeline.isDone(0.3), isFalse);
 
-        // Second cycle - continue to 0.6s (600ms total - second cycle done)
         timeline.x(0.6);
-        expect(timeline.isDone(0.6), isFalse); // Second cycle completed, but 1 more repeat remains
+        expect(timeline.isDone(0.6), isFalse);
 
-        // Third cycle - continue to 0.9s (900ms total - third cycle done)
         timeline.x(0.9);
-        expect(timeline.isDone(0.9), isTrue); // Third cycle completed, all 3 repetitions done
+        expect(timeline.isDone(0.9), isTrue);
 
-        // Prepare for infinite repetitions
         final infiniteRepeat = RepeatConfig(count: null, reverse: false);
         timeline.prepareForRepeat(infiniteRepeat);
 
-        // Should never be truly done with infinite repeats
         timeline.x(0.3);
-        expect(timeline.isDone(0.3), isFalse); // Cycle completes but repeats again
+        expect(timeline.isDone(0.3), isFalse);
         timeline.x(0.6);
-        expect(timeline.isDone(0.6), isFalse); // Another cycle, still repeating
+        expect(timeline.isDone(0.6), isFalse);
         timeline.x(0.9);
-        expect(timeline.isDone(0.9), isFalse); // Yet another cycle, infinite loop
+        expect(timeline.isDone(0.9), isFalse);
       });
     });
   });
