@@ -99,7 +99,11 @@ class CueTrackImpl extends CueTrack with AnimationLocalStatusListenersMixin {
 
     final active = forward ? motion : reverseMotion;
 
-    _startProgress = from ?? _progress;
+    if (from != null) {
+      _progress = from;
+    }
+
+    _startProgress = _progress;
 
     if (reverseType.isExclusive) {
       _value = 1.0;

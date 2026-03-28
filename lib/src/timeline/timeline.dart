@@ -66,7 +66,7 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
     );
     entry.track.prepare(
       forward: mainTrack.isForwardOrCompleted,
-      from: mainTrack.progress,
+      from: progress,
       exteranlVelocity: mainTrack.velocity,
     );
     final token = ReleaseToken(config);

@@ -127,6 +127,8 @@ class TimedMotion extends CueMotion {
       return 'TimedMotion(duration: $baseDuration, curve: $curve)';
     }
   }
+  
+  
 }
 
 abstract class SimulationMotion<S extends CueSimulation> extends CueMotion {
