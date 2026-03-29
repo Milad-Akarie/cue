@@ -25,7 +25,7 @@ class _OnVisibleCueState extends _CueState<_OnScrollVisibleCue> with SingleTicke
   late final _controller = CueController(
     motion: .linear(1.0),
     vsync: this,
-    progressBased: true,
+    progressDriven: true,
   );
 
   ScrollPosition? _scrollPosition;
@@ -52,7 +52,7 @@ class _OnVisibleCueState extends _CueState<_OnScrollVisibleCue> with SingleTicke
       _scrollPosition = position;
       _scrollPosition!.addListener(_trackViiblity);
     }
-    _trackViiblity();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _trackViiblity());
   }
 
   @override

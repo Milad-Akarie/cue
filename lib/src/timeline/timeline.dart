@@ -5,13 +5,13 @@ import 'package:cue/src/timeline/track/track_config.dart';
 import 'package:flutter/material.dart';
 
 class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixin {
-  CueTimelineImpl(TrackConfig config, {this.progressBased = false}) : super({config: TrackEntry(CueTrackImpl(config))});
+  CueTimelineImpl(TrackConfig config, {this.progressDriven = false}) : super({config: TrackEntry(CueTrackImpl(config))});
 
-  final bool progressBased;
+  final bool progressDriven;
 
-  factory CueTimelineImpl.fromMotion(CueMotion motion, {CueMotion? reverseMotion, bool progressBased = false}) {
+  factory CueTimelineImpl.fromMotion(CueMotion motion, {CueMotion? reverseMotion, bool progressDriven = false}) {
     final config = TrackConfig(motion: motion, reverseMotion: reverseMotion ?? motion);
-    return CueTimelineImpl(config, progressBased: progressBased);
+    return CueTimelineImpl(config, progressDriven: progressDriven);
   }
 
   @override
@@ -126,7 +126,7 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
     final timelineDuration = forwardDuration;
     for (final entry in tracks.entries) {
       final track = entry.value.track;
-      final normalized = progressBased ? value : (value * timelineDuration / track.forwardDuration).clamp(0.0, 1.0);
+      final normalized = progressDriven ? value : (value * timelineDuration / track.forwardDuration).clamp(0.0, 1.0);
       track.setProgress(normalized, forward: true);
     }
   }
@@ -135,7 +135,7 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
     final timelineDuration = reverseDuration;
     for (final entry in tracks.entries) {
       final track = entry.value.track;
-      if (progressBased) {
+      if (progressDriven) {
         track.setProgress(value, forward: false);
         continue;
       }

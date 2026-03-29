@@ -6,6 +6,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'dart:math' as math;
+
+import 'package:flutter/scheduler.dart';
 part 'indexed_cue.dart';
 part 'on_change_cue.dart';
 part 'self_animated_cue.dart';
@@ -15,6 +17,7 @@ part 'on_scroll_visiable_cue.dart';
 part 'controlled_cue.dart';
 part 'cue_scope.dart';
 part 'progress_cue.dart';
+part 'on_scroll_cue.dart';
 
 abstract class Cue extends StatefulWidget {
   const Cue._({
@@ -102,12 +105,23 @@ abstract class Cue extends StatefulWidget {
     double max,
   }) = _ProgressCue;
 
+  /// Maps the child's journey through the viewport to a 0-1 progress value.
+  ///
+  /// Progress is 0 when the child's leading edge enters the viewport,
+  /// and 1 when the child's leading edge reaches the viewport top.
+  const factory Cue.onScroll({
+    Key? key,
+    String? debugLabel,
+    List<Act>? acts,
+    required Widget child,
+  }) = _OnScrollCue;
+
   // This only works within the nearest scrollable ancestor and is not meant to be used as a general purpose visibility detector.
   // it doesn't support nested scrollables and is not meant to be used as a general purpose visibility detector.
 
   // if you need a general purpose visibility detector, use the VisibilityDetector package. an trigger Cue animations based on visibility changes using that package and Cue's imperative API.
   const factory Cue.onScrollVisible({
-     Key? key,
+    Key? key,
     String? debugLabel,
     bool enabled,
     List<Act>? acts,
@@ -127,8 +141,6 @@ abstract class _CueState<T extends Cue> extends State<Cue> {
 
   late final _debugId = '$debugName-${widget.debugLabel ?? ''}${identityHashCode(widget)}';
 
-
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -145,13 +157,13 @@ abstract class _CueState<T extends Cue> extends State<Cue> {
             });
           }
         }
+
         timeline.removeStatusListener(statusListener);
         timeline.addStatusListener(statusListener);
       }
     }
   }
 
- 
   @override
   void dispose() {
     _deattachDebugOverlay?.call();

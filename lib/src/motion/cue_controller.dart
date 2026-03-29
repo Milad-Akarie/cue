@@ -15,13 +15,13 @@ class CueController extends AnimationController {
     required super.vsync,
     required CueMotion motion,
     CueMotion? reverseMotion,
-    bool progressBased = false,
+    bool progressDriven = false,
   }) : _timeline = CueTimelineImpl(
          TrackConfig(
            motion: motion,
            reverseMotion: reverseMotion ?? motion,
          ),
-         progressBased: progressBased,
+         progressDriven: progressDriven,
        ),
        super.unbounded();
 

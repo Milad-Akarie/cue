@@ -149,34 +149,39 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
               //     ),
               //   ),
               // ),
-              IndicatorToButton(),
-              if (false)
-                for (var i = 0; i < 20; i++)
-                  Cue.onScrollVisible(
+              for (var i = 0; i < 20; i++)
+                Cue.onScroll(
+                  key: ValueKey(i),
+                  child: Container(
+                    height: 220,
+                    margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+                    width: double.infinity,
+                    clipBehavior: .antiAlias,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
                     child: Actor(
                       motion: .smooth(),
                       acts: [
-                        // .slideX(from: -1, reverse: .to(1)),
-                        // .scale(from: .5, to: 1.0,reverse: .to(.5), motion: .linear(.5)),
+                        // .slideX(from: -1),
+                        .scale(from: 1.0, to: 1.3),
+                        .parallax(slide: .3, axis: .vertical),
                       ],
-                      child: Container(
-                        height: 220,
-                        margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12.0),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 8,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
+                      child: Image.network(
+                        'https://picsum.photos/400/300?random=$i',
+                        fit: BoxFit.cover,
                       ),
                     ),
                   ),
+                ),
             ],
           ),
         ),
