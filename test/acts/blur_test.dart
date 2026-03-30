@@ -1,0 +1,328 @@
+
+import 'package:cue/cue.dart';
+import 'package:cue/src/timeline/track/track.dart';
+import 'package:cue/src/timeline/track/track_config.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  ActContext createActContext() {
+    final motion = CueMotion.linear(300.ms);
+    return ActContext(motion: motion, reverseMotion: motion);
+  }
+
+  CueTrack createTrack() {
+    final motion = CueMotion.linear(300.ms);
+    final config = TrackConfig(motion: motion, reverseMotion: motion);
+    return CueTrackImpl(config);
+  }
+
+  group('BlurAct', () {
+    test('key is "Blur"', () {
+      const act = BlurAct();
+      expect(act.key.key, equals('Blur'));
+    });
+
+    test('default from and to are 0.0', () {
+      const act = BlurAct();
+      expect(act.from, equals(0.0));
+      expect(act.to, equals(0.0));
+    });
+
+    test('constructor with custom from and to', () {
+      const act = BlurAct(from: 5.0, to: 10.0);
+      expect(act.from, equals(5.0));
+      expect(act.to, equals(10.0));
+    });
+
+    test('constructor with motion', () {
+      final motion = CueMotion.linear(500.ms);
+      final act = BlurAct(from: 0.0, to: 10.0, motion: motion);
+      expect(act.motion, equals(motion));
+    });
+
+    test('constructor with delay', () {
+      const act = BlurAct(delay: Duration(milliseconds: 200));
+      expect(act.delay, equals(const Duration(milliseconds: 200)));
+    });
+
+    test('focus constructor defaults', () {
+      const act = BlurAct.focus();
+      expect(act.from, equals(10.0));
+      expect(act.to, equals(0.0));
+    });
+
+    test('focus constructor with custom values', () {
+      const act = BlurAct.focus(from: 20.0, to: 5.0);
+      expect(act.from, equals(20.0));
+      expect(act.to, equals(5.0));
+    });
+
+    test('unfocus constructor defaults', () {
+      const act = BlurAct.unfocus();
+      expect(act.from, equals(0.0));
+      expect(act.to, equals(10.0));
+    });
+
+    test('unfocus constructor with custom values', () {
+      const act = BlurAct.unfocus(from: 5.0, to: 20.0);
+      expect(act.from, equals(5.0));
+      expect(act.to, equals(20.0));
+    });
+
+    test('keyframed constructor', () {
+      final frames = FractionalKeyframes<double>([
+        FractionalKeyframe(0.0, at: 0.0),
+        FractionalKeyframe(10.0, at: 1.0),
+      ]);
+      final act = BlurAct.keyframed(frames: frames);
+      expect(act.frames, equals(frames));
+    });
+
+    testWidgets('apply wraps child in ImageFiltered', (tester) async {
+      const act = BlurAct(from: 0.0, to: 10.0);
+      final ctx = createActContext();
+      final (animtable, _) = act.buildTweens(ctx);
+
+      final track = createTrack();
+      track.setProgress(0.5);
+
+      final animation = CueAnimationImpl<double>(
+        parent: track,
+        token: ReleaseToken(track.config),
+        animtable: animtable,
+      );
+
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: Builder(
+            builder: (context) => act.apply(context, animation, const SizedBox()),
+          ),
+        ),
+      );
+
+      expect(find.byType(ImageFiltered), findsOneWidget);
+    });
+
+    testWidgets('apply uses animation value for blur', (tester) async {
+      const act = BlurAct(from: 0.0, to: 10.0);
+      final ctx = createActContext();
+      final (animtable, _) = act.buildTweens(ctx);
+
+      final track = createTrack();
+      track.setProgress(0.5);
+
+      final animation = CueAnimationImpl<double>(
+        parent: track,
+        token: ReleaseToken(track.config),
+        animtable: animtable,
+      );
+
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: Builder(
+            builder: (context) => act.apply(context, animation, const SizedBox()),
+          ),
+        ),
+      );
+
+      final imageFiltered = tester.widget<ImageFiltered>(find.byType(ImageFiltered));
+      expect(imageFiltered.imageFilter, isNotNull);
+    });
+
+    test('equality', () {
+      const act1 = BlurAct(from: 0.0, to: 10.0, delay: Duration(milliseconds: 100));
+      const act2 = BlurAct(from: 0.0, to: 10.0, delay: Duration(milliseconds: 100));
+      const act3 = BlurAct(from: 0.0, to: 5.0);
+
+      expect(act1, equals(act2));
+      expect(act1, isNot(equals(act3)));
+    });
+
+    test('hashCode consistency', () {
+      const act1 = BlurAct(from: 0.0, to: 10.0);
+      const act2 = BlurAct(from: 0.0, to: 10.0);
+
+      expect(act1.hashCode, equals(act2.hashCode));
+    });
+
+    test('isConstant when from equals to', () {
+      const act = BlurAct(from: 5.0, to: 5.0);
+      expect(act.isConstant, isTrue);
+    });
+
+    test('isConstant is false when from and to differ', () {
+      const act = BlurAct(from: 0.0, to: 10.0);
+      expect(act.isConstant, isFalse);
+    });
+  });
+
+  group('BackdropBlurAct', () {
+    test('key is "BackdropBlur"', () {
+      const act = BackdropBlurAct();
+      expect(act.key.key, equals('BackdropBlur'));
+    });
+
+    test('default from and to are 0.0', () {
+      const act = BackdropBlurAct();
+      expect(act.from, equals(0.0));
+      expect(act.to, equals(0.0));
+    });
+
+    test('default blendMode is srcOver', () {
+      const act = BackdropBlurAct();
+      expect(act.blendMode, equals(BlendMode.srcOver));
+    });
+
+    test('constructor with custom from and to', () {
+      const act = BackdropBlurAct(from: 5.0, to: 10.0);
+      expect(act.from, equals(5.0));
+      expect(act.to, equals(10.0));
+    });
+
+    test('constructor with custom blendMode', () {
+      const act = BackdropBlurAct(blendMode: BlendMode.multiply);
+      expect(act.blendMode, equals(BlendMode.multiply));
+    });
+
+    test('constructor with motion', () {
+      final motion = CueMotion.linear(500.ms);
+      final act = BackdropBlurAct(from: 0.0, to: 10.0, motion: motion);
+      expect(act.motion, equals(motion));
+    });
+
+    test('constructor with delay', () {
+      const act = BackdropBlurAct(delay: Duration(milliseconds: 200));
+      expect(act.delay, equals(const Duration(milliseconds: 200)));
+    });
+
+    test('keyframed constructor', () {
+      final frames = FractionalKeyframes<double>([
+        FractionalKeyframe(0.0, at: 0.0),
+        FractionalKeyframe(10.0, at: 1.0),
+      ]);
+      final act = BackdropBlurAct.keyframed(frames: frames);
+      expect(act.frames, equals(frames));
+    });
+
+    test('keyframed constructor with custom blendMode', () {
+      final frames = FractionalKeyframes<double>([
+        FractionalKeyframe(0.0, at: 0.0),
+        FractionalKeyframe(10.0, at: 1.0),
+      ]);
+      final act = BackdropBlurAct.keyframed(frames: frames, blendMode: BlendMode.screen);
+      expect(act.blendMode, equals(BlendMode.screen));
+    });
+
+    testWidgets('apply wraps child in BackdropFilter', (tester) async {
+      const act = BackdropBlurAct(from: 0.0, to: 10.0);
+      final ctx = createActContext();
+      final (animtable, _) = act.buildTweens(ctx);
+
+      final track = createTrack();
+      track.setProgress(0.5);
+
+      final animation = CueAnimationImpl<double>(
+        parent: track,
+        token: ReleaseToken(track.config),
+        animtable: animtable,
+      );
+
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: Builder(
+            builder: (context) => act.apply(context, animation, const SizedBox()),
+          ),
+        ),
+      );
+
+      expect(find.byType(BackdropFilter), findsOneWidget);
+    });
+
+    testWidgets('apply uses animation value for blur', (tester) async {
+      const act = BackdropBlurAct(from: 0.0, to: 10.0);
+      final ctx = createActContext();
+      final (animtable, _) = act.buildTweens(ctx);
+
+      final track = createTrack();
+      track.setProgress(0.5);
+
+      final animation = CueAnimationImpl<double>(
+        parent: track,
+        token: ReleaseToken(track.config),
+        animtable: animtable,
+      );
+
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: Builder(
+            builder: (context) => act.apply(context, animation, const SizedBox()),
+          ),
+        ),
+      );
+
+      final backdropFilter = tester.widget<BackdropFilter>(find.byType(BackdropFilter));
+      expect(backdropFilter.blendMode, equals(BlendMode.srcOver));
+      expect(backdropFilter.filter, isNotNull);
+    });
+
+    testWidgets('apply uses custom blendMode', (tester) async {
+      const act = BackdropBlurAct(from: 0.0, to: 10.0, blendMode: BlendMode.multiply);
+      final ctx = createActContext();
+      final (animtable, _) = act.buildTweens(ctx);
+
+      final track = createTrack();
+      track.setProgress(0.5);
+
+      final animation = CueAnimationImpl<double>(
+        parent: track,
+        token: ReleaseToken(track.config),
+        animtable: animtable,
+      );
+
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: Builder(
+            builder: (context) => act.apply(context, animation, const SizedBox()),
+          ),
+        ),
+      );
+
+      final backdropFilter = tester.widget<BackdropFilter>(find.byType(BackdropFilter));
+      expect(backdropFilter.blendMode, equals(BlendMode.multiply));
+    });
+
+    test('equality', () {
+      const act1 = BackdropBlurAct(from: 0.0, to: 10.0, delay: Duration(milliseconds: 100));
+      const act2 = BackdropBlurAct(from: 0.0, to: 10.0, delay: Duration(milliseconds: 100));
+      const act3 = BackdropBlurAct(from: 0.0, to: 5.0);
+
+      expect(act1, equals(act2));
+      expect(act1, isNot(equals(act3)));
+    });
+
+    test('hashCode consistency', () {
+      const act1 = BackdropBlurAct(from: 0.0, to: 10.0);
+      const act2 = BackdropBlurAct(from: 0.0, to: 10.0);
+
+      expect(act1.hashCode, equals(act2.hashCode));
+    });
+
+    test('isConstant when from equals to', () {
+      const act = BackdropBlurAct(from: 5.0, to: 5.0);
+      expect(act.isConstant, isTrue);
+    });
+
+    test('isConstant is false when from and to differ', () {
+      const act = BackdropBlurAct(from: 0.0, to: 10.0);
+      expect(act.isConstant, isFalse);
+    });
+  });
+}

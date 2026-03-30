@@ -1,10 +1,8 @@
-
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:cue/cue.dart';
 
 void main() {
-
   group('ActKey equality', () {
     test('same key are equal', () {
       const a = ActKey('Opacity');
@@ -70,9 +68,57 @@ void main() {
       expect(a, isNot(equals(b)));
     });
 
+    test('mirror with same motion are equal', () {
+      const a = ReverseBehavior<double>.mirror(motion: CueMotion.linear(Duration(milliseconds: 200)));
+      const b = ReverseBehavior<double>.mirror(motion: CueMotion.linear(Duration(milliseconds: 200)));
+      expect(a, equals(b));
+    });
+
     test('mirror with different delay are not equal', () {
       const a = ReverseBehavior<double>.mirror(delay: Duration.zero);
       const b = ReverseBehavior<double>.mirror(delay: Duration(milliseconds: 100));
+      expect(a, isNot(equals(b)));
+    });
+
+    test('mirror with same delay are equal', () {
+      const a = ReverseBehavior<double>.mirror(delay: Duration(milliseconds: 150));
+      const b = ReverseBehavior<double>.mirror(delay: Duration(milliseconds: 150));
+      expect(a, equals(b));
+    });
+
+    test('mirror with motion and delay combination', () {
+      const a = ReverseBehavior<double>.mirror(
+        motion: CueMotion.linear(Duration(milliseconds: 100)),
+        delay: Duration(milliseconds: 50),
+      );
+      const b = ReverseBehavior<double>.mirror(
+        motion: CueMotion.linear(Duration(milliseconds: 100)),
+        delay: Duration(milliseconds: 50),
+      );
+      expect(a, equals(b));
+    });
+
+    test('mirror with same motion different delay not equal', () {
+      const a = ReverseBehavior<double>.mirror(
+        motion: CueMotion.linear(Duration(milliseconds: 100)),
+        delay: Duration(milliseconds: 50),
+      );
+      const b = ReverseBehavior<double>.mirror(
+        motion: CueMotion.linear(Duration(milliseconds: 100)),
+        delay: Duration(milliseconds: 100),
+      );
+      expect(a, isNot(equals(b)));
+    });
+
+    test('mirror with different motion same delay not equal', () {
+      const a = ReverseBehavior<double>.mirror(
+        motion: CueMotion.linear(Duration(milliseconds: 100)),
+        delay: Duration(milliseconds: 50),
+      );
+      const b = ReverseBehavior<double>.mirror(
+        motion: CueMotion.linear(Duration(milliseconds: 200)),
+        delay: Duration(milliseconds: 50),
+      );
       expect(a, isNot(equals(b)));
     });
 
@@ -100,10 +146,70 @@ void main() {
       expect(a, isNot(equals(b)));
     });
 
+    test('to with same motion are equal', () {
+      const a = ReverseBehavior<double>.to(0.5, motion: CueMotion.linear(Duration(milliseconds: 100)));
+      const b = ReverseBehavior<double>.to(0.5, motion: CueMotion.linear(Duration(milliseconds: 100)));
+      expect(a, equals(b));
+    });
+
+    test('to with different motion are not equal', () {
+      const a = ReverseBehavior<double>.to(0.5, motion: CueMotion.linear(Duration(milliseconds: 100)));
+      const b = ReverseBehavior<double>.to(0.5, motion: CueMotion.linear(Duration(milliseconds: 200)));
+      expect(a, isNot(equals(b)));
+    });
+
+    test('to with same delay are equal', () {
+      const a = ReverseBehavior<double>.to(0.5, delay: Duration(milliseconds: 50));
+      const b = ReverseBehavior<double>.to(0.5, delay: Duration(milliseconds: 50));
+      expect(a, equals(b));
+    });
+
+    test('to with different delay are not equal', () {
+      const a = ReverseBehavior<double>.to(0.5, delay: Duration(milliseconds: 50));
+      const b = ReverseBehavior<double>.to(0.5, delay: Duration(milliseconds: 100));
+      expect(a, isNot(equals(b)));
+    });
+
     test('different types are not equal', () {
       const a = ReverseBehavior<double>.mirror();
       const b = ReverseBehavior<double>.exclusive();
       expect(a, isNot(equals(b)));
+    });
+
+    test('mirror vs none not equal', () {
+      const a = ReverseBehavior<double>.mirror();
+      const b = ReverseBehavior<double>.none();
+      expect(a, isNot(equals(b)));
+    });
+
+    test('exclusive vs none not equal', () {
+      const a = ReverseBehavior<double>.exclusive();
+      const b = ReverseBehavior<double>.none();
+      expect(a, isNot(equals(b)));
+    });
+
+    test('mirror vs to not equal', () {
+      const a = ReverseBehavior<double>.mirror();
+      const b = ReverseBehavior<double>.to(0.5);
+      expect(a, isNot(equals(b)));
+    });
+
+    test('equal ReverseBehaviors have same hashCode', () {
+      const a = ReverseBehavior<double>.mirror(
+        motion: CueMotion.linear(Duration(milliseconds: 100)),
+        delay: Duration(milliseconds: 50),
+      );
+      const b = ReverseBehavior<double>.mirror(
+        motion: CueMotion.linear(Duration(milliseconds: 100)),
+        delay: Duration(milliseconds: 50),
+      );
+      expect(a.hashCode, equals(b.hashCode));
+    });
+
+    test('different ReverseBehaviors typically have different hashCode', () {
+      const a = ReverseBehavior<double>.mirror(delay: Duration(milliseconds: 50));
+      const b = ReverseBehavior<double>.mirror(delay: Duration(milliseconds: 100));
+      expect(a.hashCode, isNot(equals(b.hashCode)));
     });
   });
 
@@ -112,6 +218,18 @@ void main() {
       const a = KFReverseBehavior<double>.mirror();
       const b = KFReverseBehavior<double>.mirror();
       expect(a, equals(b));
+    });
+
+    test('mirror with same delay are equal', () {
+      const a = KFReverseBehavior<double>.mirror(delay: Duration(milliseconds: 50));
+      const b = KFReverseBehavior<double>.mirror(delay: Duration(milliseconds: 50));
+      expect(a, equals(b));
+    });
+
+    test('mirror with different delay are not equal', () {
+      const a = KFReverseBehavior<double>.mirror(delay: Duration.zero);
+      const b = KFReverseBehavior<double>.mirror(delay: Duration(milliseconds: 100));
+      expect(a, isNot(equals(b)));
     });
 
     test('exclusive are equal', () {
@@ -124,6 +242,240 @@ void main() {
       const a = KFReverseBehavior<double>.none();
       const b = KFReverseBehavior<double>.none();
       expect(a, equals(b));
+    });
+
+    test('to with same frames are equal', () {
+      final frames = MotionKeyframes([Keyframe.key(0.5, motion: CueMotion.none)]);
+      final a = KFReverseBehavior<double>.to(frames);
+      final b = KFReverseBehavior<double>.to(frames);
+      expect(a, equals(b));
+    });
+
+    test('to with different frames are not equal', () {
+      final a = KFReverseBehavior<double>.to(MotionKeyframes([Keyframe.key(0.5, motion: CueMotion.none)]));
+      final b = KFReverseBehavior<double>.to(MotionKeyframes([Keyframe.key(0.8, motion: CueMotion.none)]));
+      expect(a, isNot(equals(b)));
+    });
+
+    test('to with same delay are equal', () {
+      final frames = MotionKeyframes([Keyframe.key(0.5, motion: CueMotion.none)]);
+      final a = KFReverseBehavior<double>.to(frames, delay: const Duration(milliseconds: 50));
+      final b = KFReverseBehavior<double>.to(frames, delay: const Duration(milliseconds: 50));
+      expect(a, equals(b));
+    });
+
+    test('to with different delay are not equal', () {
+      final frames = MotionKeyframes([Keyframe.key(0.5, motion: CueMotion.none)]);
+      final a = KFReverseBehavior<double>.to(frames, delay: const Duration(milliseconds: 50));
+      final b = KFReverseBehavior<double>.to(frames, delay: const Duration(milliseconds: 100));
+      expect(a, isNot(equals(b)));
+    });
+
+    test('different types are not equal', () {
+      const a = KFReverseBehavior<double>.mirror();
+      const b = KFReverseBehavior<double>.exclusive();
+      expect(a, isNot(equals(b)));
+    });
+
+    test('mirror vs none not equal', () {
+      const a = KFReverseBehavior<double>.mirror();
+      const b = KFReverseBehavior<double>.none();
+      expect(a, isNot(equals(b)));
+    });
+
+    test('exclusive vs none not equal', () {
+      const a = KFReverseBehavior<double>.exclusive();
+      const b = KFReverseBehavior<double>.none();
+      expect(a, isNot(equals(b)));
+    });
+
+    test('mirror vs to not equal', () {
+      const a = KFReverseBehavior<double>.mirror();
+      final b = KFReverseBehavior<double>.to(MotionKeyframes([Keyframe.key(0.5, motion: CueMotion.none)]));
+      expect(a, isNot(equals(b)));
+    });
+
+    test('equal KFReverseBehaviors have same hashCode', () {
+      const a = KFReverseBehavior<double>.mirror(delay: Duration(milliseconds: 50));
+      const b = KFReverseBehavior<double>.mirror(delay: Duration(milliseconds: 50));
+      expect(a.hashCode, equals(b.hashCode));
+    });
+  });
+
+  group('CueMotion equality', () {
+    test('TimedMotion with same duration are equal', () {
+      const a = CueMotion.linear(Duration(milliseconds: 200));
+      const b = CueMotion.linear(Duration(milliseconds: 200));
+      expect(a, equals(b));
+    });
+
+    test('TimedMotion with different duration are not equal', () {
+      const a = CueMotion.linear(Duration(milliseconds: 200));
+      const b = CueMotion.linear(Duration(milliseconds: 300));
+      expect(a, isNot(equals(b)));
+    });
+
+    test('TimedMotion.curved with same curve are equal', () {
+      const a = CueMotion.curved(Duration(milliseconds: 200), curve: Curves.easeInOut);
+      const b = CueMotion.curved(Duration(milliseconds: 200), curve: Curves.easeInOut);
+      expect(a, equals(b));
+    });
+
+    test('TimedMotion.curved with different curve are not equal', () {
+      const a = CueMotion.curved(Duration(milliseconds: 200), curve: Curves.easeIn);
+      const b = CueMotion.curved(Duration(milliseconds: 200), curve: Curves.easeOut);
+      expect(a, isNot(equals(b)));
+    });
+
+    test('TimedMotion vs curved with same duration are not equal', () {
+      const a = CueMotion.linear(Duration(milliseconds: 200));
+      const b = CueMotion.curved(Duration(milliseconds: 200), curve: Curves.linear);
+      expect(a, isNot(equals(b)));
+    });
+
+    test('CueMotion.none is equal to itself', () {
+      expect(CueMotion.none, equals(CueMotion.none));
+    });
+
+    test('Spring.smooth with same defaults are equal', () {
+      const a = CueMotion.smooth();
+      const b = CueMotion.smooth();
+      expect(a, equals(b));
+    });
+
+    test('Spring.gentle with same defaults are equal', () {
+      const a = CueMotion.gentle();
+      const b = CueMotion.gentle();
+      expect(a, equals(b));
+    });
+
+    test('Spring.iosDefault with same defaults are equal', () {
+      const a = CueMotion.iosDefaultSpring();
+      const b = CueMotion.iosDefaultSpring();
+      expect(a, equals(b));
+    });
+
+    test('Spring.bouncy with same defaults are equal', () {
+      const a = CueMotion.bouncy();
+      const b = CueMotion.bouncy();
+      expect(a, equals(b));
+    });
+
+    test('Spring.wobbly with same defaults are equal', () {
+      const a = CueMotion.wobbly();
+      const b = CueMotion.wobbly();
+      expect(a, equals(b));
+    });
+
+    test('Spring.stiff with same defaults are equal', () {
+      const a = CueMotion.stiff();
+      const b = CueMotion.stiff();
+      expect(a, equals(b));
+    });
+
+    test('Spring.custom with same parameters are equal', () {
+      const a = Spring.custom(mass: 1.0, stiffness: 100.0, damping: 10.0);
+      const b = Spring.custom(mass: 1.0, stiffness: 100.0, damping: 10.0);
+      expect(a, equals(b));
+    });
+
+    test('Spring.custom with different mass are not equal', () {
+      const a = Spring.custom(mass: 1.0, stiffness: 100.0, damping: 10.0);
+      const b = Spring.custom(mass: 2.0, stiffness: 100.0, damping: 10.0);
+      expect(a, isNot(equals(b)));
+    });
+
+    test('Spring.custom with different stiffness are not equal', () {
+      const a = Spring.custom(mass: 1.0, stiffness: 100.0, damping: 10.0);
+      const b = Spring.custom(mass: 1.0, stiffness: 200.0, damping: 10.0);
+      expect(a, isNot(equals(b)));
+    });
+
+    test('Spring.custom with different damping are not equal', () {
+      const a = Spring.custom(mass: 1.0, stiffness: 100.0, damping: 10.0);
+      const b = Spring.custom(mass: 1.0, stiffness: 100.0, damping: 20.0);
+      expect(a, isNot(equals(b)));
+    });
+
+    test('Spring.custom with different snapToEnd are not equal', () {
+      const a = Spring.custom(mass: 1.0, stiffness: 100.0, damping: 10.0, snapToEnd: true);
+      const b = Spring.custom(mass: 1.0, stiffness: 100.0, damping: 10.0, snapToEnd: false);
+      expect(a, isNot(equals(b)));
+    });
+
+    test('different Spring presets are not equal', () {
+      const a = CueMotion.smooth();
+      const b = CueMotion.bouncy();
+      expect(a, isNot(equals(b)));
+    });
+
+    test('SegmentedMotion with same motions are equal', () {
+      const a = SegmentedMotion([
+        CueMotion.linear(Duration(milliseconds: 100)),
+        CueMotion.linear(Duration(milliseconds: 200)),
+      ]);
+      const b = SegmentedMotion([
+        CueMotion.linear(Duration(milliseconds: 100)),
+        CueMotion.linear(Duration(milliseconds: 200)),
+      ]);
+      expect(a, equals(b));
+    });
+
+    test('SegmentedMotion with different motions are not equal', () {
+      const a = SegmentedMotion([
+        CueMotion.linear(Duration(milliseconds: 100)),
+        CueMotion.linear(Duration(milliseconds: 200)),
+      ]);
+      const b = SegmentedMotion([
+        CueMotion.linear(Duration(milliseconds: 100)),
+        CueMotion.linear(Duration(milliseconds: 300)),
+      ]);
+      expect(a, isNot(equals(b)));
+    });
+
+    test('SegmentedMotion with different lengths are not equal', () {
+      const a = SegmentedMotion([CueMotion.linear(Duration(milliseconds: 100))]);
+      const b = SegmentedMotion([
+        CueMotion.linear(Duration(milliseconds: 100)),
+        CueMotion.linear(Duration(milliseconds: 200)),
+      ]);
+      expect(a, isNot(equals(b)));
+    });
+
+    test('DelayedMotion with same base and delay are equal', () {
+      final a = CueMotion.linear(Duration(milliseconds: 200)).delayed(const Duration(milliseconds: 50));
+      final b = CueMotion.linear(Duration(milliseconds: 200)).delayed(const Duration(milliseconds: 50));
+      expect(a, equals(b));
+    });
+
+    test('DelayedMotion with different delay are not equal', () {
+      final a = CueMotion.linear(Duration(milliseconds: 200)).delayed(const Duration(milliseconds: 50));
+      final b = CueMotion.linear(Duration(milliseconds: 200)).delayed(const Duration(milliseconds: 100));
+      expect(a, isNot(equals(b)));
+    });
+
+    test('DelayedMotion with different base are not equal', () {
+      final a = CueMotion.linear(Duration(milliseconds: 200)).delayed(const Duration(milliseconds: 50));
+      final b = CueMotion.linear(Duration(milliseconds: 300)).delayed(const Duration(milliseconds: 50));
+      expect(a, isNot(equals(b)));
+    });
+
+    test('equal TimedMotions have same hashCode', () {
+      const a = CueMotion.linear(Duration(milliseconds: 200));
+      const b = CueMotion.linear(Duration(milliseconds: 200));
+      expect(a.hashCode, equals(b.hashCode));
+    });
+
+    test('equal Springs have same hashCode', () {
+      const a = Spring.custom(mass: 1.0, stiffness: 100.0, damping: 10.0);
+      const b = Spring.custom(mass: 1.0, stiffness: 100.0, damping: 10.0);
+      expect(a.hashCode, equals(b.hashCode));
+    });
+
+    test('equal SegmentedMotions have same hashCode', () {
+      const a = SegmentedMotion([CueMotion.linear(Duration(milliseconds: 100))]);
+      const b = SegmentedMotion([CueMotion.linear(Duration(milliseconds: 100))]);
+      expect(a.hashCode, equals(b.hashCode));
     });
   });
 
@@ -777,24 +1129,6 @@ void main() {
       const b = DecoratedBoxAct(position: DecorationPosition.foreground);
       expect(a, isNot(equals(b)));
     });
-
-    test('different motion are equal (motion not in equality)', () {
-      const a = DecoratedBoxAct(motion: CueMotion.none);
-      const b = DecoratedBoxAct(motion: CueMotion.linear(Duration(milliseconds: 100)));
-      expect(a, equals(b));
-    });
-
-    test('different delay are equal (delay not in equality)', () {
-      const a = DecoratedBoxAct(delay: Duration.zero);
-      const b = DecoratedBoxAct(delay: Duration(milliseconds: 100));
-      expect(a, equals(b));
-    });
-
-    test('different reverse are equal (reverse not in equality)', () {
-      const a = DecoratedBoxAct(reverse: ReverseBehavior.mirror());
-      const b = DecoratedBoxAct(reverse: ReverseBehavior.none());
-      expect(a, equals(b));
-    });
   });
 
   group('CardAct equality', () {
@@ -957,8 +1291,8 @@ void main() {
     });
 
     test('different clipGeometry are not equal', () {
-      const a = SizedClipAct(clipGeometry:  ClipGeometry.rect());
-      const b = SizedClipAct(clipGeometry:  ClipGeometry.rrect(BorderRadius.all(Radius.circular(10))));
+      const a = SizedClipAct(clipGeometry: ClipGeometry.rect());
+      const b = SizedClipAct(clipGeometry: ClipGeometry.rrect(BorderRadius.all(Radius.circular(10))));
       expect(a, isNot(equals(b)));
     });
 

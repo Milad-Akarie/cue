@@ -17,7 +17,7 @@ class _SmoothSwitchState extends State<SmoothSwitch> {
     final width = height * 2;
     final trackColor = theme.colorScheme.surface;
     final thumbColor = theme.colorScheme.onSurface;
-    const duration =Duration(milliseconds: 300);
+    const duration = Duration(milliseconds: 300);
     return Cue.onToggle(
       toggled: _toggled,
       motion: .linear(duration),
@@ -36,9 +36,9 @@ class _SmoothSwitchState extends State<SmoothSwitch> {
           acts: [
             ScaleAct.keyframed(
               frames: .fractional([
-                  .key(1.1, at: .4),
-                  .key(1.1, at: .6),
-                  .key(1.0, at: 1.0),
+                .key(1.1, at: .4),
+                .key(1.1, at: .6),
+                .key(1.0, at: 1.0),
               ]),
             ),
           ],
@@ -80,7 +80,7 @@ class _SmoothSwitchState extends State<SmoothSwitch> {
                       child: DecoratedBoxActor(
                         shape: .circle,
                         color: .tween(from: trackColor, to: thumbColor),
-                        motion: .linear(duration * .5), 
+                        motion: .linear(duration * .5),
                         reverse: .mirror(delay: duration * .5),
                         child: SizedBox.square(dimension: width * .16),
                       ),
@@ -90,7 +90,7 @@ class _SmoothSwitchState extends State<SmoothSwitch> {
                         child: DecoratedBoxActor(
                           color: .tween(from: thumbColor, to: trackColor),
                           borderRadius: .tween(from: .circular(width * .2), to: .circular(width * .2)),
-                          motion: .linear(duration * .5), 
+                          motion: .linear(duration * .5),
                           delay: duration * .5,
                           child: SizedBox(width: width * .08, height: width * .22),
                         ),

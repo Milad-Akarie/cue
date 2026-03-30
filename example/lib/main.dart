@@ -1,5 +1,6 @@
 import 'package:cue/cue.dart';
 import 'package:example/examples/horizinally_expanding_cards.dart';
+import 'package:example/examples/smooth_toggle.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -52,8 +53,20 @@ class _DemoPageState extends State<DemoPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Cue.onMount(
+              acts: [
+                PathMotionAct.circular(radius: 80)
+              ],
+              child: Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: Colors.blue,
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
 
-            HorizontallyExpandingCards(),
             CueModalTransition(
               triggerBuilder: (context, open) {
                 return InkWell(
@@ -103,7 +116,7 @@ class _DemoPageState extends State<DemoPage> {
                             child: Actor(
                               delay: 100.ms,
                               acts: [
-                                .clip(borderRadius: BorderRadius.circular(16),alignment: .bottomCenter),
+                                .clip(borderRadius: BorderRadius.circular(16), alignment: .bottomCenter),
                                 .fadeIn(),
                                 .slideUp(),
                               ],
