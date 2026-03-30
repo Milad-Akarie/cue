@@ -118,16 +118,16 @@ class CueController extends AnimationController {
 
   @override
   TickerFuture animateTo(double target, {bool? forward, Duration? duration, Curve curve = Curves.linear}) {
-    if (duration != null) {
-      throw UnsupportedError(
-        'animateTo with duration is not supported by CueController. CueController is designed for physics-based animations and does not support time-based animations. Received: duration: $duration',
-      );
-    }
-    if (curve != Curves.linear) {
-      throw UnsupportedError(
-        'animateTo with curve is not supported by CueController. CueController is designed to run muliple tracks, each with its own motion configuration, and does not support global curves. Received: curve: $curve',
-      );
-    }
+    // if (duration != null) {
+    //   throw UnsupportedError(
+    //     'animateTo with duration is not supported by CueController. CueController is designed for physics-based animations and does not support time-based animations. Received: duration: $duration',
+    //   );
+    // }
+    // if (curve != Curves.linear) {
+    //   throw UnsupportedError(
+    //     'animateTo with curve is not supported by CueController. CueController is designed to run muliple tracks, each with its own motion configuration, and does not support global curves. Received: curve: $curve',
+    //   );
+    // }
     assert(target >= 0.0 && target <= 1.0, 'The target value must be between 0.0 and 1.0. Received: $target');
     if (target == value) {
       return TickerFuture.complete();

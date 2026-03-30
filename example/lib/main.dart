@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:cue/cue.dart';
+import 'package:example/examples/horizinally_expanding_cards.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -114,50 +115,7 @@ class __OnChangeDemoState extends State<_OnChangeDemo> with SingleTickerProvider
               //     ),
               //   ),
               // ),
-              Cue.onToggle(
-                motion: .linear(500.ms),
-                toggled: _checked,
-                child: Stack(
-                  children: [
-                    Actor(
-                      acts: [
-                        .rotate3D(
-                          from: .zero,
-                          to: Rotation3D(y: 180),
-                          perspective: 0.005,
-                        ),
-                        .fadeOut(motion: .curved(500.ms, curve: Threshold(0.5))),
-                      ],
-                      child: Box(
-                        size: Size(80, 80),
-                        color: Colors.blue,
-                      )
-                    ),
-                    Actor(
-                      acts: [
-                        .rotate3D(
-                          from: Rotation3D(y: -180),
-                          to: .zero,
-                          perspective: 0.005,
-                        ),
-                        .fadeIn( motion: .curved(500.ms, curve: Threshold(0.5))),
-                      ],
-                      child: Box(
-                        size: Size(80, 80),
-                        color: Colors.red.withValues(alpha: .8),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    _checked = !_checked;
-                  });
-                },
-                child: Text('Toggle'),
-              ),
+              HorizontallyExpandingCards(),
               if (false)
                 for (var i = 0; i < 20; i++)
                   Cue.onScrollVisible(
@@ -208,3 +166,4 @@ class Box extends StatelessWidget {
     );
   }
 }
+ 

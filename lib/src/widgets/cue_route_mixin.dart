@@ -66,7 +66,6 @@ mixin CueModalRouteMixin<T extends Object?> on ModalRoute<T> {
 mixin CuePageRouteMixin<T extends Object?> on PageRoute<T> {
   CueMotion get motion;
   CueMotion? get reverseMotion;
-  bool get hideOnPushNext;
 
   @override
   AnimationController createAnimationController() {

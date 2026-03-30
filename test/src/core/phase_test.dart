@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:cue/src/core/phase.dart';
 import 'package:cue/src/motion/cue_motion.dart';
@@ -76,6 +77,65 @@ void main() {
       const c = Phase(begin: 0.0, end: 50.0);
       expect(a, isNot(equals(b)));
       expect(a, isNot(equals(c)));
+    });
+  });
+  group('Keyframe equality', () {
+    test('identical Keyframe are equal', () {
+      const a = Keyframe.key(42, motion: CueMotion.none);
+      const b = Keyframe.key(42, motion: CueMotion.none);
+      expect(a, equals(b));
+    });
+    test('different value or motion are not equal', () {
+      const a = Keyframe.key(42, motion: CueMotion.none);
+      const b = Keyframe.key(43, motion: CueMotion.none);
+      const c = Keyframe.key(42, motion: CueMotion.linear(Duration(milliseconds: 1)));
+      expect(a, isNot(equals(b)));
+      expect(a, isNot(equals(c)));
+    });
+  });
+
+  group('FractionalKeyframe equality', () {
+    test('identical FractionalKeyframe are equal', () {
+      const a = FractionalKeyframe.key(42, at: 0.5);
+      const b = FractionalKeyframe.key(42, at: 0.5);
+      expect(a, equals(b));
+    });
+    test('different value or at or curve are not equal', () {
+      const a = FractionalKeyframe.key(42, at: 0.5);
+      const b = FractionalKeyframe.key(43, at: 0.5);
+      const c = FractionalKeyframe.key(42, at: 0.6);
+      const d = FractionalKeyframe.key(42, at: 0.5, curve: Curves.easeIn);
+      expect(a, isNot(equals(b)));
+      expect(a, isNot(equals(c)));
+      expect(a, isNot(equals(d)));
+    });
+  });
+
+  group('MotionKeyframes and FractionalKeyframes equality', () {
+    test('identical MotionKeyframes are equal', () {
+      final a = MotionKeyframes([Keyframe.key(1, motion: CueMotion.none), Keyframe.key(2, motion: CueMotion.none)]);
+      final b = MotionKeyframes([Keyframe.key(1, motion: CueMotion.none), Keyframe.key(2, motion: CueMotion.none)]);
+      expect(a, equals(b));
+    });
+    test('different MotionKeyframes are not equal', () {
+      final a = MotionKeyframes([Keyframe.key(1, motion: CueMotion.none)]);
+      final b = MotionKeyframes([Keyframe.key(2, motion: CueMotion.none)]);
+      expect(a, isNot(equals(b)));
+    });
+    test('identical FractionalKeyframes are equal', () {
+      final a = FractionalKeyframes([FractionalKeyframe.key(1, at: 0.1), FractionalKeyframe.key(2, at: 0.2)]);
+      final b = FractionalKeyframes([FractionalKeyframe.key(1, at: 0.1), FractionalKeyframe.key(2, at: 0.2)]);
+      expect(a, equals(b));
+    });
+    test('different FractionalKeyframes are not equal', () {
+      final a = FractionalKeyframes([FractionalKeyframe.key(1, at: 0.1)]);
+      final b = FractionalKeyframes([FractionalKeyframe.key(2, at: 0.1)]);
+      expect(a, isNot(equals(b)));
+    });
+    test('FractionalKeyframes with different durations are not equal', () {
+      final a = FractionalKeyframes([FractionalKeyframe.key(1, at: 0.1)], duration: Duration(seconds: 1));
+      final b = FractionalKeyframes([FractionalKeyframe.key(1, at: 0.1)], duration: Duration(seconds: 2));
+      expect(a, isNot(equals(b)));
     });
   });
 }
