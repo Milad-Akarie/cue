@@ -11,6 +11,7 @@ class TransformAct extends TweenAct<Matrix4> {
     super.reverse,
     this.alignment,
     this.origin,
+    super.delay,
   }) : super.tween(from: from ?? Matrix4.identity());
 
   final AlignmentGeometry? alignment;
@@ -21,6 +22,7 @@ class TransformAct extends TweenAct<Matrix4> {
     super.reverse,
     this.alignment,
     this.origin,
+    super.delay,
   }) : super.keyframed(from: Matrix4.identity());
 
   @override

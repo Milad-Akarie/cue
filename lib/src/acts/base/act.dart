@@ -50,20 +50,24 @@ abstract class Act {
     double from,
     double to,
     CueMotion? motion,
+    Duration delay,
+    ReverseBehavior<double> reverse,
   }) = ScaleAct.zoomIn;
 
   const factory Act.zoomOut({
     double from,
     double to,
     CueMotion? motion,
+    Duration delay,
+    ReverseBehavior<double> reverse,
   }) = ScaleAct.zoomOut;
 
   const factory Act.stretch({
     Stretch from,
     required Stretch to,
     CueMotion? motion,
-    ReverseBehavior<Stretch> reverse,
     Duration delay,
+    ReverseBehavior<Stretch> reverse,
   }) = StretchAct;
 
   const factory Act.fractionalSize({
@@ -71,6 +75,8 @@ abstract class Act {
     AnimatableValue<double>? heightFactor,
     AnimatableValue<AlignmentGeometry>? alignment,
     CueMotion? motion,
+    ReverseBehavior<FractionalSize> reverse,
+    Duration delay,
   }) = FractionalSizeAct;
 
   const factory Act.translate({
@@ -94,6 +100,7 @@ abstract class Act {
     double to,
     CueMotion? motion,
     Duration delay,
+
     ReverseBehavior<double> reverse,
   }) = TranslateAct.fromX;
 
@@ -101,12 +108,15 @@ abstract class Act {
     double from,
     double to,
     CueMotion? motion,
+    Duration delay,
+    ReverseBehavior<double> reverse,
   }) = TranslateAct.y;
 
   const factory Act.translateFromGlobal({
     required Offset offset,
     Offset toLocal,
     CueMotion? motion,
+    Duration delay,
   }) = TranslateAct.fromGlobal;
 
   const factory Act.translateFromGlobalRect(
@@ -114,6 +124,7 @@ abstract class Act {
     AlignmentGeometry alignment,
     Offset toLocal,
     CueMotion? motion,
+    Duration delay,
   }) = TranslateAct.fromGlobalRect;
 
   const factory Act.translateFromGlobalKey(
@@ -121,12 +132,15 @@ abstract class Act {
     AlignmentGeometry alignment,
     Offset toLocal,
     CueMotion? motion,
+    Duration delay,
   }) = TranslateAct.fromGlobalKey;
 
   const factory Act.slide({
     Offset from,
     Offset to,
     CueMotion? motion,
+    Duration delay,
+    ReverseBehavior<Offset> reverse,
   }) = SlideAct;
 
   const factory Act.slideX({
@@ -147,24 +161,34 @@ abstract class Act {
 
   const factory Act.slideUp({
     CueMotion? motion,
+    Duration delay,
+    ReverseBehavior<Offset> reverse,
   }) = SlideAct.up;
 
   const factory Act.slideDown({
     CueMotion? motion,
+    Duration delay,
+    ReverseBehavior<Offset> reverse,
   }) = SlideAct.down;
 
   const factory Act.slideFromLeading({
     CueMotion? motion,
+    Duration delay,
+    ReverseBehavior<Offset> reverse,
   }) = SlideAct.fromLeading;
 
   const factory Act.slideFromTrailing({
     CueMotion? motion,
+    Duration delay,
+    ReverseBehavior<Offset> reverse,
   }) = SlideAct.fromTrailing;
 
   const factory Act.opacity({
     required double from,
     required double to,
     CueMotion? motion,
+    Duration delay,
+    ReverseBehavior<double> reverse,
   }) = OpacityAct;
 
   const factory Act.fadeIn({
@@ -172,6 +196,7 @@ abstract class Act {
     double to,
     CueMotion? motion,
     ReverseBehavior<double> reverse,
+
     Duration delay,
   }) = OpacityAct.fadeIn;
 
@@ -180,12 +205,15 @@ abstract class Act {
     double to,
     CueMotion? motion,
     ReverseBehavior<double> reverse,
+    Duration delay,
   }) = OpacityAct.fadeOut;
 
   const factory Act.align({
     AlignmentGeometry from,
     AlignmentGeometry to,
     CueMotion? motion,
+    Duration delay,
+    ReverseBehavior<AlignmentGeometry> reverse,
   }) = AlignAct;
 
   const factory Act.padding({
@@ -200,18 +228,24 @@ abstract class Act {
     double from,
     double to,
     CueMotion? motion,
+    Duration delay,
+    ReverseBehavior<double> reverse,
   }) = BlurAct;
 
   const factory Act.focus({
     double from,
     double to,
     CueMotion? motion,
+    Duration delay,
+    ReverseBehavior<double> reverse,
   }) = BlurAct.focus;
 
   const factory Act.unfocus({
     double from,
     double to,
     CueMotion? motion,
+    Duration delay,
+    ReverseBehavior<double> reverse,
   }) = BlurAct.unfocus;
 
   const factory Act.backdropBlur({
@@ -219,12 +253,16 @@ abstract class Act {
     double to,
     CueMotion? motion,
     BlendMode blendMode,
+    Duration delay,
+    ReverseBehavior<double> reverse,
   }) = BackdropBlurAct;
 
   const factory Act.colorTint({
     required Color from,
     required Color to,
     CueMotion? motion,
+    Duration delay,
+    ReverseBehavior<Color> reverse,
   }) = ColorTintAct;
 
   const factory Act.sizedBox({
@@ -233,6 +271,7 @@ abstract class Act {
     AlignmentGeometry alignment,
     CueMotion? motion,
     Duration delay,
+    ReverseBehavior<Size> reverse,
   }) = SizedBoxAct;
 
   const factory Act.sizedClip({
@@ -242,6 +281,8 @@ abstract class Act {
     AlignmentGeometry alignment,
     ClipGeometry clipGeometry,
     Clip clipBehavior,
+    Duration delay,
+    ReverseBehavior<NSize> reverse,
   }) = SizedClipAct;
 
   const factory Act.clip({
@@ -249,6 +290,7 @@ abstract class Act {
     AlignmentGeometry alignment,
     bool useSuperellipse,
     CueMotion? motion,
+    Duration delay,
   }) = ClipAct;
 
   const factory Act.clipHeight({
@@ -256,6 +298,7 @@ abstract class Act {
     double toFactor,
     AlignmentGeometry alignment,
     CueMotion? motion,
+    Duration delay,
   }) = ClipAct.height;
 
   const factory Act.clipWidth({
@@ -263,11 +306,13 @@ abstract class Act {
     double toFactor,
     AlignmentGeometry alignment,
     CueMotion? motion,
+    Duration delay,
   }) = ClipAct.width;
 
   const factory Act.circularClip({
     AlignmentGeometry alignment,
     CueMotion? motion,
+    Duration delay,
   }) = ClipAct.circular;
 
   const factory Act.rotate({
@@ -297,14 +342,18 @@ abstract class Act {
     double to,
     CueMotion? motion,
     RotateUnit unit,
+    Duration delay,
+    ReverseBehavior<double> reverse,
   }) = RotateLayoutAct;
 
   const factory Act.flipX({
     CueMotion? motion,
+    Duration delay,
   }) = RotateAct.flipX;
 
   const factory Act.flipY({
     CueMotion? motion,
+    Duration delay,
   }) = RotateAct.flipY;
 
   const factory Act.skew({
@@ -321,18 +370,25 @@ abstract class Act {
     required TextStyle from,
     required TextStyle to,
     CueMotion? motion,
+    Duration delay,
+    ReverseBehavior<TextStyle> reverse,
   }) = TextStyleAct;
 
   const factory Act.iconTheme({
     required IconThemeData from,
     required IconThemeData to,
     CueMotion? motion,
+    Duration delay,
+    ReverseBehavior<IconThemeData> reverse,
   }) = IconThemeAct;
 
   factory Act.transform({
     Matrix4? from,
     required Matrix4 to,
     CueMotion? motion,
+    AlignmentGeometry alignment,
+    Duration delay,
+    ReverseBehavior<Matrix4> reverse,
   }) = TransformAct;
 
   const factory Act.decorate({
@@ -344,6 +400,8 @@ abstract class Act {
     BoxShape shape,
     DecorationPosition position,
     CueMotion? motion,
+    Duration delay,
+    ReverseBehavior<Decoration> reverse,
   }) = DecoratedBoxAct;
 
   ActKey get key;

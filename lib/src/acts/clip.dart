@@ -6,11 +6,13 @@ abstract class ClipAct extends Act {
     AlignmentGeometry alignment,
     bool useSuperellipse,
     CueMotion? motion,
+    Duration delay,
   }) = _ClipEffect;
 
   const factory ClipAct.circular({
     AlignmentGeometry alignment,
     CueMotion? motion,
+    Duration delay,
   }) = _ClipEffect.circular;
 
   const factory ClipAct.width({
@@ -18,6 +20,7 @@ abstract class ClipAct extends Act {
     double toFactor,
     AlignmentGeometry alignment,
     CueMotion? motion,
+    Duration delay,
   }) = _AxisClipEffect.horizontal;
 
   const factory ClipAct.height({
@@ -25,6 +28,7 @@ abstract class ClipAct extends Act {
     double toFactor,
     AlignmentGeometry alignment,
     CueMotion? motion,
+    Duration delay,
   }) = _AxisClipEffect.vertical;
 }
 
@@ -37,6 +41,7 @@ class _AxisClipEffect extends TweenAct<double> implements ClipAct {
     double toFactor = 1,
     this.alignment = AlignmentDirectional.centerStart,
     super.motion,
+    super.delay,
   }) : _axis = Axis.horizontal,
        super.tween(from: fromFactor, to: toFactor);
 
@@ -45,6 +50,7 @@ class _AxisClipEffect extends TweenAct<double> implements ClipAct {
     double toFactor = 1,
     this.alignment = AlignmentDirectional.topCenter,
     super.motion,
+    super.delay,
   }) : _axis = Axis.vertical,
        super.tween(from: fromFactor, to: toFactor);
 
@@ -84,6 +90,7 @@ class _ClipEffect extends TweenAct<double> implements ClipAct {
     this.useSuperellipse = false,
     super.from = 0,
     super.to = 1,
+    super.delay,
   }) : super.tween();
 
   const _ClipEffect.circular({
@@ -91,6 +98,7 @@ class _ClipEffect extends TweenAct<double> implements ClipAct {
     super.motion,
     super.from = 0,
     super.to = 1,
+    super.delay,
   }) : borderRadius = null,
        useSuperellipse = false,
        super.tween();

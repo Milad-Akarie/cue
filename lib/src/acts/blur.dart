@@ -10,6 +10,7 @@ class BlurAct extends TweenAct<double> {
     super.to = 0.0,
     super.motion,
     super.reverse,
+    super.delay,
   }) : super.tween();
 
   const BlurAct.keyframed({
@@ -23,6 +24,7 @@ class BlurAct extends TweenAct<double> {
     super.to = 0.0,
     super.motion,
     super.reverse,
+    super.delay,
   }) : super.tween();
 
   const BlurAct.unfocus({
@@ -30,6 +32,7 @@ class BlurAct extends TweenAct<double> {
     super.to = 10.0,
     super.motion,
     super.reverse,
+    super.delay,
   }) : super.tween();
 
   @override
@@ -61,6 +64,7 @@ class BackdropBlurAct extends TweenAct<double> {
     super.to = 0.0,
     super.motion,
     super.reverse,
+    super.delay,
     this.blendMode = BlendMode.srcOver,
   }) : super.tween();
 

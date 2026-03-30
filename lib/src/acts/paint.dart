@@ -12,6 +12,7 @@ class PaintAct extends TweenAct<double> {
     this.paintOnTop = false,
     super.motion,
     super.reverse,
+    super.delay,
   }) : super.tween(from: 0.0, to: 1.0);
 
   @override
@@ -36,6 +37,7 @@ class PaintActor extends SingleActorBase<double> {
     required super.child,
     super.motion,
     super.reverse,
+    super.delay,
   }) : super(from: 0.0, to: 1.0);
 
   @override
@@ -44,6 +46,7 @@ class PaintActor extends SingleActorBase<double> {
     paintOnTop: paintOnTop,
     motion: motion,
     reverse: reverse,
+    delay: delay,
   );
 }
 

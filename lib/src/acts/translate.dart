@@ -34,6 +34,7 @@ abstract class TranslateAct extends Act {
     double to,
     CueMotion? motion,
     ReverseBehavior<double> reverse,
+    Duration delay,
   }) = _AxisTranslate.vertical;
 
   const factory TranslateAct.keyframedY({
@@ -46,6 +47,7 @@ abstract class TranslateAct extends Act {
     required Offset offset,
     Offset toLocal,
     CueMotion? motion,
+    Duration delay,
   }) = _TranslateFromGlobalEffect.offset;
 
   const factory TranslateAct.fromGlobalRect(
@@ -53,6 +55,7 @@ abstract class TranslateAct extends Act {
     AlignmentGeometry alignment,
     Offset toLocal,
     CueMotion? motion,
+    Duration delay,
   }) = _TranslateFromGlobalEffect.fromRect;
 
   const factory TranslateAct.fromGlobalKey(
@@ -60,6 +63,7 @@ abstract class TranslateAct extends Act {
     AlignmentGeometry alignment,
     Offset toLocal,
     CueMotion? motion,
+    Duration delay,
   }) = _TranslateFromGlobalEffect.fromKey;
 }
 
@@ -100,6 +104,7 @@ class _AxisTranslate extends TweenActBase<double, Offset> implements TranslateAc
     super.to = 0,
     super.motion,
     super.reverse,
+    super.delay,
   }) : _axis = Axis.vertical,
        super.tween();
 
@@ -178,6 +183,7 @@ class _TranslateFromGlobalEffect extends TweenAct<double> implements TranslateAc
   const _TranslateFromGlobalEffect.offset({
     required Offset this.offset,
     this.toLocal = Offset.zero,
+    super.delay,
     super.motion,
   }) : rect = null,
        alignment = null,
@@ -189,6 +195,7 @@ class _TranslateFromGlobalEffect extends TweenAct<double> implements TranslateAc
     this.toLocal = Offset.zero,
     this.alignment = Alignment.center,
     super.motion,
+    super.delay,
   }) : offset = null,
        globalKey = null,
        super.tween(from: 0, to: 1);
@@ -198,6 +205,7 @@ class _TranslateFromGlobalEffect extends TweenAct<double> implements TranslateAc
     this.toLocal = Offset.zero,
     this.alignment = Alignment.center,
     super.motion,
+    super.delay,
   }) : offset = null,
        rect = null,
        super.tween(from: 0, to: 1);

@@ -10,6 +10,7 @@ class TextStyleAct extends TweenAct<TextStyle> {
     required super.to,
     super.motion,
     super.reverse,
+    super.delay,
   }) : super.tween();
 
   const TextStyleAct.keyframed({
@@ -40,6 +41,7 @@ class IconThemeAct extends TweenAct<IconThemeData> {
     required super.to,
     super.motion,
     super.reverse,
+    super.delay,
   }) : super.tween();
 
   const IconThemeAct.keyframed({

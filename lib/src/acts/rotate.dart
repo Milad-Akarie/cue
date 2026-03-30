@@ -23,6 +23,7 @@ class RotateAct extends TweenAct<double> {
     super.motion,
     super.reverse,
     this.alignment = Alignment.center,
+    super.delay,
   }) : unit = RotateUnit.radians,
        axis = RotateAxis.x,
        super.tween(from: 0, to: math.pi);
@@ -31,6 +32,7 @@ class RotateAct extends TweenAct<double> {
     super.motion,
     super.reverse,
     this.alignment = Alignment.center,
+    super.delay,
   }) : unit = RotateUnit.radians,
        axis = RotateAxis.y,
        super.tween(from: 0, to: math.pi);
@@ -51,6 +53,7 @@ class RotateAct extends TweenAct<double> {
     super.reverse,
     this.axis = RotateAxis.z,
     this.alignment = Alignment.center,
+    super.delay,
   }) : unit = RotateUnit.radians,
        super.tween();
 
@@ -59,6 +62,7 @@ class RotateAct extends TweenAct<double> {
     super.to = 0,
     super.motion,
     super.reverse,
+    super.delay,
     this.alignment = Alignment.center,
     this.axis = RotateAxis.z,
   }) : unit = RotateUnit.degrees,
@@ -69,6 +73,7 @@ class RotateAct extends TweenAct<double> {
     super.to = 0,
     super.motion,
     super.reverse,
+    super.delay,
     this.axis = RotateAxis.z,
     this.alignment = Alignment.center,
   }) : unit = RotateUnit.quarterTurns,

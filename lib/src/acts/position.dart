@@ -12,6 +12,7 @@ class PositionAct extends TweenAct<Position> {
     required super.to,
     super.motion,
     super.reverse,
+    super.delay,
   }) : _relativeTo = null,
        super.tween();
 
@@ -21,6 +22,7 @@ class PositionAct extends TweenAct<Position> {
     required Size size,
     super.motion,
     super.reverse,
+    super.delay,
   }) : _relativeTo = size,
        super.tween();
 
@@ -32,6 +34,7 @@ class PositionAct extends TweenAct<Position> {
     super.reverse,
     Size? relativeTo,
     super.frames,
+    super.delay,
   }) : _relativeTo = relativeTo;
 
   const PositionAct.keyframed({

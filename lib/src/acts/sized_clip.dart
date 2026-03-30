@@ -19,6 +19,7 @@ class SizedClipAct extends DeferredTweenAct<Size?> {
     this.alignment,
     this.clipBehavior = Clip.hardEdge,
     this.clipGeometry = const ClipGeometry.rect(),
+    super.delay,
     ReverseBehavior<NSize> reverse = const ReverseBehavior.mirror(),
   }) : frames = null,
        _reverse = reverse;

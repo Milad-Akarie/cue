@@ -12,6 +12,7 @@ class DecoratedBoxAct extends AnimtableAct<Decoration, Decoration> {
   final BoxShape shape;
   final DecorationPosition position;
   final Keyframes<Decoration>? frames;
+  
 
   const DecoratedBoxAct({
     this.color,

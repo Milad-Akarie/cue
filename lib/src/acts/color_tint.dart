@@ -11,6 +11,7 @@ class ColorTintAct extends TweenAct<Color?> {
     super.motion,
     super.reverse,
     this.blendMode = BlendMode.srcIn,
+    super.delay,
   }) : super.tween();
 
   final BlendMode blendMode;

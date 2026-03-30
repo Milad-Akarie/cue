@@ -9,6 +9,7 @@ class AlignAct extends TweenActBase<AlignmentGeometry?, Alignment?> {
     super.to = Alignment.center,
     super.motion,
     super.reverse,
+    super.delay,
   }) : super.tween();
 
   const AlignAct.keyframed({

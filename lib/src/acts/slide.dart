@@ -12,21 +12,25 @@ abstract class SlideAct extends Act {
   const factory SlideAct.up({
     CueMotion? motion,
     ReverseBehavior<Offset> reverse,
+    Duration delay,
   }) = _SlideEffect.fromBottom;
 
   const factory SlideAct.down({
     CueMotion? motion,
     ReverseBehavior<Offset> reverse,
+    Duration delay,
   }) = _SlideEffect.fromTop;
 
   const factory SlideAct.fromLeading({
     CueMotion? motion,
     ReverseBehavior<Offset> reverse,
+    Duration delay,
   }) = _SlideEffect.fromLeading;
 
   const factory SlideAct.fromTrailing({
     CueMotion? motion,
     ReverseBehavior<Offset> reverse,
+    Duration delay,
   }) = _SlideEffect.fromTrailing;
 
   const factory SlideAct.keyframed({
