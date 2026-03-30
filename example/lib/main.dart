@@ -43,51 +43,85 @@ class DemoPage extends StatefulWidget {
 }
 
 class _DemoPageState extends State<DemoPage> {
-  final _sheetController = DraggableScrollableController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Cue Demo'),
-      ),
-      body: Center(
-        child: Cue.onHover(
-          motion: .defaultTime,
-          child: Actor(
-            acts: [.scale(to: 1.5), .rotate(to: 15)],
-            child: Container(
-              width: 200,
-              height: 200,
-              color: Colors.blue,
-            ),
-          ),
-        ),
-      ),
-      bottomSheet: DraggableScrollableSheet(
-        controller: _sheetController,
-        minChildSize: .2,
-        builder: (context, scrollController) {
-          return Container(
-            color: Colors.grey,
-            child: Cue.onProgress(
-              listenable: _sheetController,
-              min: 0.2,
-              progress: ()=> _sheetController.isAttached ? _sheetController.size : 0.0,
-              child: ListView.builder(
-                controller: scrollController,
-                itemCount: 50,
-                itemBuilder: (context, index) {
-                  return Actor(
-                    acts: [ .slideX(from: -.5)],
-                    child: ListTile(
-                      title: Text('Item $index'),
+      body: SizedBox.expand(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CueModalTransition(
+              triggerBuilder: (context, open) {
+                return InkWell(
+                  onTap: open,
+                  child: Card(
+                    child: SizedBox.square(
+                      dimension: 200,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          children: [
+                            Text('Hello, Cue!'),
+                            const SizedBox(height: 8),
+                          ],
+                        ),
+                      ),
                     ),
-                  );
-                },
-              ),
+                  ),
+                );
+              },
+              alignment: .center,
+              hideTriggerOnTransition: true,
+              motion: .smooth(),
+              builder: (context, rect) {
+                return Actor(
+                  acts: [
+                    .rotate3D(from: Rotation3D(y: 180)),
+                    .sizedBox(
+                      width: .tween(from: rect.width, to: 400),
+                      height: .tween(from: rect.height, to: 300),
+                    ),
+                  ],
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          Actor(
+                            acts: [
+                              .slideY(from: -2),
+                              .fadeIn(),
+                            ],
+                            child: Text('Hello, Cue!'),
+                          ),
+                          const SizedBox(height: 8),
+                          Expanded(
+                            child: Actor(
+                              delay: 100.ms,
+                              acts: [
+                                .clip(borderRadius: BorderRadius.circular(16),alignment: .bottomCenter),
+                                .fadeIn(),
+                                .slideUp(),
+                              ],
+                              child: SizedBox(
+                                width: double.infinity,
+                                child: Image.network(
+                                  'https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d',
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
-          );
-        },
+          ],
+        ),
       ),
     );
   }

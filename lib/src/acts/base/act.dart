@@ -172,6 +172,7 @@ abstract class Act {
     double to,
     CueMotion? motion,
     ReverseBehavior<double> reverse,
+    Duration delay,
   }) = OpacityAct.fadeIn;
 
   const factory Act.fadeOut({

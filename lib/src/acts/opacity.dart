@@ -9,6 +9,7 @@ class OpacityAct extends TweenAct<double> {
     required super.to,
     super.motion,
     super.reverse,
+    super.delay,
   }) : super.tween();
 
   const OpacityAct.fadeIn({
@@ -16,6 +17,7 @@ class OpacityAct extends TweenAct<double> {
     super.to = 1.0,
     super.motion,
     super.reverse,
+    super.delay,
   }) : super.tween();
 
   const OpacityAct.fadeOut({
@@ -23,6 +25,7 @@ class OpacityAct extends TweenAct<double> {
     super.to = 0.0,
     super.motion,
     super.reverse,
+    super.delay,
   }) : super.tween();
 
   const OpacityAct.keyframed({
