@@ -1,6 +1,7 @@
 part of 'base/act.dart';
 
 class RotateLayoutAct extends TweenAct<double> {
+
   @override
   final ActKey key = const ActKey('RotateLayout');
   
@@ -65,6 +66,17 @@ class RotateLayoutAct extends TweenAct<double> {
       },
     );
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is RotateLayoutAct && super == other &&
+        other.unit == unit;
+  }
+
+  @override
+  int get hashCode => Object.hash(super.hashCode, unit);
+
 }
 
 class _RotateLayout extends SingleChildRenderObjectWidget {

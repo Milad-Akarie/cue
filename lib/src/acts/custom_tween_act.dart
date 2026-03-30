@@ -28,7 +28,7 @@ class _CustomTweenAct<T extends Object?> extends TweenAct<T> {
       return _InlineFnTween<T>(
         begin: from,
         end: to,
-        lerpFn: (t) => from.lerp(to as Lerpable?, t) as T,
+        lerpFn: (t) => from.lerpTo(to as Lerpable?, t) as T,
       );
     }
     return super.createSingleTween(from, to);
@@ -38,6 +38,18 @@ class _CustomTweenAct<T extends Object?> extends TweenAct<T> {
   Widget apply(BuildContext context, covariant CueAnimation<T> animation, Widget child) {
     return builder(context, animation);
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is _CustomTweenAct<T> &&
+        super == other &&
+        builder == other.builder &&
+        tweenBuilder == other.tweenBuilder;
+  }
+
+  @override
+  int get hashCode => Object.hash(super.hashCode, builder, tweenBuilder);
 }
 
 class TweenActor<T extends Object?> extends SingleActorBase<T> {
@@ -97,7 +109,7 @@ class AnimatedValues extends Lerpable<AnimatedValues> {
   });
 
   @override
-  AnimatedValues lerp(covariant AnimatedValues? end, double t) {
+  AnimatedValues lerpTo(covariant AnimatedValues? end, double t) {
     if (end is! AnimatedValues) return this;
     return AnimatedValues(
       scale: lerpDouble(scale, end.scale, t)!,
@@ -113,7 +125,7 @@ class AnimatedValues extends Lerpable<AnimatedValues> {
 
 abstract class Lerpable<T extends Lerpable<T>> {
   const Lerpable();
-  T lerp(covariant T? end, double t);
+  T lerpTo(covariant T? end, double t);
 }
 
 class _InlineFnTween<T extends Object?> extends Tween<T> {

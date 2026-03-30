@@ -12,6 +12,7 @@ part of 'base/act.dart';
 /// rectangle. Use [shape] for arbitrary [ShapeBorder] animations (e.g.
 /// [StadiumBorder], [BeveledRectangleBorder]). The two are mutually exclusive.
 class CardAct extends AnimtableAct<CardProps, CardProps> {
+  
   @override
   final ActKey key = const ActKey('Card');
 

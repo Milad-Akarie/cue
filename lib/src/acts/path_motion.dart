@@ -102,17 +102,15 @@ class PathMotionAct extends AnimtableAct<Matrix4, Matrix4> {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other.runtimeType != runtimeType) return false;
-    return other is PathMotionAct &&
+    return other is PathMotionAct && super == other &&
         other.path == path &&
         other.autoRotate == autoRotate &&
         other.alignment == alignment &&
-        other._startAngle == _startAngle &&
-        other.motion == motion &&
-        other.delay == delay;
+        other._startAngle == _startAngle;
   }
 
   @override
-  int get hashCode => Object.hash(path, autoRotate, alignment, _startAngle, motion, delay);
+  int get hashCode => Object.hash(super.hashCode, path, autoRotate, alignment, _startAngle, motion, delay);
 }
 
 class _AnimtablePath extends Animatable<Matrix4> {

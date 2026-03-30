@@ -1,6 +1,7 @@
 part of 'base/act.dart';
 
 class OpacityAct extends TweenAct<double> {
+  
   @override
   final ActKey key = const ActKey('Opacity');
 

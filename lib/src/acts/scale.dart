@@ -50,6 +50,15 @@ class ScaleAct extends TweenAct<double> {
       child: child,
     );
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ScaleAct && super == other && other.alignment == alignment;
+  }
+
+  @override
+  int get hashCode => Object.hash(super.hashCode, alignment);
 }
 
 class StretchAct extends TweenActBase<Stretch, Matrix4> {

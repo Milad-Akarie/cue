@@ -45,7 +45,7 @@ class SizedBoxAct extends DeferredTweenAct<Size> {
       reverseType: reverse.type,
     );
     final (track, token) = timline.trackFor(trackConfig);
-    return DeferredCueAnimation<Size>(parent: track,  token: token, context: context);
+    return DeferredCueAnimation<Size>(parent: track, token: token, context: context);
   }
 
   @override
@@ -73,14 +73,7 @@ class SizedBoxAct extends DeferredTweenAct<Size> {
           reverse == other.reverse;
 
   @override
-  int get hashCode => Object.hash(
-    super.hashCode,
-    width,
-    height,
-    alignment,
-    frames,
-    reverse,
-  );
+  int get hashCode => Object.hash(super.hashCode, width, height, alignment, frames, reverse);
 }
 
 class _AnimatedSizedBox extends SingleChildRenderObjectWidget {
@@ -296,7 +289,6 @@ class _AnimtableRenderConstrainedBox extends RenderConstrainedBox {
     context.paintChild(child!, childOffset);
   }
 }
-
 
 class _SizeTween extends Tween<Size> {
   _SizeTween({required Size begin, required Size end}) : super(begin: begin, end: end);

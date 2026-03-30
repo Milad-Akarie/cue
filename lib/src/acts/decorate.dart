@@ -12,7 +12,6 @@ class DecoratedBoxAct extends AnimtableAct<Decoration, Decoration> {
   final BoxShape shape;
   final DecorationPosition position;
   final Keyframes<Decoration>? frames;
-  
 
   const DecoratedBoxAct({
     this.color,
@@ -81,6 +80,7 @@ class DecoratedBoxAct extends AnimtableAct<Decoration, Decoration> {
     if (identical(this, other)) return true;
     if (other.runtimeType != runtimeType) return false;
     return other is DecoratedBoxAct &&
+        super == other &&
         other.color == color &&
         other.borderRadius == borderRadius &&
         other.border == border &&
@@ -91,7 +91,7 @@ class DecoratedBoxAct extends AnimtableAct<Decoration, Decoration> {
   }
 
   @override
-  int get hashCode => Object.hash(color, borderRadius, border, boxShadow, gradient, shape, position);
+  int get hashCode => Object.hash(super.hashCode, color, borderRadius, border, boxShadow, gradient, shape, position);
 
   @override
   ActContext resolve(ActContext context) {

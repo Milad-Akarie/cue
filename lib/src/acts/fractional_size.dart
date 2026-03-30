@@ -73,6 +73,19 @@ class FractionalSizeAct extends AnimtableAct<FractionalSize, FractionalSize> {
       frames: frames,
     );
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is FractionalSizeAct && super == other &&
+          runtimeType == other.runtimeType &&
+          widthFactor == other.widthFactor &&
+          heightFactor == other.heightFactor &&
+          alignment == other.alignment &&
+          frames == other.frames;
+
+  @override
+  int get hashCode => Object.hash(super.hashCode, widthFactor, heightFactor, alignment, frames);
 }
 
 class FractionalSize {
@@ -89,6 +102,18 @@ class FractionalSize {
       alignment: AlignmentGeometry.lerp(a.alignment, b.alignment, t),
     );
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is FractionalSize &&
+          runtimeType == other.runtimeType &&
+          widthFactor == other.widthFactor &&
+          heightFactor == other.heightFactor &&
+          alignment == other.alignment;
+
+  @override
+  int get hashCode => Object.hash(widthFactor, heightFactor, alignment);
 }
 
 class _FractionalSizeTween extends Tween<FractionalSize> {

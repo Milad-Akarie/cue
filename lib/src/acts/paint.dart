@@ -24,6 +24,18 @@ class PaintAct extends TweenAct<double> {
       child: child,
     );
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is PaintAct && super == other &&
+        other.key == key &&
+        other.painter == painter &&
+        other.paintOnTop == paintOnTop;
+  }
+
+  @override
+  int get hashCode => Object.hash(super.hashCode, key, painter, paintOnTop);
 }
 
 class PaintActor extends SingleActorBase<double> {

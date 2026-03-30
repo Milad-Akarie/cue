@@ -33,6 +33,9 @@ abstract class ClipAct extends Act {
 }
 
 class _AxisClipEffect extends TweenAct<double> implements ClipAct {
+  @override
+  ActKey get key => const ActKey('Clip');
+
   final Axis _axis;
   final AlignmentGeometry alignment;
 
@@ -75,10 +78,25 @@ class _AxisClipEffect extends TweenAct<double> implements ClipAct {
   }
 
   @override
-  ActKey get key => const ActKey('Clip');
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        super == other &&
+            other is _AxisClipEffect &&
+            super == other &&
+            _axis == other._axis &&
+            alignment == other.alignment;
+  }
+
+  @override
+  int get hashCode => Object.hash(super.hashCode, _axis, alignment);
 }
 
 class _ClipEffect extends TweenAct<double> implements ClipAct {
+
+
+  @override
+  ActKey get key => const ActKey('Clip');
+
   final BorderRadiusGeometry? borderRadius;
   final AlignmentGeometry? alignment;
   final bool useSuperellipse;
@@ -136,8 +154,20 @@ class _ClipEffect extends TweenAct<double> implements ClipAct {
     );
   }
 
+ @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        super == other &&
+            other is _ClipEffect &&
+            super == other &&
+            borderRadius == other.borderRadius &&
+            alignment == other.alignment &&
+            useSuperellipse == other.useSuperellipse;
+  }
+
   @override
-  ActKey get key => const ActKey('Clip');
+  int get hashCode => Object.hash(super.hashCode, borderRadius, alignment, useSuperellipse);
+
 }
 
 class ExpandingPathClipper extends CustomClipper<Path> {

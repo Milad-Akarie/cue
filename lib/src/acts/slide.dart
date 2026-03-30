@@ -180,4 +180,13 @@ class _AxisSlideEffect extends TweenActBase<double, Offset> implements SlideAct 
   Widget apply(BuildContext context, Animation<Offset> animation, Widget child) {
     return SlideTransition(position: animation, child: child);
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is _AxisSlideEffect && super == other && other._axis == _axis;
+  }
+
+  @override
+  int get hashCode => Object.hash(super.hashCode, _axis);
 }

@@ -145,6 +145,16 @@ class _AxisTranslate extends TweenActBase<double, Offset> implements TranslateAc
   Widget apply(BuildContext context, CueAnimation<Offset> animation, Widget child) {
     return TranslateTransition(offset: animation, child: child);
   }
+  
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        other is _AxisTranslate && super == (other) && _axis == other._axis;
+  }
+
+  @override
+  int get hashCode => Object.hash(super.hashCode, _axis);
+
 }
 
 class TranslateTransition extends AnimatedWidget {

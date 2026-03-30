@@ -70,6 +70,17 @@ class PositionAct extends TweenAct<Position> {
       },
     );
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other.runtimeType != runtimeType) return false;
+    return other is PositionAct && super == other
+        && other._relativeTo == _relativeTo;
+  }
+
+  @override
+  int get hashCode => Object.hash(super.hashCode, _relativeTo);
 }
 
 class Position {

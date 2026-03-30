@@ -45,6 +45,17 @@ class TransformAct extends TweenAct<Matrix4> {
       },
     );
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TransformAct &&
+          runtimeType == other.runtimeType && super == (other) &&
+          alignment == other.alignment &&
+          origin == other.origin;
+
+  @override
+  int get hashCode => Object.hash(super.hashCode, alignment, origin);
 }
 
 class SkewAct extends TweenActBase<Skew, Matrix4> {
