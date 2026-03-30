@@ -1,5 +1,4 @@
 import 'package:cue/cue.dart';
-import 'package:cue/src/widgets/cue_modals.dart';
 import 'package:flutter/material.dart';
 
 @optionalTypeArgs
