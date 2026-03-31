@@ -17,7 +17,7 @@ class OnFocusCue extends OnMountCue {
   CueState<OnFocusCue> createState() => _OnFocusCueState();
 }
 
-class _OnFocusCueState extends SelfAnimatedState<OnFocusCue> {
+class _OnFocusCueState extends SelfAnimatedCueState<OnFocusCue> {
   late final FocusNode _focusNode;
 
   @override

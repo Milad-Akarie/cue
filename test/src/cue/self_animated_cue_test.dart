@@ -10,7 +10,7 @@ void main() {
       await tester.pumpWidget(MaterialApp(home: widget));
       final state = tester.state<OnMountCueState>(find.byType(OnMountCue));
       expect(state.widget.motion, CueMotion.defaultTime);
-      expect(state.debugName, 'SelfAnimatedCue');
+      expect(state.debugName, 'OnMountCue');
       expect(state.controller, isA<CueController>());
       expect(state.timeline, state.controller.timeline);
     });

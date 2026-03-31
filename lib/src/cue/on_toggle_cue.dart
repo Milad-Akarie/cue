@@ -19,7 +19,7 @@ class OnToggleCue extends OnMountCue {
   State<StatefulWidget> createState() => _ToggledStageState();
 }
 
-class _ToggledStageState extends SelfAnimatedState<OnToggleCue> {
+class _ToggledStageState extends SelfAnimatedCueState<OnToggleCue> {
   @override
   String get debugName => 'ToggledCue';
 

@@ -1,6 +1,6 @@
 export 'src/widgets/cue_model_transition.dart';
 export 'src/cue/cue.dart'
-    show Cue, CueScope, CuePageController, CueTabController, CueIndexController, IndexedCueController;
+    show Cue, CueScope, CuePageController, CueTabController, CueIndexController, IndexedCueController, SelfAnimatedCue;
 export 'src/motion/animations.dart';
 export 'src/core/phase.dart';
 export 'src/cue/cue_debug_provider.dart';

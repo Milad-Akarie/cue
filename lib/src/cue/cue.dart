@@ -18,6 +18,7 @@ part 'cue_scope.dart';
 part 'progress_cue.dart';
 part 'on_scroll_cue.dart';
 part 'on_focus_cue.dart';
+part 'on_mount_cue.dart';
 
 abstract class Cue extends StatefulWidget {
   const Cue._({

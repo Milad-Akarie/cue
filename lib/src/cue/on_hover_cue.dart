@@ -18,7 +18,7 @@ class OnHoverCue extends OnMountCue {
   State<StatefulWidget> createState() => _OnHoverStageState();
 }
 
-class _OnHoverStageState extends SelfAnimatedState<OnHoverCue> {
+class _OnHoverStageState extends SelfAnimatedCueState<OnHoverCue> {
   @override
   String get debugName => 'OnHoverCue';
 

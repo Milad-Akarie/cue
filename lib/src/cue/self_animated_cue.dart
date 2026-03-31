@@ -1,7 +1,9 @@
 part of 'cue.dart';
 
-class OnMountCue extends Cue {
-  const OnMountCue({
+
+
+abstract class SelfAnimatedCue extends Cue {
+  const SelfAnimatedCue({
     super.key,
     required super.child,
     this.motion = CueMotion.defaultTime,
@@ -18,58 +20,10 @@ class OnMountCue extends Cue {
   final bool repeat;
   final int? repeatCount;
   final bool reverseOnRepeat;
-
-  @override
-  State<StatefulWidget> createState() => OnMountCueState();
 }
 
-class OnMountCueState extends SelfAnimatedState<OnMountCue> {
-  @override
-  String get debugName => 'OnMountCue';
+abstract class SelfAnimatedCueState<T extends SelfAnimatedCue> extends CueState<T> with SingleTickerProviderStateMixin {
 
-  @override
-  void onControllerReady() async {
-    if (widget.repeat) {
-      controller.repeat(reverse: widget.reverseOnRepeat, count: widget.repeatCount);
-    } else {
-      controller.forward();
-    }
-  }
-
-  @override
-  void didUpdateWidget(covariant OnMountCue oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.repeat != oldWidget.repeat ||
-        widget.reverseOnRepeat != oldWidget.reverseOnRepeat ||
-        widget.repeatCount != oldWidget.repeatCount) {
-      controller.stop();
-      if (widget.repeat) {
-        controller.repeat(reverse: widget.reverseOnRepeat, count: widget.repeatCount);
-      } else {
-        controller.forward();
-      }
-    }
-  }
-
-  bool _devToolControlled = false;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (kDebugMode) {
-      final devToolScope = CueDebugTools.maybeOf(context);
-      final isDevToolControlled = devToolScope?.activeTargetId == _debugId && devToolScope?.isMinimized == false;
-      if (!_devToolControlled && isDevToolControlled) {
-        controller.stop();
-      } else if (_devToolControlled && !isDevToolControlled && widget.repeat) {
-        controller.repeat(reverse: widget.reverseOnRepeat, count: widget.repeatCount);
-      }
-      _devToolControlled = isDevToolControlled;
-    }
-  }
-}
-
-abstract class SelfAnimatedState<T extends OnMountCue> extends CueState<T> with SingleTickerProviderStateMixin {
   late final CueController controller;
 
   CueMotion get motion => widget.motion;
@@ -128,6 +82,23 @@ abstract class SelfAnimatedState<T extends OnMountCue> extends CueState<T> with 
           );
         }
       }
+    }
+  }
+
+  bool _devToolControlled = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (kDebugMode) {
+      final devToolScope = CueDebugTools.maybeOf(context);
+      final isDevToolControlled = devToolScope?.activeTargetId == _debugId && devToolScope?.isMinimized == false;
+      if (!_devToolControlled && isDevToolControlled) {
+        controller.stop();
+      } else if (_devToolControlled && !isDevToolControlled && widget.repeat) {
+        controller.repeat(reverse: widget.reverseOnRepeat, count: widget.repeatCount);
+      }
+      _devToolControlled = isDevToolControlled;
     }
   }
 

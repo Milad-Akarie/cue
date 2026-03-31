@@ -20,7 +20,7 @@ class OnChangeCue extends OnMountCue {
   State<StatefulWidget> createState() => _OnChangeCueState();
 }
 
-class _OnChangeCueState extends SelfAnimatedState<OnChangeCue> {
+class _OnChangeCueState extends SelfAnimatedCueState<OnChangeCue> {
 
 
   @override
