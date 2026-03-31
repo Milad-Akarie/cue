@@ -7,12 +7,10 @@ class OnScrollVisibleCue extends Cue {
     super.debugLabel,
     this.enabled = true,
     super.acts,
-    this.mode = const ScrollAnimationMode.progress(),
   }) : super._();
 
   final bool enabled;
 
-  final ScrollAnimationMode mode;
 
   @override
   State<StatefulWidget> createState() => OnScrollVisibleCueState();
@@ -25,18 +23,15 @@ class OnScrollVisibleCueState extends CueState<OnScrollVisibleCue> with SingleTi
   @override
   CueTimeline get timeline => _controller.timeline;
 
-  late final CueController _controller;
+  late final CueController _controller = CueController(vsync: this, motion: .linear(Duration(milliseconds: 500)));
   ScrollPosition? _scrollPosition;
   double? _cachedRevealedOffset;
 
-  @override
+ 
+ @override
   void initState() {
     super.initState();
-    _controller = CueController(
-      vsync: this,
-      motion: widget.mode.motion ?? .defaultTime,
-      reverseMotion: widget.mode.reverseMotion ?? widget.mode.motion ?? .defaultTime,
-    );
+    _controller.setProgress(1.0, forward: true);
   }
 
   @override
@@ -44,7 +39,6 @@ class OnScrollVisibleCueState extends CueState<OnScrollVisibleCue> with SingleTi
     super.didChangeDependencies();
     _cachedRevealedOffset = null;
     if (!widget.enabled) return;
-
     if (mounted) {
       _subscribeToScrollPosition();
     }
@@ -74,12 +68,7 @@ class OnScrollVisibleCueState extends CueState<OnScrollVisibleCue> with SingleTi
         _subscribeToScrollPosition();
       }
     }
-    if (widget.mode.motion != oldWidget.mode.motion || widget.mode.reverseMotion != oldWidget.mode.reverseMotion) {
-      _controller.updateMotion(
-        widget.mode.motion ?? .defaultTime,
-        reverseMotion: widget.mode.reverseMotion ?? widget.mode.motion ?? .defaultTime,
-      );
-    }
+   
   }
 
   @override
@@ -129,29 +118,5 @@ class OnScrollVisibleCueState extends CueState<OnScrollVisibleCue> with SingleTi
   }
 }
 
-class ScrollAnimationMode {
-  final double? fraction;
-  final CueMotion? motion;
-  final CueMotion? reverseMotion;
-
-  const ScrollAnimationMode.progress() : fraction = null, motion = null, reverseMotion = null;
-
-  const ScrollAnimationMode.trigger({
-    this.fraction = 1.0,
-    this.motion,
-    this.reverseMotion,
-  });
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-
-    return other is ScrollAnimationMode &&
-        other.fraction == fraction &&
-        other.motion == motion &&
-        other.reverseMotion == reverseMotion;
-  }
-
-  @override
-  int get hashCode => fraction.hashCode ^ motion.hashCode ^ reverseMotion.hashCode;
-}
+ 
+ 

@@ -44,7 +44,7 @@ class _IndicatorToButtonState extends State<IndicatorToButton> {
                     clipBehavior: .antiAlias,
                     shape: RoundedSuperellipseBorder(borderRadius: .circular(32)),
                     child: Actor(
-                      acts: [.parallax(slide: .1,axis: .vertical, reverse: .to(-.1))],
+                      acts: [.parallax(slide: .15, axis: .vertical)],
                       child: Image.network(
                         'https://picsum.photos/400/300?random=$index',
                         fit: BoxFit.cover,

@@ -151,7 +151,6 @@ Future<T?> showCueModalBottomSheet<T>({
     vsync: navigator,
     motion: motion,
     reverseMotion: reverseMotion,
-    progressDriven: true,
   );
 
   return navigator.push<T>(

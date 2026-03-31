@@ -1,5 +1,5 @@
 import 'package:cue/cue.dart';
-import 'package:example/examples/delete_confirmation.dart';
+import 'package:example/examples/indicator_to_button.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -63,24 +63,13 @@ class _DemoPageState extends State<DemoPage> {
         ],
       ),
       body: SizedBox.expand(
-        child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(0.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              for (var i = 0; i < 10; i++)
-                Cue.onScrollVisible(
-                  acts: [.slideY(from: 1, reverse: .to(-1))],
-                  child: Container(
-                    margin: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-                    width: double.infinity,
-                    height: 200,
-                    decoration: BoxDecoration(
-                      color: Colors.green,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
+                IndicatorToButton(),
             ],
           ),
         ),

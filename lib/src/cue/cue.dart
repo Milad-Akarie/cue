@@ -139,7 +139,6 @@ abstract class Cue extends StatefulWidget {
     bool enabled,
     List<Act>? acts,
     required Widget child,
-    ScrollAnimationMode mode,
   }) = OnScrollVisibleCue;
 }
 

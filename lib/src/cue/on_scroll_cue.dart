@@ -19,7 +19,7 @@ class _OnScrollCueState extends CueState<OnScrollCue> with SingleTickerProviderS
   @override
   CueTimeline get timeline => _controller.timeline;
 
-  late final _controller = CueController(vsync: this, motion: .linear(1000.ms), progressDriven: true);
+  late final _controller = CueController(vsync: this, motion: .linear(500.ms));
 
   ScrollPosition? _scrollPosition;
   double? _cachedRevealedOffset;

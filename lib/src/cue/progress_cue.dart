@@ -22,7 +22,7 @@ class _ProgressCue extends Cue {
 }
 
 class _ProgressCueState extends CueState<_ProgressCue> {
-  final _progresstimeline = CueTimelineImpl.fromMotion(.defaultTime, progressDriven: true);
+  final _progresstimeline = CueTimelineImpl.fromMotion(.linear(500.ms));
 
   @override
   String get debugName => 'ProgressCue';
