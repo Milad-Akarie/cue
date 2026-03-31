@@ -44,101 +44,45 @@ class DemoPage extends StatefulWidget {
 }
 
 class _DemoPageState extends State<DemoPage> {
+  bool toggled = false;
+  final focuseNode = FocusNode();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Cue Demo'),
+        actions: [
+          IconButton(
+            onPressed: () {
+              setState(() {
+                toggled = !toggled;
+              });
+            },
+            icon: const Icon(Icons.toggle_on),
+          ),
+        ],
+      ),
       body: SizedBox.expand(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-        
-            DeleteConfirmationDialog(),
-            // Cue.onMount(
-            //   motion: .spatialSlow(),
-            //   acts: [
-            //     PathMotionAct.circular(radius: 80)
-            //   ],
-            //   child: Container(
-            //     width: 80,
-            //     height: 80,
-            //     decoration: BoxDecoration(
-            //       color: Colors.blue,
-            //       shape: BoxShape.circle,
-            //     ),
-            //   ),
-            // ),
-
-            CueModalTransition(
-              triggerBuilder: (context, open) {
-                return InkWell(
-                  onTap: open,
-                  child: Card(
-                    child: SizedBox.square(
-                      dimension: 200,
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          children: [
-                            Text('Hello, Cue!'),
-                            const SizedBox(height: 8),
-                          ],
-                        ),
-                      ),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              for (var i = 0; i < 10; i++)
+                Cue.onScrollVisible(
+                  acts: [.slideY(from: 1, reverse: .to(-1))],
+                  child: Container(
+                    margin: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+                    width: double.infinity,
+                    height: 200,
+                    decoration: BoxDecoration(
+                      color: Colors.green,
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                );
-              },
-              alignment: .center,
-              hideTriggerOnTransition: true,
-              motion: .gentle(),
-              builder: (context, rect) {
-                return Actor(
-                  acts: [
-                    .rotate3D(from: Rotation3D(y: 180)),
-                    .sizedBox(
-                      width: .tween(from: rect.width, to: 400),
-                      height: .tween(from: rect.height, to: 300),
-                    ),
-                  ],
-                  child: Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        children: [
-                          Actor(
-                            acts: [
-                              .slideY(from: -2),
-                              .fadeIn(),
-                            ],
-                            child: Text('Hello, Cue!'),
-                          ),
-                          const SizedBox(height: 8),
-                          Expanded(
-                            child: Actor(
-                              delay: 100.ms,
-                              acts: [
-                                .clip(borderRadius: BorderRadius.circular(16), alignment: .bottomCenter),
-                                .fadeIn(),
-                                .slideUp(),
-                              ],
-                              child: SizedBox(
-                                width: double.infinity,
-                                child: Image.network(
-                                  'https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d',
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ],
+                ),
+            ],
+          ),
         ),
       ),
     );

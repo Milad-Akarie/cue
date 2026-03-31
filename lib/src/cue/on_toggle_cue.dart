@@ -5,6 +5,7 @@ class OnToggleCue extends OnMountCue {
     super.key,
     required super.child,
     super.debugLabel,
+    super.onEnd,
     super.motion,
     super.reverseMotion,
     required this.toggled,

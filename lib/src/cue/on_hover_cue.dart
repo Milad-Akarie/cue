@@ -1,6 +1,6 @@
 part of 'cue.dart';
 
-class OnHoverCue extends OnMountCue {
+class OnHoverCue extends SelfAnimatedCue {
   const OnHoverCue({
     super.key,
     required super.child,
@@ -8,6 +8,7 @@ class OnHoverCue extends OnMountCue {
     super.motion = .defaultTime,
     this.cursor = MouseCursor.defer,
     this.opaque = false,
+    super.onEnd,
     super.acts,
   }) : super();
 
@@ -19,6 +20,7 @@ class OnHoverCue extends OnMountCue {
 }
 
 class _OnHoverStageState extends SelfAnimatedCueState<OnHoverCue> {
+
   @override
   String get debugName => 'OnHoverCue';
 

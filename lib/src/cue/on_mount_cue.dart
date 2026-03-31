@@ -10,8 +10,10 @@ class OnMountCue extends SelfAnimatedCue {
     super.repeat = false,
     super.reverseOnRepeat = false,
     super.repeatCount,
+    super.onEnd,
     super.acts,
   }) : super();
+
 
   @override
   State<StatefulWidget> createState() => OnMountCueState();

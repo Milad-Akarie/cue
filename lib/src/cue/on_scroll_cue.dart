@@ -1,7 +1,7 @@
 part of 'cue.dart';
 
-class _OnScrollCue extends Cue {
-  const _OnScrollCue({
+class OnScrollCue extends Cue {
+  const OnScrollCue({
     super.key,
     required super.child,
     super.debugLabel,
@@ -12,7 +12,7 @@ class _OnScrollCue extends Cue {
   State<StatefulWidget> createState() => _OnScrollCueState();
 }
 
-class _OnScrollCueState extends CueState<_OnScrollCue> with SingleTickerProviderStateMixin {
+class _OnScrollCueState extends CueState<OnScrollCue> with SingleTickerProviderStateMixin {
   @override
   String get debugName => 'OnScrollCue';
 

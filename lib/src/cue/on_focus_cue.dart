@@ -1,6 +1,6 @@
 part of 'cue.dart';
 
-class OnFocusCue extends OnMountCue {
+class OnFocusCue extends SelfAnimatedCue {
   const OnFocusCue({
     super.key,
     super.debugLabel,
@@ -8,6 +8,7 @@ class OnFocusCue extends OnMountCue {
     super.reverseMotion,
     this.focusNode,
     super.acts,
+    super.onEnd,
     required super.child,
   });
 
@@ -35,6 +36,17 @@ class _OnFocusCueState extends SelfAnimatedCueState<OnFocusCue> {
       _focusNode.dispose();
     }
     super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(covariant OnFocusCue oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.focusNode != oldWidget.focusNode) {
+      if (oldWidget.focusNode == null) {
+        _focusNode.dispose();
+      }
+      _focusNode = widget.focusNode ?? FocusNode();
+    }
   }
 
   @override

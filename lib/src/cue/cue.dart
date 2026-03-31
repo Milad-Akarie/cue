@@ -49,6 +49,7 @@ abstract class Cue extends StatefulWidget {
     bool reverseOnRepeat,
     int? repeatCount,
     List<Act>? acts,
+    ValueChanged<bool>? onEnd,
     required Widget child,
   }) = OnMountCue;
 
@@ -59,6 +60,7 @@ abstract class Cue extends StatefulWidget {
     MouseCursor cursor,
     bool opaque,
     List<Act>? acts,
+    ValueChanged<bool>? onEnd,
     required Widget child,
   }) = OnHoverCue;
 
@@ -69,6 +71,7 @@ abstract class Cue extends StatefulWidget {
     CueMotion? reverseMotion,
     FocusNode? focusNode,
     List<Act>? acts,
+    ValueChanged<bool>? onEnd,
     required Widget child,
   }) = OnFocusCue;
 
@@ -81,6 +84,7 @@ abstract class Cue extends StatefulWidget {
     bool skipFirstAnimation,
     required Widget child,
     List<Act>? acts,
+    ValueChanged<bool>? onEnd,
   }) = OnToggleCue;
 
   const factory Cue.onChange({
@@ -107,7 +111,6 @@ abstract class Cue extends StatefulWidget {
     Key? key,
     String? debugLabel,
     List<Act>? acts,
-
     required Listenable listenable,
     required ValueGetter<double> progress,
     required Widget child,
@@ -124,7 +127,7 @@ abstract class Cue extends StatefulWidget {
     String? debugLabel,
     List<Act>? acts,
     required Widget child,
-  }) = _OnScrollCue;
+  }) = OnScrollCue;
 
   // This only works within the nearest scrollable ancestor and is not meant to be used as a general purpose visibility detector.
   // it doesn't support nested scrollables and is not meant to be used as a general purpose visibility detector.
@@ -136,7 +139,8 @@ abstract class Cue extends StatefulWidget {
     bool enabled,
     List<Act>? acts,
     required Widget child,
-  }) = _OnScrollVisibleCue;
+    ScrollAnimationMode mode,
+  }) = OnScrollVisibleCue;
 }
 
 abstract class CueState<T extends Cue> extends State<Cue> {

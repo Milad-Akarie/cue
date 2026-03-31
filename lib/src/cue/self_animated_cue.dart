@@ -12,6 +12,7 @@ abstract class SelfAnimatedCue extends Cue {
     this.repeat = false,
     this.reverseOnRepeat = false,
     this.repeatCount,
+    this.onEnd,
     super.acts,
   }) : super._();
 
@@ -20,6 +21,7 @@ abstract class SelfAnimatedCue extends Cue {
   final bool repeat;
   final int? repeatCount;
   final bool reverseOnRepeat;
+  final ValueChanged<bool>? onEnd;
 }
 
 abstract class SelfAnimatedCueState<T extends SelfAnimatedCue> extends CueState<T> with SingleTickerProviderStateMixin {
@@ -39,19 +41,22 @@ abstract class SelfAnimatedCueState<T extends SelfAnimatedCue> extends CueState<
   void initState() {
     super.initState();
     _createController();
+    if(widget.onEnd != null) {
+      _updateStatusListener();
+    }
     _updateStatusListener();
     onControllerReady();
   }
 
   void _updateStatusListener() {
-    if (_statusListener != null) {
+    if (_statusListener != null ) {
       controller.removeStatusListener(_statusListener!);
     }
     _statusListener = (status) {
       if (status.isCompleted) {
-        onAnimationEnd(true);
+          widget.onEnd?.call(true);
       } else if (status.isDismissed) {
-        onAnimationEnd(false);
+          widget.onEnd?.call(false);
       }
     };
     controller.addStatusListener(_statusListener!);
@@ -70,7 +75,7 @@ abstract class SelfAnimatedCueState<T extends SelfAnimatedCue> extends CueState<
   void didUpdateWidget(covariant T oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.motion != motion || oldWidget.reverseMotion != reverseMotion) {
-      controller.updateMotion(motion, newReverseMotion: reverseMotion);
+      controller.updateMotion(motion, reverseMotion: reverseMotion);
       if (kDebugMode) {
         final debugToolScope = CueDebugTools.maybeOf(context);
         if (debugToolScope != null) {
@@ -82,6 +87,9 @@ abstract class SelfAnimatedCueState<T extends SelfAnimatedCue> extends CueState<
           );
         }
       }
+    }
+    if (oldWidget.onEnd != widget.onEnd) {
+      _updateStatusListener();
     }
   }
 
@@ -103,8 +111,6 @@ abstract class SelfAnimatedCueState<T extends SelfAnimatedCue> extends CueState<
   }
 
   void onControllerReady() {}
-
-  void onAnimationEnd(bool forward) {}
 
   @override
   void dispose() {

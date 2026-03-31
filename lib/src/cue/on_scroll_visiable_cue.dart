@@ -1,35 +1,43 @@
 part of 'cue.dart';
 
-class _OnScrollVisibleCue extends Cue {
-  const _OnScrollVisibleCue({
+class OnScrollVisibleCue extends Cue {
+  const OnScrollVisibleCue({
     super.key,
     required super.child,
     super.debugLabel,
     this.enabled = true,
     super.acts,
+    this.mode = const ScrollAnimationMode.progress(),
   }) : super._();
 
   final bool enabled;
 
+  final ScrollAnimationMode mode;
+
   @override
-  State<StatefulWidget> createState() => _OnVisibleCueState();
+  State<StatefulWidget> createState() => OnScrollVisibleCueState();
 }
 
-class _OnVisibleCueState extends CueState<_OnScrollVisibleCue> with SingleTickerProviderStateMixin {
+class OnScrollVisibleCueState extends CueState<OnScrollVisibleCue> with SingleTickerProviderStateMixin {
   @override
   String get debugName => 'OnScrollVisibleCue';
 
   @override
   CueTimeline get timeline => _controller.timeline;
 
-  late final _controller = CueController(
-    motion: const .linear(Duration(milliseconds: 300)),
-    vsync: this,
-    progressDriven: true,
-  );
-
+  late final CueController _controller;
   ScrollPosition? _scrollPosition;
   double? _cachedRevealedOffset;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = CueController(
+      vsync: this,
+      motion: widget.mode.motion ?? .defaultTime,
+      reverseMotion: widget.mode.reverseMotion ?? widget.mode.motion ?? .defaultTime,
+    );
+  }
 
   @override
   void didChangeDependencies() {
@@ -56,7 +64,7 @@ class _OnVisibleCueState extends CueState<_OnScrollVisibleCue> with SingleTicker
   }
 
   @override
-  void didUpdateWidget(covariant _OnScrollVisibleCue oldWidget) {
+  void didUpdateWidget(covariant OnScrollVisibleCue oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.enabled != oldWidget.enabled) {
       if (!widget.enabled) {
@@ -65,6 +73,12 @@ class _OnVisibleCueState extends CueState<_OnScrollVisibleCue> with SingleTicker
       } else {
         _subscribeToScrollPosition();
       }
+    }
+    if (widget.mode.motion != oldWidget.mode.motion || widget.mode.reverseMotion != oldWidget.mode.reverseMotion) {
+      _controller.updateMotion(
+        widget.mode.motion ?? .defaultTime,
+        reverseMotion: widget.mode.reverseMotion ?? widget.mode.motion ?? .defaultTime,
+      );
     }
   }
 
@@ -113,4 +127,31 @@ class _OnVisibleCueState extends CueState<_OnScrollVisibleCue> with SingleTicker
       _controller.setProgress(target, forward: forward);
     }
   }
+}
+
+class ScrollAnimationMode {
+  final double? fraction;
+  final CueMotion? motion;
+  final CueMotion? reverseMotion;
+
+  const ScrollAnimationMode.progress() : fraction = null, motion = null, reverseMotion = null;
+
+  const ScrollAnimationMode.trigger({
+    this.fraction = 1.0,
+    this.motion,
+    this.reverseMotion,
+  });
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is ScrollAnimationMode &&
+        other.fraction == fraction &&
+        other.motion == motion &&
+        other.reverseMotion == reverseMotion;
+  }
+
+  @override
+  int get hashCode => fraction.hashCode ^ motion.hashCode ^ reverseMotion.hashCode;
 }

@@ -25,10 +25,10 @@ class CueController extends AnimationController {
        ),
        super.unbounded();
 
-  void updateMotion(CueMotion newMotion, {CueMotion? newReverseMotion}) {
+  void updateMotion(CueMotion newMotion, {CueMotion? reverseMotion}) {
     final mainTrack = timeline.mainTrack;
-    if (newMotion != mainTrack.motion || newReverseMotion != mainTrack.reverseMotion) {
-      timeline.resetTracks(TrackConfig(motion: newMotion, reverseMotion: newReverseMotion ?? newMotion));
+    if (newMotion != mainTrack.motion || reverseMotion != mainTrack.reverseMotion) {
+      timeline.resetTracks(TrackConfig(motion: newMotion, reverseMotion: reverseMotion ?? newMotion));
     }
   }
 
