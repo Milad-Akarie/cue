@@ -327,13 +327,9 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                                                     final progress = _data.forward
                                                         ? widget.controller.value
                                                         : 1 - widget.controller.value;
-
                                                     final durationInSeconds = duration * progress;
-
                                                     final durationInMs = durationInSeconds * 1000;
                                                     final maxChars = ( duration * 1000).toStringAsFixed(0).length;
-                                                    print(maxChars);
-
                                                     return Text(
                                                       '${durationInMs.toStringAsFixed(0).padLeft(maxChars, '0')}ms',
                                                       style: const TextStyle(

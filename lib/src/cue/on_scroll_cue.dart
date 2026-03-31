@@ -12,7 +12,7 @@ class _OnScrollCue extends Cue {
   State<StatefulWidget> createState() => _OnScrollCueState();
 }
 
-class _OnScrollCueState extends _CueState<_OnScrollCue> with SingleTickerProviderStateMixin {
+class _OnScrollCueState extends CueState<_OnScrollCue> with SingleTickerProviderStateMixin {
   @override
   String get debugName => 'OnScrollCue';
 

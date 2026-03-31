@@ -1,7 +1,7 @@
 part of 'cue.dart';
 
-class _OnFocusCue extends SelfAnimatedCue {
-  const _OnFocusCue({
+class OnFocusCue extends OnMountCue {
+  const OnFocusCue({
     super.key,
     super.debugLabel,
     super.motion,
@@ -14,10 +14,10 @@ class _OnFocusCue extends SelfAnimatedCue {
   final FocusNode? focusNode;
 
   @override
-  _CueState<_OnFocusCue> createState() => _OnFocusCueState();
+  CueState<OnFocusCue> createState() => _OnFocusCueState();
 }
 
-class _OnFocusCueState extends SelfAnimatedState<_OnFocusCue> {
+class _OnFocusCueState extends SelfAnimatedState<OnFocusCue> {
   late final FocusNode _focusNode;
 
   @override

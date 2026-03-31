@@ -34,7 +34,6 @@ abstract class Cue extends StatefulWidget {
   const factory Cue({
     Key? key,
     String? debugLabel,
-    bool isBounded,
     List<Act>? acts,
     required CueTimeline timeline,
     required Widget child,
@@ -50,7 +49,7 @@ abstract class Cue extends StatefulWidget {
     int? repeatCount,
     List<Act>? acts,
     required Widget child,
-  }) = SelfAnimatedCue;
+  }) = OnMountCue;
 
   const factory Cue.onHover({
     Key? key,
@@ -60,7 +59,7 @@ abstract class Cue extends StatefulWidget {
     bool opaque,
     List<Act>? acts,
     required Widget child,
-  }) = _OnHoverCue;
+  }) = OnHoverCue;
 
   const factory Cue.onFocus({
     Key? key,
@@ -70,7 +69,7 @@ abstract class Cue extends StatefulWidget {
     FocusNode? focusNode,
     List<Act>? acts,
     required Widget child,
-  }) = _OnFocusCue;
+  }) = OnFocusCue;
 
   const factory Cue.onToggle({
     Key? key,
@@ -81,7 +80,7 @@ abstract class Cue extends StatefulWidget {
     bool skipFirstAnimation,
     required Widget child,
     List<Act>? acts,
-  }) = _TogglableCue;
+  }) = OnToggleCue;
 
   const factory Cue.onChange({
     Key? key,
@@ -92,7 +91,7 @@ abstract class Cue extends StatefulWidget {
     List<Act>? acts,
     required Object? value,
     required Widget child,
-  }) = _OnChangeCue;
+  }) = OnChangeCue;
 
   const factory Cue.indexed({
     Key? key,
@@ -101,7 +100,7 @@ abstract class Cue extends StatefulWidget {
     required IndexedCueController controller,
     required int index,
     required Widget child,
-  }) = _IndexedCue;
+  }) = IndexedCue;
 
   const factory Cue.onProgress({
     Key? key,
@@ -139,7 +138,7 @@ abstract class Cue extends StatefulWidget {
   }) = _OnScrollVisibleCue;
 }
 
-abstract class _CueState<T extends Cue> extends State<Cue> {
+abstract class CueState<T extends Cue> extends State<Cue> {
   @override
   T get widget => super.widget as T;
 

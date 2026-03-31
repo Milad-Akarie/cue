@@ -1,7 +1,7 @@
 part of 'cue.dart';
 
-class _IndexedCue extends Cue {
-  const _IndexedCue({
+class IndexedCue extends Cue {
+  const IndexedCue({
     super.key,
     super.debugLabel,
     required super.child,
@@ -17,7 +17,7 @@ class _IndexedCue extends Cue {
   State<StatefulWidget> createState() => _IndexedCueState();
 }
 
-class _IndexedCueState extends _CueState<_IndexedCue> {
+class _IndexedCueState extends CueState<IndexedCue> {
   final _progressTimeline = CueTimelineImpl.fromMotion(.linear(1.0.s), progressDriven: true);
 
   @override
@@ -47,7 +47,7 @@ class _IndexedCueState extends _CueState<_IndexedCue> {
   }
 
   @override
-  void didUpdateWidget(covariant _IndexedCue oldWidget) {
+  void didUpdateWidget(covariant IndexedCue oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.controller != oldWidget.controller || listenable != oldWidget.controller.tickListenable) {
       listenable.removeListener(_updateAnimation);

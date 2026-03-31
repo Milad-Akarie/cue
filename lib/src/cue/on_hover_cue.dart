@@ -1,7 +1,7 @@
 part of 'cue.dart';
 
-class _OnHoverCue extends SelfAnimatedCue {
-  const _OnHoverCue({
+class OnHoverCue extends OnMountCue {
+  const OnHoverCue({
     super.key,
     required super.child,
     super.debugLabel,
@@ -18,7 +18,7 @@ class _OnHoverCue extends SelfAnimatedCue {
   State<StatefulWidget> createState() => _OnHoverStageState();
 }
 
-class _OnHoverStageState extends SelfAnimatedState<_OnHoverCue> {
+class _OnHoverStageState extends SelfAnimatedState<OnHoverCue> {
   @override
   String get debugName => 'OnHoverCue';
 

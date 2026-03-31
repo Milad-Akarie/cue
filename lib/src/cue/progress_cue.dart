@@ -21,7 +21,7 @@ class _ProgressCue extends Cue {
   State<StatefulWidget> createState() => _ProgressCueState();
 }
 
-class _ProgressCueState extends _CueState<_ProgressCue> {
+class _ProgressCueState extends CueState<_ProgressCue> {
   final _progresstimeline = CueTimelineImpl.fromMotion(.defaultTime, progressDriven: true);
 
   @override

@@ -1,8 +1,5 @@
-import 'dart:ui';
 
 import 'package:cue/cue.dart';
-import 'package:cue/src/timeline/track/track.dart';
-import 'package:cue/src/timeline/track/track_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -13,13 +10,6 @@ void main() {
     final motion = CueMotion.linear(300.ms);
     return ActContext(motion: motion, reverseMotion: motion);
   }
-
-  CueTrack createTrack() {
-    final motion = CueMotion.linear(300.ms);
-    final config = TrackConfig(motion: motion, reverseMotion: motion);
-    return CueTrackImpl(config);
-  }
-
   group('PathMotionAct', () {
     group('key', () {
       test('has correct key name', () {

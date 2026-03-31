@@ -4,20 +4,18 @@ class _ControlledCue extends Cue {
   const _ControlledCue({
     super.key,
     required super.child,
-    this.isBounded = true,
     super.debugLabel,
     required this.timeline,
     super.acts,
   }) : super._();
 
   final CueTimeline timeline;
-  final bool isBounded;
 
   @override
   State<StatefulWidget> createState() => _ControlledCueState();
 }
 
-class _ControlledCueState extends _CueState<_ControlledCue> {
+class _ControlledCueState extends CueState<_ControlledCue> {
 
   @override
   String get debugName => 'ControlledCue';

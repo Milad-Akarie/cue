@@ -1,7 +1,7 @@
 part of 'cue.dart';
 
-class _OnChangeCue extends SelfAnimatedCue {
-  const _OnChangeCue({
+class OnChangeCue extends OnMountCue {
+  const OnChangeCue({
     super.key,
     required super.child,
     super.motion,
@@ -20,7 +20,7 @@ class _OnChangeCue extends SelfAnimatedCue {
   State<StatefulWidget> createState() => _OnChangeCueState();
 }
 
-class _OnChangeCueState extends SelfAnimatedState<_OnChangeCue> {
+class _OnChangeCueState extends SelfAnimatedState<OnChangeCue> {
 
 
   @override
@@ -39,7 +39,7 @@ class _OnChangeCueState extends SelfAnimatedState<_OnChangeCue> {
   }
 
   @override
-  void didUpdateWidget(covariant _OnChangeCue oldWidget) {
+  void didUpdateWidget(covariant OnChangeCue oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.value != oldWidget.value) {
       controller.forward(from: 0.0);

@@ -1,4 +1,3 @@
-import 'dart:ui';
 
 import 'package:cue/cue.dart';
 import 'package:flutter/material.dart';
@@ -6,11 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-
-  ActContext createActContext() {
-    final motion = CueMotion.linear(300.ms);
-    return ActContext(motion: motion, reverseMotion: motion);
-  }
+ 
 
   group('Lerpable', () {
     test('is abstract class', () {

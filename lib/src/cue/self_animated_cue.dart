@@ -1,7 +1,7 @@
 part of 'cue.dart';
 
-class SelfAnimatedCue extends Cue {
-  const SelfAnimatedCue({
+class OnMountCue extends Cue {
+  const OnMountCue({
     super.key,
     required super.child,
     this.motion = CueMotion.defaultTime,
@@ -20,12 +20,12 @@ class SelfAnimatedCue extends Cue {
   final bool reverseOnRepeat;
 
   @override
-  State<StatefulWidget> createState() => SelfAnimatedCueState();
+  State<StatefulWidget> createState() => OnMountCueState();
 }
 
-class SelfAnimatedCueState extends SelfAnimatedState<SelfAnimatedCue> {
+class OnMountCueState extends SelfAnimatedState<OnMountCue> {
   @override
-  String get debugName => 'SelfAnimatedCue';
+  String get debugName => 'OnMountCue';
 
   @override
   void onControllerReady() async {
@@ -37,7 +37,7 @@ class SelfAnimatedCueState extends SelfAnimatedState<SelfAnimatedCue> {
   }
 
   @override
-  void didUpdateWidget(covariant SelfAnimatedCue oldWidget) {
+  void didUpdateWidget(covariant OnMountCue oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.repeat != oldWidget.repeat ||
         widget.reverseOnRepeat != oldWidget.reverseOnRepeat ||
@@ -69,7 +69,7 @@ class SelfAnimatedCueState extends SelfAnimatedState<SelfAnimatedCue> {
   }
 }
 
-abstract class SelfAnimatedState<T extends SelfAnimatedCue> extends _CueState<T> with SingleTickerProviderStateMixin {
+abstract class SelfAnimatedState<T extends OnMountCue> extends CueState<T> with SingleTickerProviderStateMixin {
   late final CueController controller;
 
   CueMotion get motion => widget.motion;
@@ -79,11 +79,28 @@ abstract class SelfAnimatedState<T extends SelfAnimatedCue> extends _CueState<T>
   @override
   CueTimeline get timeline => controller.timeline;
 
+  AnimationStatusListener? _statusListener;
+
   @override
   void initState() {
     super.initState();
     _createController();
+    _updateStatusListener();
     onControllerReady();
+  }
+
+  void _updateStatusListener() {
+    if (_statusListener != null) {
+      controller.removeStatusListener(_statusListener!);
+    }
+    _statusListener = (status) {
+      if (status.isCompleted) {
+        onAnimationEnd(true);
+      } else if (status.isDismissed) {
+        onAnimationEnd(false);
+      }
+    };
+    controller.addStatusListener(_statusListener!);
   }
 
   void _createController() {
@@ -116,8 +133,13 @@ abstract class SelfAnimatedState<T extends SelfAnimatedCue> extends _CueState<T>
 
   void onControllerReady() {}
 
+  void onAnimationEnd(bool forward) {}
+
   @override
   void dispose() {
+    if (_statusListener != null) {
+      controller.removeStatusListener(_statusListener!);
+    }
     controller.dispose();
     super.dispose();
   }

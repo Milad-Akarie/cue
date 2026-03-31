@@ -1,7 +1,7 @@
 part of 'cue.dart';
 
-class _TogglableCue extends SelfAnimatedCue {
-  const _TogglableCue({
+class OnToggleCue extends OnMountCue {
+  const OnToggleCue({
     super.key,
     required super.child,
     super.debugLabel,
@@ -19,7 +19,7 @@ class _TogglableCue extends SelfAnimatedCue {
   State<StatefulWidget> createState() => _ToggledStageState();
 }
 
-class _ToggledStageState extends SelfAnimatedState<_TogglableCue> {
+class _ToggledStageState extends SelfAnimatedState<OnToggleCue> {
   @override
   String get debugName => 'ToggledCue';
 
@@ -34,7 +34,7 @@ class _ToggledStageState extends SelfAnimatedState<_TogglableCue> {
   }
 
   @override
-  void didUpdateWidget(covariant _TogglableCue oldWidget) {
+  void didUpdateWidget(covariant OnToggleCue oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.toggled != oldWidget.toggled) {
       _toggle();
