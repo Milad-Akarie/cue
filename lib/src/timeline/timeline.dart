@@ -74,7 +74,7 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
 
   @override
   (CueTrack track, ReleaseToken token) trackFor(TrackConfig config) {
-    if (config == mainTrackConfig) return (mainTrack, ReleaseToken(config));
+    if (config == mainTrackConfig) return (mainTrack, ReleaseToken(config, this));
 
     final entry = tracks.putIfAbsent(
       config,
@@ -87,7 +87,7 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
       from: progress,
       exteranlVelocity: mainTrack.velocity,
     );
-    final token = ReleaseToken(config);
+    final token = ReleaseToken(config, this);
     entry.addToken(token);
     return (entry.track, token);
   }
@@ -362,7 +362,10 @@ class RepeatConfig {
 
 class ReleaseToken {
   final TrackConfig config;
-  const ReleaseToken(this.config);
+  final CueTimeline _timeline;
+  const ReleaseToken(this.config, this._timeline);
+
+  void release() => _timeline.release(this);
 }
 
 class TrackEntry {

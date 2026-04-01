@@ -254,7 +254,7 @@ void main() {
         0.0,
       );
       final delayed = DelayedSimulation(base: springCue, delay: 0.5);
-      
+
       expect(refDuration(delayed), closeTo(delayed.duration, 1 / 60));
     });
 
@@ -266,7 +266,7 @@ void main() {
         0.0,
       );
       final delayed = DelayedSimulation(base: springCue, delay: 0.3);
-      
+
       expect(refDuration(delayed), closeTo(delayed.duration, 1 / 60));
     });
 
@@ -278,7 +278,7 @@ void main() {
         0.0,
       );
       final delayed = DelayedSimulation(base: springCue, delay: 0.2);
-      
+
       expect(refDuration(delayed), closeTo(delayed.duration, 1 / 60));
     });
 
@@ -291,7 +291,7 @@ void main() {
         2.0,
       );
       final delayed = DelayedSimulation(base: springCue, delay: 0.4);
-      
+
       expect(refDuration(delayed), closeTo(delayed.duration, 1 / 60));
     });
 
@@ -304,7 +304,7 @@ void main() {
         0.0,
       );
       final delayed = DelayedSimulation(base: springCue, delay: 0.25);
-      
+
       expect(refDuration(delayed), closeTo(delayed.duration, 1 / 60));
     });
 
@@ -318,7 +318,7 @@ void main() {
         samplingStepSize: 1 / 90,
       );
       final delayed = DelayedSimulation(base: springCue, delay: 0.3);
-      
+
       expect(refDuration(delayed, stepSize: 1 / 90), closeTo(delayed.duration, 1 / 90));
     });
 
@@ -331,7 +331,7 @@ void main() {
         samplingStepSize: 1 / 120,
       );
       final delayed = DelayedSimulation(base: springCue, delay: 0.5);
-      
+
       expect(refDuration(delayed, stepSize: 1 / 120), closeTo(delayed.duration, 1 / 120));
     });
 
@@ -344,7 +344,7 @@ void main() {
         samplingStepSize: 1 / 144,
       );
       final delayed = DelayedSimulation(base: springCue, delay: 0.2);
-      
+
       expect(refDuration(delayed, stepSize: 1 / 144), closeTo(delayed.duration, 1 / 144));
     });
 
@@ -357,7 +357,7 @@ void main() {
         0.0,
       );
       final delayed = DelayedSimulation(base: springCue, delay: 0.01);
-      
+
       expect(refDuration(delayed), closeTo(delayed.duration, 1 / 60));
     });
 
@@ -369,7 +369,7 @@ void main() {
         0.0,
       );
       final delayed = DelayedSimulation(base: springCue, delay: 1.5);
-      
+
       expect(refDuration(delayed), closeTo(delayed.duration, 1 / 60));
     });
 
@@ -383,7 +383,7 @@ void main() {
         samplingStepSize: 1 / 120,
       );
       final delayed = DelayedSimulation(base: springCue, delay: 0.6);
-      
+
       expect(refDuration(delayed, stepSize: 1 / 120), closeTo(delayed.duration, 1 / 120));
     });
 
@@ -396,7 +396,7 @@ void main() {
         0.0,
       );
       final delayed = DelayedSimulation(base: springCue, delay: 0.4);
-      
+
       expect(refDuration(delayed), closeTo(delayed.duration, 1 / 60));
     });
   });
@@ -529,14 +529,14 @@ void main() {
     test('linear curve 300ms', () {
       final motion = CueMotion.linear(300.ms);
       final curved = motion.build(SimulationBuildData.forward(startValue: 0.0));
-      
+
       expect(refDuration(curved), closeTo(curved.duration, 1 / 60));
     });
 
     test('linear curve 500ms', () {
       final motion = CueMotion.linear(500.ms);
       final curved = motion.build(SimulationBuildData.forward(startValue: 0.0));
-      
+
       expect(refDuration(curved), closeTo(curved.duration, 1 / 60));
     });
 
@@ -547,18 +547,18 @@ void main() {
         curve: Curves.easeIn,
       );
       final curved = motion.build(SimulationBuildData.forward(startValue: 0.0));
-      
+
       expect(refDuration(curved), closeTo(curved.duration, 1 / 60));
     });
 
     // Ease out curve
     test('easeOut curve', () {
       final motion = CueMotion.curved(
-       300.ms,
+        300.ms,
         curve: Curves.easeOut,
       );
       final curved = motion.build(SimulationBuildData.forward(startValue: 0.0));
-      
+
       expect(refDuration(curved), closeTo(curved.duration, 1 / 60));
     });
 
@@ -569,7 +569,7 @@ void main() {
         curve: Curves.easeInOut,
       );
       final curved = motion.build(SimulationBuildData.forward(startValue: 0.0));
-      
+
       expect(refDuration(curved), closeTo(curved.duration, 1 / 60));
     });
 
@@ -580,7 +580,7 @@ void main() {
         curve: Curves.elasticIn,
       );
       final curved = motion.build(SimulationBuildData.forward(startValue: 0.0));
-      
+
       expect(refDuration(curved), closeTo(curved.duration, 1 / 60));
     });
 
@@ -591,7 +591,7 @@ void main() {
         curve: Curves.bounceOut,
       );
       final curved = motion.build(SimulationBuildData.forward(startValue: 0.0));
-      
+
       expect(refDuration(curved), closeTo(curved.duration, 1 / 60));
     });
 
@@ -599,7 +599,7 @@ void main() {
     test('zero duration curve', () {
       final motion = CueMotion.linear(0.ms);
       final curved = motion.build(SimulationBuildData.forward(startValue: 0.0));
-      
+
       expect(curved.duration, lessThanOrEqualTo(0.01));
       expect(refDuration(curved), closeTo(curved.duration, 1 / 60));
     });
@@ -608,7 +608,7 @@ void main() {
     test('very long duration curve (2s)', () {
       final motion = CueMotion.linear(2000.ms);
       final curved = motion.build(SimulationBuildData.forward(startValue: 0.0));
-      
+
       expect(refDuration(curved), closeTo(curved.duration, 1 / 60));
     });
 
@@ -619,7 +619,7 @@ void main() {
         curve: Curves.easeOut,
       );
       final curved = motion.build(SimulationBuildData.forward(startValue: 0.5));
-      
+
       expect(refDuration(curved), closeTo(curved.duration, 1 / 60));
     });
   });
@@ -635,7 +635,7 @@ void main() {
       );
       final delayed1 = DelayedSimulation(base: springCue, delay: 0.2);
       final delayed2 = DelayedSimulation(base: delayed1, delay: 0.3);
-      
+
       // Total duration = 0.3 + 0.2 + spring.duration
       expect(refDuration(delayed2), closeTo(delayed2.duration, 1 / 60));
     });
@@ -650,7 +650,7 @@ void main() {
       final delayed1 = DelayedSimulation(base: springCue, delay: 0.1);
       final delayed2 = DelayedSimulation(base: delayed1, delay: 0.2);
       final delayed3 = DelayedSimulation(base: delayed2, delay: 0.1);
-      
+
       // Total duration = 0.1 + 0.2 + 0.1 + spring.duration
       expect(refDuration(delayed3), closeTo(delayed3.duration, 1 / 60));
     });
@@ -663,7 +663,7 @@ void main() {
       );
       final curved = motion.build(SimulationBuildData.forward(startValue: 0.0));
       final delayed = DelayedSimulation(base: curved, delay: .5);
-      
+
       expect(refDuration(delayed), closeTo(delayed.duration, 1 / 60));
     });
 
@@ -676,15 +676,93 @@ void main() {
       final curved = motion.build(SimulationBuildData.forward(startValue: 0.0));
       final delayed1 = DelayedSimulation(base: curved, delay: 0.3);
       final delayed2 = DelayedSimulation(base: delayed1, delay: 0.2);
-      
+
       expect(refDuration(delayed2), closeTo(delayed2.duration, 1 / 60));
+    });
+  });
+
+  group('DelayedSimulation phase getter', () {
+    test('phase returns base simulation phase', () {
+      final baseSim = TimedMotion(Duration(milliseconds: 300)).buildBase();
+      final delayedSim = DelayedSimulation(base: baseSim, delay: 0.1);
+      expect(delayedSim.phase, equals(baseSim.phase));
+    });
+  });
+
+  group('DelayedSimulation x method', () {
+    test('x returns 0 during delay', () {
+      final baseSim = TimedMotion(Duration(milliseconds: 300)).buildBase();
+      final delayedSim = DelayedSimulation(base: baseSim, delay: 0.1);
+      expect(delayedSim.x(0.05), equals(0.0));
+    });
+
+    test('x returns base value after delay', () {
+      final baseSim = TimedMotion(Duration(milliseconds: 300)).buildBase();
+      final delayedSim = DelayedSimulation(base: baseSim, delay: 0.1);
+      final value = delayedSim.x(0.2);
+      expect(value, greaterThan(0.0));
+      expect(value, lessThanOrEqualTo(1.0));
+    });
+  });
+
+  group('DelayedSimulation dx method', () {
+    test('dx returns 0 during delay', () {
+      final baseSim = TimedMotion(Duration(milliseconds: 300)).buildBase();
+      final delayedSim = DelayedSimulation(base: baseSim, delay: 0.1);
+      expect(delayedSim.dx(0.05), equals(0.0));
+    });
+
+    test('dx returns base derivative after delay', () {
+      final baseSim = TimedMotion(Duration(milliseconds: 300)).buildBase();
+      final delayedSim = DelayedSimulation(base: baseSim, delay: 0.1);
+      final derivative = delayedSim.dx(0.2);
+      expect(derivative, isNonZero);
+    });
+  });
+
+  group('SegmentedSimulation dx method', () {
+    test('dx returns derivative at given time', () {
+      final motion = SegmentedMotion([
+        TimedMotion(Duration(milliseconds: 200)),
+        TimedMotion(Duration(milliseconds: 300)),
+      ]);
+      final sim = motion.build(
+        SimulationBuildData.forward(startValue: 0.0),
+      );
+      final derivative = sim.dx(0.1);
+      expect(derivative, isNotNull);
+    });
+
+    test('dx works for reverse direction', () {
+      final motion = SegmentedMotion([
+        TimedMotion(Duration(milliseconds: 200)),
+        TimedMotion(Duration(milliseconds: 300)),
+      ]);
+      final sim = motion.build(
+        SimulationBuildData.reverse(startValue: 1.0),
+      );
+      final derivative = sim.dx(0.1);
+      expect(derivative, isNotNull);
+    });
+  });
+
+  group('SegmentedSimulation valueAtProgress edge cases', () {
+    test('valueAtProgress with zero duration motions', () {
+      final motion = SegmentedMotion([
+        TimedMotion(Duration.zero),
+        TimedMotion(Duration.zero),
+      ]);
+      final sim = motion.build(
+        SimulationBuildData.forward(startValue: 0.0),
+      );
+      final (value, phase) = sim.valueAtProgress(0.5);
+      expect(value, isNotNull);
+      expect(phase, equals(0));
     });
   });
 }
 
-
-
-// mimic an actual ticker by incrementing time until the simulation reports it's done, 
+// mimic an actual ticker by incrementing time until the simulation reports it's done,
 //then return the total elapsed time
 double refDuration(Simulation sim, {double stepSize = 1 / 60}) {
   double t = 0.0;
@@ -694,3 +772,4 @@ double refDuration(Simulation sim, {double stepSize = 1 / 60}) {
   }
   return t;
 }
+ 

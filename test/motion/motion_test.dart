@@ -235,4 +235,151 @@ void main() {
       expect(a, isNot(equals(b)));
     });
   });
+
+  group('SegmentedMotion baseDuration', () {
+    test('sums durations of all motions', () {
+      const motion = SegmentedMotion([
+        TimedMotion(Duration(milliseconds: 200)),
+        TimedMotion(Duration(milliseconds: 300)),
+        TimedMotion(Duration(milliseconds: 100)),
+      ]);
+      expect(motion.baseDuration, equals(Duration(milliseconds: 600)));
+    });
+
+    test('returns zero for empty list', () {
+      const motion = SegmentedMotion([]);
+      expect(motion.baseDuration, equals(Duration.zero));
+    });
+
+    test('handles single motion', () {
+      const motion = SegmentedMotion([
+        TimedMotion(Duration(milliseconds: 500)),
+      ]);
+      expect(motion.baseDuration, equals(Duration(milliseconds: 500)));
+    });
+  });
+
+  group('DelayedMotion baseDuration', () {
+    test('sums base duration and delay', () {
+      const motion = DelayedMotion(
+        TimedMotion(Duration(milliseconds: 300)),
+        Duration(milliseconds: 100),
+      );
+      expect(motion.baseDuration, equals(Duration(milliseconds: 400)));
+    });
+
+    test('handles zero delay', () {
+      const motion = DelayedMotion(
+        TimedMotion(Duration(milliseconds: 300)),
+        Duration.zero,
+      );
+      expect(motion.baseDuration, equals(Duration(milliseconds: 300)));
+    });
+
+    test('handles zero base duration', () {
+      const motion = DelayedMotion(
+        TimedMotion(Duration.zero),
+        Duration(milliseconds: 100),
+      );
+      expect(motion.baseDuration, equals(Duration(milliseconds: 100)));
+    });
+  });
+
+  group('DelayedMotion build with startProgress', () {
+    test('builds simulation with forward startProgress', () {
+      const motion = DelayedMotion(
+        TimedMotion(Duration(milliseconds: 300)),
+        Duration(milliseconds: 100),
+      );
+      final sim = motion.build(
+        SimulationBuildData.forward(
+          startValue: 0.0,
+          startProgress: 0.5,
+        ),
+      );
+      expect(sim, isNotNull);
+      expect(sim.duration, greaterThan(0));
+    });
+
+    test('builds simulation with reverse startProgress', () {
+      const motion = DelayedMotion(
+        TimedMotion(Duration(milliseconds: 300)),
+        Duration(milliseconds: 100),
+      );
+      final sim = motion.build(
+        SimulationBuildData.reverse(
+          startValue: 1.0,
+          startProgress: 0.5,
+        ),
+      );
+      expect(sim, isNotNull);
+      expect(sim.duration, greaterThan(0));
+    });
+
+    test('builds simulation with high startProgress clamps delay', () {
+      const motion = DelayedMotion(
+        TimedMotion(Duration(milliseconds: 100)),
+        Duration(milliseconds: 100),
+      );
+      final sim = motion.build(
+        SimulationBuildData.forward(
+          startValue: 0.0,
+          startProgress: 0.9,
+        ),
+      );
+      expect(sim, isNotNull);
+    });
+  });
+
+  group('Spring constructors', () {
+    test('withDampingRatio creates valid spring', () {
+      final spring = Spring.withDampingRatio(stiffness: 100, ratio: 0.5);
+      final desc = spring.springDescription;
+      expect(desc.stiffness, equals(100));
+      expect(desc.mass, equals(1.0));
+    });
+
+    test('spatialFast creates valid spring', () {
+      final spring = Spring.spatialFast();
+      final desc = spring.springDescription;
+      expect(desc.stiffness, equals(1400.0));
+      expect(desc.mass, equals(1.0));
+    });
+
+    test('spatial creates valid spring', () {
+      final spring = Spring.spatial();
+      final desc = spring.springDescription;
+      expect(desc.stiffness, equals(700.0));
+      expect(desc.mass, equals(1.0));
+      expect(spring.snapToEnd, isFalse);
+    });
+
+    test('spatialSlow creates valid spring', () {
+      final spring = Spring.spatialSlow();
+      final desc = spring.springDescription;
+      expect(desc.stiffness, equals(300.0));
+      expect(desc.mass, equals(1.0));
+    });
+
+    test('effectFast creates valid spring', () {
+      final spring = Spring.effectFast();
+      final desc = spring.springDescription;
+      expect(desc.stiffness, equals(1400.0));
+      expect(desc.mass, equals(1.0));
+    });
+
+    test('effect creates valid spring', () {
+      final spring = Spring.effect();
+      final desc = spring.springDescription;
+      expect(desc.stiffness, equals(700.0));
+      expect(desc.mass, equals(1.0));
+    });
+
+    test('effectSlow creates valid spring', () {
+      final spring = Spring.effectSlow();
+      final desc = spring.springDescription;
+      expect(desc.stiffness, equals(300.0));
+      expect(desc.mass, equals(1.0));
+    });
+  });
 }
