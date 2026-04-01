@@ -335,4 +335,210 @@ void main() {
       expect(animation.value, equals(1.0));
     });
   });
+
+  group('RetargetableCueAnimation', () {
+    late CueController controller;
+    late CueTrack track;
+    late ReleaseToken token;
+
+    setUp(() {
+      controller = CueController(
+        vsync: TestVSync(),
+        motion: CueMotion.linear(300.ms),
+      );
+      track = controller.timeline.mainTrack;
+      final config = TrackConfig(
+        motion: CueMotion.linear(300.ms),
+        reverseMotion: CueMotion.linear(300.ms),
+      );
+      token = ReleaseToken(config, controller.timeline);
+    });
+
+    tearDown(() {
+      controller.dispose();
+    });
+
+    test('stores parent, controller, and token', () {
+      final animation = RetargetableCueAnimation<double>(
+        parent: track,
+        controller: controller,
+        initialValue: 0.0,
+        token: token,
+      );
+
+      expect(animation.parent, equals(track));
+      expect(animation.controller, equals(controller));
+      expect(animation.token, equals(token));
+    });
+
+    test('initialValue is returned as value', () {
+      final animation = RetargetableCueAnimation<double>(
+        parent: track,
+        controller: controller,
+        initialValue: 42.0,
+        token: token,
+      );
+
+      expect(animation.value, equals(42.0));
+    });
+
+    test('setValue sets value and stops controller', () {
+      final animation = RetargetableCueAnimation<double>(
+        parent: track,
+        controller: controller,
+        initialValue: 0.0,
+        token: token,
+      );
+
+      controller.setProgress(0.5, forward: true);
+      animation.setValue(99.0);
+
+      expect(animation.value, equals(99.0));
+      expect(controller.isAnimating, isFalse);
+    });
+
+    test('setValue overwrites previous value', () {
+      final animation = RetargetableCueAnimation<double>(
+        parent: track,
+        controller: controller,
+        initialValue: 0.0,
+        token: token,
+      );
+
+      animation.setValue(10.0);
+      expect(animation.value, equals(10.0));
+
+      animation.setValue(20.0);
+      expect(animation.value, equals(20.0));
+    });
+
+    test('retarget creates new tween and animates forward', () {
+      final animation = RetargetableCueAnimation<double>(
+        parent: track,
+        controller: controller,
+        initialValue: 0.0,
+        token: token,
+      );
+
+      animation.setValue(50.0);
+      animation.retarget(100.0, forward: true);
+
+      expect(controller.status, equals(AnimationStatus.forward));
+    });
+
+    test('retarget creates new tween and animates reverse', () {
+      final animation = RetargetableCueAnimation<double>(
+        parent: track,
+        controller: controller,
+        initialValue: 0.0,
+        token: token,
+      );
+
+      animation.setValue(100.0);
+      animation.retarget(50.0, forward: false);
+
+      expect(controller.status, equals(AnimationStatus.reverse));
+    });
+
+    test('retarget interpolates between current and target', () {
+      final animation = RetargetableCueAnimation<double>(
+        parent: track,
+        controller: controller,
+        initialValue: 0.0,
+        token: token,
+      );
+
+      animation.setValue(0.0);
+      animation.retarget(100.0, forward: true);
+      controller.setProgress(0.5);
+
+      expect(animation.value, closeTo(50.0, 0.001));
+    });
+
+    test('retarget default forward is true', () {
+      final animation = RetargetableCueAnimation<double>(
+        parent: track,
+        controller: controller,
+        initialValue: 0.0,
+        token: token,
+      );
+
+      animation.retarget(100.0);
+
+      expect(controller.status, equals(AnimationStatus.forward));
+    });
+
+    test('isReverseOrDismissed reflects track status', () {
+      final animation = RetargetableCueAnimation<double>(
+        parent: track,
+        controller: controller,
+        initialValue: 0.0,
+        token: token,
+      );
+
+      track.setProgress(0.0, forward: false);
+      expect(animation.isReverseOrDismissed, isTrue);
+
+      track.setProgress(1.0);
+      expect(animation.isReverseOrDismissed, isFalse);
+    });
+
+    test('trackConfig returns parent config', () {
+      final animation = RetargetableCueAnimation<double>(
+        parent: track,
+        controller: controller,
+        initialValue: 0.0,
+        token: token,
+      );
+
+      expect(animation.trackConfig, equals(track.config));
+    });
+
+    test('with string type', () {
+      final animation = RetargetableCueAnimation<String>(
+        parent: track,
+        controller: controller,
+        initialValue: 'hello',
+        token: token,
+      );
+
+      expect(animation.value, equals('hello'));
+
+      animation.setValue('world');
+      expect(animation.value, equals('world'));
+    });
+  });
+
+  group('CueAnimation.release', () {
+    late CueTrack track;
+    late ReleaseToken token;
+
+    setUp(() {
+      final motion = CueMotion.linear(300.ms);
+      final config = TrackConfig(motion: motion, reverseMotion: motion);
+      track = CueTrackImpl(config);
+      token = ReleaseToken(config, timeline);
+    });
+
+    test('release calls token.release without error', () {
+      final animation = CueAnimationImpl<double>(
+        parent: track,
+        token: token,
+        animtable: TweenAnimtable(Tween(begin: 0.0, end: 1.0)),
+      );
+
+      animation.release();
+    });
+
+    test('release can be called multiple times', () {
+      final animation = CueAnimationImpl<double>(
+        parent: track,
+        token: token,
+        animtable: TweenAnimtable(Tween(begin: 0.0, end: 1.0)),
+      );
+
+      animation.release();
+      animation.release();
+    });
+  });
 }

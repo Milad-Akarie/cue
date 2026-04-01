@@ -53,48 +53,41 @@ class _DemoPageState extends State<DemoPage> with TickerProviderStateMixin {
       appBar: AppBar(title: const Text('Cue Demo')),
       body: Row(
         children: [
-          ElevatedButton(
-            onPressed: () {
-              showModalBottomSheet(
-                context: context,
-                builder: (context) {
-                  return Builder(
-                    builder: (context) {
-                      return Cue.onMount(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            for (int i = 0; i < 5; i++)
-                              Actor(
-                                motion: .smooth(),
-                                acts: [
-                                  .slideX(
-                                    from: -1,
-                                    delay: 20.ms * i,
-                                  ),
-                                ],
-                                child: ListTile(
-                                  leading: const Icon(Icons.delete),
-                                  title: const Text('Delete'),
-                                  onTap: () {
-                                    Navigator.of(context).pop();
-                                    showDialog(
-                                      context: context,
-                                      builder: (context) => const DeleteConfirmationDialog(),
-                                    );
-                                  },
-                                ),
-                              ),
-                          ],
-                        ),
-                      );
-                    },
-                  );
-                },
-              );
-            },
-            child: Text("Navigate"),
-          ),
+         Cue.onMount(
+          motion: .wobbly(),
+            child: RichText(
+              text: TextSpan(
+                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                children: [
+                  WidgetSpan(
+                    alignment: PlaceholderAlignment.baseline,
+                    baseline: TextBaseline.alphabetic,
+                    child: Actor(
+                      acts: [
+                        .fadeIn(),
+                        .translateY(from: 16),
+                      ],
+                      delay: 0.ms,
+                      child: Text("Hello", style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+                  TextSpan(text: " "),
+                  WidgetSpan(
+                    alignment: PlaceholderAlignment.baseline,
+                    baseline: TextBaseline.alphabetic,
+                    child: Actor(
+                      acts: [
+                        .fadeIn(),
+                        .translateY(from: 16),
+                      ],
+                      delay: 50.ms,
+                      child: Text("World", style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          )
         ],
       ),
     );
