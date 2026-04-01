@@ -7,21 +7,15 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  ActContext createActContext() {
     final motion = CueMotion.linear(300.ms);
-    return ActContext(motion: motion, reverseMotion: motion);
-  }
-
-  CueTrackImpl createTrack() {
-    final motion = CueMotion.linear(300.ms);
-    final config = TrackConfig(motion: motion, reverseMotion: motion);
-    return CueTrackImpl(config);
-  }
+  final actContext = ActContext(motion: motion, reverseMotion: motion);
+  final track = CueTrackImpl(TrackConfig(motion: motion, reverseMotion: motion));
+  final timeline = CueTimelineImpl.fromMotion(motion);
 
   DeferredCueAnimation<Offset> createDeferredAnimation(CueTrackImpl track, ActContext ctx) {
     return DeferredCueAnimation<Offset>(
       parent: track,
-      token: ReleaseToken(track.config),
+      token: ReleaseToken(track.config , timeline),
       context: ctx,
     );
   }
@@ -75,15 +69,15 @@ void main() {
       test('returns ActContext with motion and delay', () {
         final motion = CueMotion.linear(300.ms);
         final act = ParallaxAct(slide: 0.5, motion: motion);
-        final ctx = createActContext();
-        final resolved = act.resolve(ctx);
+        
+        final resolved = act.resolve(actContext);
         expect(resolved.motion, isNotNull);
       });
 
       test('returns ActContext with delay', () {
         final act = ParallaxAct(slide: 0.5, delay: 100.ms);
-        final ctx = createActContext();
-        final resolved = act.resolve(ctx);
+        
+        final resolved = act.resolve(actContext);
         expect(resolved, isA<ActContext>());
       });
     });
@@ -91,10 +85,10 @@ void main() {
     group('apply', () {
       testWidgets('renders child widget', (tester) async {
         final act = ParallaxAct(slide: 0.5);
-        final ctx = createActContext();
-        final track = createTrack();
+        
+        
         track.setProgress(0.5);
-        final animation = createDeferredAnimation(track, ctx);
+        final animation = createDeferredAnimation(track, actContext);
 
         await tester.pumpWidget(
           Directionality(
@@ -112,10 +106,10 @@ void main() {
 
       testWidgets('renders with horizontal axis', (tester) async {
         final act = ParallaxAct(slide: 0.3, axis: Axis.horizontal);
-        final ctx = createActContext();
-        final track = createTrack();
+        
+        
         track.setProgress(0.5);
-        final animation = createDeferredAnimation(track, ctx);
+        final animation = createDeferredAnimation(track, actContext);
 
         await tester.pumpWidget(
           Directionality(
@@ -135,10 +129,10 @@ void main() {
 
       testWidgets('renders with vertical axis', (tester) async {
         final act = ParallaxAct(slide: 0.3, axis: Axis.vertical);
-        final ctx = createActContext();
-        final track = createTrack();
+        
+        
         track.setProgress(0.5);
-        final animation = createDeferredAnimation(track, ctx);
+        final animation = createDeferredAnimation(track, actContext);
 
         await tester.pumpWidget(
           Directionality(
@@ -160,10 +154,10 @@ void main() {
 
       testWidgets('layout performs correctly with child', (tester) async {
         final act = ParallaxAct(slide: 0.5, axis: Axis.horizontal);
-        final ctx = createActContext();
-        final track = createTrack();
+        
+        
         track.setProgress(0);
-        final animation = createDeferredAnimation(track, ctx);
+        final animation = createDeferredAnimation(track, actContext);
 
         await tester.pumpWidget(
           Directionality(
@@ -187,10 +181,10 @@ void main() {
 
       testWidgets('works with empty child', (tester) async {
         final act = ParallaxAct(slide: 0.5);
-        final ctx = createActContext();
-        final track = createTrack();
+        
+        
         track.setProgress(0.5);
-        final animation = createDeferredAnimation(track, ctx);
+        final animation = createDeferredAnimation(track, actContext);
 
         await tester.pumpWidget(
           Directionality(
@@ -208,10 +202,10 @@ void main() {
 
       testWidgets('renders with different slide values', (tester) async {
         final act = ParallaxAct(slide: 1.0, axis: Axis.horizontal);
-        final ctx = createActContext();
-        final track = createTrack();
+        
+        
         track.setProgress(0);
-        final animation = createDeferredAnimation(track, ctx);
+        final animation = createDeferredAnimation(track, actContext);
 
         await tester.pumpWidget(
           Directionality(

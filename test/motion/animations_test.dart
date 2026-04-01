@@ -7,19 +7,13 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
+  final motion = CueMotion.linear(300.ms);
+  final timeline = CueTimelineImpl.fromMotion(motion);
+  final config = TrackConfig(motion: motion, reverseMotion: motion);
+  final track = CueTrackImpl(config);
+  final animtable = TweenAnimtable(Tween(begin: 0.0, end: 1.0));
+  final token = ReleaseToken(config, timeline);
   group('CueAnimationImpl', () {
-    late CueTrack track;
-    late ReleaseToken token;
-    late CueAnimtable<double> animtable;
-
-    setUp(() {
-      final motion = CueMotion.linear(300.ms);
-      final config = TrackConfig(motion: motion, reverseMotion: motion);
-      track = CueTrackImpl(config);
-      token = ReleaseToken(config);
-      animtable = TweenAnimtable(Tween(begin: 0.0, end: 1.0));
-    });
-
     test('stores parent, token, and animtable', () {
       final animation = CueAnimationImpl<double>(
         parent: track,
@@ -135,7 +129,7 @@ void main() {
       final motion = CueMotion.linear(300.ms);
       final config = TrackConfig(motion: motion, reverseMotion: motion);
       track = CueTrackImpl(config);
-      token = ReleaseToken(config);
+      token = ReleaseToken(config, timeline);
       context = ActContext(
         motion: motion,
         reverseMotion: motion,
@@ -265,7 +259,7 @@ void main() {
     test('evaluate transforms value using selector', () {
       final animation = CueAnimationImpl<double>(
         parent: track,
-        token: ReleaseToken(track.config),
+        token: ReleaseToken(track.config, timeline),
         animtable: baseAnimtable,
       );
       final mapped = animation.map((value) => 'value: $value');
@@ -280,7 +274,7 @@ void main() {
     test('evaluate with complex selector', () {
       final animation = CueAnimationImpl<double>(
         parent: track,
-        token: ReleaseToken(track.config),
+        token: ReleaseToken(track.config, timeline),
         animtable: baseAnimtable,
       );
       final mapped = animation.map((value) => value * value);
@@ -295,7 +289,7 @@ void main() {
     test('evaluate with type conversion', () {
       final animation = CueAnimationImpl<double>(
         parent: track,
-        token: ReleaseToken(track.config),
+        token: ReleaseToken(track.config, timeline),
         animtable: baseAnimtable,
       );
       final mapped = animation.map((value) => (value * 100).round());
@@ -317,7 +311,8 @@ void main() {
       final motion = CueMotion.linear(300.ms);
       final config = TrackConfig(motion: motion, reverseMotion: motion);
       track = CueTrackImpl(config);
-      token = ReleaseToken(config);
+      final timeline = CueTimelineImpl.fromMotion(motion);
+      token = ReleaseToken(config, timeline);
       animation = CueAnimationImpl<double>(
         parent: track,
         token: token,

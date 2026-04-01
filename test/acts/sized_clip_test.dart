@@ -5,10 +5,9 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  ActContext createActContext() {
-    final motion = CueMotion.linear(300.ms);
-    return ActContext(motion: motion, reverseMotion: motion);
-  }
+  final motion = CueMotion.linear(300.ms);
+  final actContext = ActContext(motion: motion, reverseMotion: motion);
+ 
 
   group('NSize', () {
     test('default constructor creates NSize with null values', () {
@@ -199,8 +198,8 @@ void main() {
 
     test('resolve returns ActContext with motion', () {
       const act = SizedClipAct();
-      final ctx = createActContext();
-      final resolved = act.resolve(ctx);
+      
+      final resolved = act.resolve(actContext);
       expect(resolved, isA<ActContext>());
     });
 

@@ -9,16 +9,10 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  ActContext createActContext() {
-    final motion = CueMotion.linear(300.ms);
-    return ActContext(motion: motion, reverseMotion: motion);
-  }
-
-  CueTrack createTrack() {
-    final motion = CueMotion.linear(300.ms);
-    final config = TrackConfig(motion: motion, reverseMotion: motion);
-    return CueTrackImpl(config);
-  }
+  final motion = CueMotion.linear(300.ms);
+  final actContext = ActContext(motion: motion, reverseMotion: motion);
+  final track = CueTrackImpl(TrackConfig(motion: motion, reverseMotion: motion));
+  final timeline = CueTimelineImpl.fromMotion(motion);
 
   group('RotateLayoutAct', () {
     group('key', () {
@@ -135,15 +129,15 @@ void main() {
     group('transform', () {
       test('converts degrees to radians', () {
         final act = RotateLayoutAct.degrees(from: 0, to: 180);
-        final ctx = createActContext();
-        final radians = act.transform(ctx, 180);
+        
+        final radians = act.transform(actContext, 180);
         expect(radians, closeTo(pi, 0.0001));
       });
 
       test('converts quarterTurns to radians', () {
         final act = RotateLayoutAct.turns(from: 0, to: 2);
-        final ctx = createActContext();
-        final radians = act.transform(ctx, 2);
+        
+        final radians = act.transform(actContext, 2);
         expect(radians, closeTo(pi, 0.0001));
       });
 
@@ -153,8 +147,8 @@ void main() {
           to: pi,
           unit: RotateUnit.radians,
         );
-        final ctx = createActContext();
-        final radians = act.transform(ctx, pi);
+        
+        final radians = act.transform(actContext, pi);
         expect(radians, closeTo(pi, 0.0001));
       });
     });
@@ -163,8 +157,8 @@ void main() {
       test('returns ActContext with motion', () {
         final motion = CueMotion.linear(300.ms);
         final act = RotateLayoutAct(from: 0, to: 90, motion: motion);
-        final ctx = createActContext();
-        final resolved = act.resolve(ctx);
+        
+        final resolved = act.resolve(actContext);
         expect(resolved.motion, isNotNull);
       });
     });
@@ -172,15 +166,15 @@ void main() {
     group('apply', () {
       testWidgets('wraps child in widget', (tester) async {
         final act = RotateLayoutAct.degrees(from: 0, to: 90);
-        final ctx = createActContext();
-        final (animtable, _) = act.buildTweens(ctx);
+        
+        final (animtable, _) = act.buildTweens(actContext);
 
-        final track = createTrack();
+        
         track.setProgress(0.5);
 
         final animation = CueAnimationImpl<double>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 
@@ -200,15 +194,15 @@ void main() {
 
       testWidgets('renders with degrees unit', (tester) async {
         final act = RotateLayoutAct.degrees(from: 0, to: 180);
-        final ctx = createActContext();
-        final (animtable, _) = act.buildTweens(ctx);
+        
+        final (animtable, _) = act.buildTweens(actContext);
 
-        final track = createTrack();
+        
         track.setProgress(0);
 
         final animation = CueAnimationImpl<double>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 
@@ -229,15 +223,15 @@ void main() {
 
       testWidgets('renders with turns unit', (tester) async {
         final act = RotateLayoutAct.turns(from: 0, to: 1);
-        final ctx = createActContext();
-        final (animtable, _) = act.buildTweens(ctx);
+        
+        final (animtable, _) = act.buildTweens(actContext);
 
-        final track = createTrack();
+        
         track.setProgress(0.5);
 
         final animation = CueAnimationImpl<double>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 
@@ -258,15 +252,15 @@ void main() {
 
       testWidgets('renders with radians unit', (tester) async {
         final act = RotateLayoutAct(from: 0, to: pi, unit: RotateUnit.radians);
-        final ctx = createActContext();
-        final (animtable, _) = act.buildTweens(ctx);
+        
+        final (animtable, _) = act.buildTweens(actContext);
 
-        final track = createTrack();
+        
         track.setProgress(0.5);
 
         final animation = CueAnimationImpl<double>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 

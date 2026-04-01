@@ -7,16 +7,10 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  ActContext createActContext() {
-    final motion = CueMotion.linear(300.ms);
-    return ActContext(motion: motion, reverseMotion: motion);
-  }
-
-  CueTrack createTrack() {
-    final motion = CueMotion.linear(300.ms);
-    final config = TrackConfig(motion: motion, reverseMotion: motion);
-    return CueTrackImpl(config);
-  }
+   final motion = CueMotion.linear(300.ms);
+  final actContext = ActContext(motion: motion, reverseMotion: motion);
+  final track = CueTrackImpl(TrackConfig(motion: motion, reverseMotion: motion));
+  final timeline = CueTimelineImpl.fromMotion(motion);
 
   group('FractionalSizeAct', () {
     group('key', () {
@@ -84,8 +78,8 @@ void main() {
         const act = FractionalSizeAct(
           widthFactor: AnimatableValue(from: 0.5, to: 1.0),
         );
-        final ctx = createActContext();
-        final (animtable, _) = act.buildTweens(ctx);
+        
+        final (animtable, _) = act.buildTweens(actContext);
         expect(animtable, isNotNull);
       });
 
@@ -94,8 +88,8 @@ void main() {
           widthFactor: AnimatableValue(from: 0.5, to: 1.0),
           heightFactor: AnimatableValue(from: 0.5, to: 1.0),
         );
-        final ctx = createActContext();
-        final (animtable, _) = act.buildTweens(ctx);
+        
+        final (animtable, _) = act.buildTweens(actContext);
         expect(animtable, isNotNull);
       });
     });
@@ -105,15 +99,15 @@ void main() {
         const act = FractionalSizeAct(
           widthFactor: AnimatableValue(from: 0.5, to: 1.0),
         );
-        final ctx = createActContext();
-        final (animtable, _) = act.buildTweens(ctx);
+        
+        final (animtable, _) = act.buildTweens(actContext);
 
-        final track = createTrack();
+        
         track.setProgress(0.5);
 
         final animation = CueAnimationImpl<FractionalSize>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 
@@ -136,15 +130,15 @@ void main() {
         const act = FractionalSizeAct(
           widthFactor: AnimatableValue(from: 0.5, to: 1.0),
         );
-        final ctx = createActContext();
-        final (animtable, _) = act.buildTweens(ctx);
+        
+        final (animtable, _) = act.buildTweens(actContext);
 
-        final track = createTrack();
+        
         track.setProgress(0.0);
 
         final animation = CueAnimationImpl<FractionalSize>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 
@@ -167,15 +161,15 @@ void main() {
         const act = FractionalSizeAct(
           widthFactor: AnimatableValue(from: 0.5, to: 1.0),
         );
-        final ctx = createActContext();
-        final (animtable, _) = act.buildTweens(ctx);
+        
+        final (animtable, _) = act.buildTweens(actContext);
 
-        final track = createTrack();
+        
         track.setProgress(1.0);
 
         final animation = CueAnimationImpl<FractionalSize>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 
@@ -198,15 +192,15 @@ void main() {
         const act = FractionalSizeAct(
           widthFactor: AnimatableValue(from: 0.0, to: 1.0),
         );
-        final ctx = createActContext();
-        final (animtable, _) = act.buildTweens(ctx);
+        
+        final (animtable, _) = act.buildTweens(actContext);
 
-        final track = createTrack();
+        
         track.setProgress(0.5);
 
         final animation = CueAnimationImpl<FractionalSize>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 
@@ -230,15 +224,15 @@ void main() {
           widthFactor: AnimatableValue(from: 0.5, to: 1.0),
           heightFactor: AnimatableValue(from: 0.5, to: 1.0),
         );
-        final ctx = createActContext();
-        final (animtable, _) = act.buildTweens(ctx);
+        
+        final (animtable, _) = act.buildTweens(actContext);
 
-        final track = createTrack();
+        
         track.setProgress(0.5);
 
         final animation = CueAnimationImpl<FractionalSize>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 

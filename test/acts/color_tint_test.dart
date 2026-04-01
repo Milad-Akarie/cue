@@ -7,17 +7,10 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  ActContext createActContext() {
-    final motion = CueMotion.linear(300.ms);
-    return ActContext(motion: motion, reverseMotion: motion);
-  }
-
-  CueTrack createTrack() {
-    final motion = CueMotion.linear(300.ms);
-    final config = TrackConfig(motion: motion, reverseMotion: motion);
-    return CueTrackImpl(config);
-  }
-
+  final motion = CueMotion.linear(300.ms);
+  final actContext = ActContext(motion: motion, reverseMotion: motion);
+  final track = CueTrackImpl(TrackConfig(motion: motion, reverseMotion: motion));
+  final timeline = CueTimelineImpl.fromMotion(motion);
   group('ColorTintAct', () {
     group('key', () {
       test('has correct key name', () {
@@ -121,15 +114,15 @@ void main() {
     group('apply', () {
       testWidgets('wraps child in ColorFiltered with correct values', (tester) async {
         const act = ColorTintAct(from: Colors.red, to: Colors.blue);
-        final ctx = createActContext();
-        final (animtable, _) = act.buildTweens(ctx);
+        
+        final (animtable, _) = act.buildTweens(actContext);
 
-        final track = createTrack();
+        
         track.setProgress(0.5);
 
         final animation = CueAnimationImpl<Color?>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 
@@ -154,15 +147,15 @@ void main() {
           to: Colors.blue,
           blendMode: BlendMode.multiply,
         );
-        final ctx = createActContext();
-        final (animtable, _) = act.buildTweens(ctx);
+        
+        final (animtable, _) = act.buildTweens(actContext);
 
-        final track = createTrack();
+        
         track.setProgress(0.5);
 
         final animation = CueAnimationImpl<Color?>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 
@@ -180,15 +173,15 @@ void main() {
 
       testWidgets('animation value affects color filter', (tester) async {
         const act = ColorTintAct(from: Colors.red, to: Colors.blue);
-        final ctx = createActContext();
-        final (animtable, _) = act.buildTweens(ctx);
+        
+        final (animtable, _) = act.buildTweens(actContext);
 
-        final track = createTrack();
+        
 
         track.setProgress(0.0);
         final animation = CueAnimationImpl<Color?>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 
@@ -221,10 +214,10 @@ void main() {
       testWidgets('uses transparent for null animation value', (tester) async {
         const act = ColorTintAct(from: Colors.red, to: Colors.blue);
 
-        final track = createTrack();
+        
         final animation = CueAnimationImpl<Color?>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: AlwaysStoppedAnimatable<Color?>(null),
         );
 

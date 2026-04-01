@@ -7,17 +7,10 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  ActContext createActContext() {
-    final motion = CueMotion.linear(300.ms);
-    return ActContext(motion: motion, reverseMotion: motion);
-  }
-
-  CueTrack createTrack() {
-    final motion = CueMotion.linear(300.ms);
-    final config = TrackConfig(motion: motion, reverseMotion: motion);
-    return CueTrackImpl(config);
-  }
-
+   final motion = CueMotion.linear(300.ms);
+  final actContext = ActContext(motion: motion, reverseMotion: motion);
+  final track = CueTrackImpl(TrackConfig(motion: motion, reverseMotion: motion));
+  final timeline = CueTimelineImpl.fromMotion(motion);
   group('PaddingAct', () {
     group('key', () {
       test('has correct key name', () {
@@ -70,15 +63,15 @@ void main() {
     group('apply', () {
       testWidgets('wraps child in Padding widget', (tester) async {
         const act = PaddingAct(from: EdgeInsets.zero, to: EdgeInsets.all(20));
-        final ctx = createActContext();
-        final (animtable, _) = act.buildTweens(ctx);
+        
+        final (animtable, _) = act.buildTweens(actContext);
 
-        final track = createTrack();
+        
         track.setProgress(0.5);
 
         final animation = CueAnimationImpl<EdgeInsetsGeometry>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 
@@ -99,15 +92,15 @@ void main() {
 
       testWidgets('applies padding at progress 0', (tester) async {
         const act = PaddingAct(from: EdgeInsets.all(10), to: EdgeInsets.all(20));
-        final ctx = createActContext();
-        final (animtable, _) = act.buildTweens(ctx);
+        
+        final (animtable, _) = act.buildTweens(actContext);
 
-        final track = createTrack();
+        
         track.setProgress(0.0);
 
         final animation = CueAnimationImpl<EdgeInsetsGeometry>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 
@@ -128,15 +121,15 @@ void main() {
 
       testWidgets('applies padding at progress 1', (tester) async {
         const act = PaddingAct(from: EdgeInsets.all(10), to: EdgeInsets.all(20));
-        final ctx = createActContext();
-        final (animtable, _) = act.buildTweens(ctx);
+        
+        final (animtable, _) = act.buildTweens(actContext);
 
-        final track = createTrack();
+        
         track.setProgress(1.0);
 
         final animation = CueAnimationImpl<EdgeInsetsGeometry>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 
@@ -157,15 +150,15 @@ void main() {
 
       testWidgets('interpolates padding at progress 0.5', (tester) async {
         const act = PaddingAct(from: EdgeInsets.all(0), to: EdgeInsets.all(20));
-        final ctx = createActContext();
-        final (animtable, _) = act.buildTweens(ctx);
+        
+        final (animtable, _) = act.buildTweens(actContext);
 
-        final track = createTrack();
+        
         track.setProgress(0.5);
 
         final animation = CueAnimationImpl<EdgeInsetsGeometry>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 
@@ -189,15 +182,15 @@ void main() {
           from: EdgeInsets.only(left: 5, top: 10, right: 15, bottom: 20),
           to: EdgeInsets.only(left: 10, top: 20, right: 30, bottom: 40),
         );
-        final ctx = createActContext();
-        final (animtable, _) = act.buildTweens(ctx);
+        
+        final (animtable, _) = act.buildTweens(actContext);
 
-        final track = createTrack();
+        
         track.setProgress(0.5);
 
         final animation = CueAnimationImpl<EdgeInsetsGeometry>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 

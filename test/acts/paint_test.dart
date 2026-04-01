@@ -9,16 +9,10 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  ActContext createActContext() {
-    final motion = CueMotion.linear(300.ms);
-    return ActContext(motion: motion, reverseMotion: motion);
-  }
-
-  CueTrack createTrack() {
-    final motion = CueMotion.linear(300.ms);
-    final config = TrackConfig(motion: motion, reverseMotion: motion);
-    return CueTrackImpl(config);
-  }
+  final motion = CueMotion.linear(300.ms);
+  final actContext = ActContext(motion: motion, reverseMotion: motion);
+  final track = CueTrackImpl(TrackConfig(motion: motion, reverseMotion: motion));
+  final timeline = CueTimelineImpl.fromMotion(motion);
 
   group('PaintAct', () {
     group('key', () {
@@ -83,8 +77,8 @@ void main() {
         final act = PaintAct(
           painter: Painter.paint((canvas, size, progress) {}),
         );
-        final ctx = createActContext();
-        final (animtable, _) = act.buildTweens(ctx);
+        
+        final (animtable, _) = act.buildTweens(actContext);
         expect(animtable, isNotNull);
       });
     });
@@ -94,15 +88,15 @@ void main() {
         final act = PaintAct(
           painter: Painter.paint((canvas, size, progress) {}),
         );
-        final ctx = createActContext();
-        final (animtable, _) = act.buildTweens(ctx);
+        
+        final (animtable, _) = act.buildTweens(actContext);
 
-        final track = createTrack();
+        
         track.setProgress(0.5);
 
         final animation = CueAnimationImpl<double>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 
@@ -126,15 +120,15 @@ void main() {
           painter: Painter.paint((canvas, size, progress) {}),
           paintOnTop: false,
         );
-        final ctx = createActContext();
-        final (animtable, _) = act.buildTweens(ctx);
+        
+        final (animtable, _) = act.buildTweens(actContext);
 
-        final track = createTrack();
+        
         track.setProgress(0.5);
 
         final animation = CueAnimationImpl<double>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 
@@ -159,15 +153,15 @@ void main() {
           painter: Painter.paint((canvas, size, progress) {}),
           paintOnTop: true,
         );
-        final ctx = createActContext();
-        final (animtable, _) = act.buildTweens(ctx);
+        
+        final (animtable, _) = act.buildTweens(actContext);
 
-        final track = createTrack();
+        
         track.setProgress(0.5);
 
         final animation = CueAnimationImpl<double>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 

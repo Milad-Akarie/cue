@@ -7,21 +7,15 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  ActContext createActContext() {
-    final motion = CueMotion.linear(300.ms);
-    return ActContext(motion: motion, reverseMotion: motion);
-  }
-
-  CueTrackImpl createTrack() {
-    final motion = CueMotion.linear(300.ms);
-    final config = TrackConfig(motion: motion, reverseMotion: motion);
-    return CueTrackImpl(config);
-  }
+  final motion = CueMotion.linear(300.ms);
+  final actContext = ActContext(motion: motion, reverseMotion: motion);
+  final track = CueTrackImpl(TrackConfig(motion: motion, reverseMotion: motion));
+  final timeline = CueTimelineImpl.fromMotion(motion);
 
   DeferredCueAnimation<Size> createDeferredAnimation(CueTrackImpl track, ActContext ctx) {
     return DeferredCueAnimation<Size>(
       parent: track,
-      token: ReleaseToken(track.config),
+      token: ReleaseToken(track.config, timeline),
       context: ctx,
     );
   }
@@ -114,8 +108,8 @@ void main() {
       test('returns ActContext with motion', () {
         final motion = CueMotion.linear(300.ms);
         final act = SizedBoxAct(motion: motion);
-        final ctx = createActContext();
-        final resolved = act.resolve(ctx);
+
+        final resolved = act.resolve(actContext);
         expect(resolved.motion, isNotNull);
       });
     });
@@ -124,10 +118,9 @@ void main() {
       testWidgets('renders with width animation', (tester) async {
         final width = AnimatableValue(from: 100.0, to: 200.0);
         final act = SizedBoxAct(width: width);
-        final ctx = createActContext();
-        final track = createTrack();
+
         track.setProgress(0);
-        final animation = createDeferredAnimation(track, ctx);
+        final animation = createDeferredAnimation(track, actContext);
 
         await tester.pumpWidget(
           Directionality(
@@ -149,10 +142,9 @@ void main() {
       testWidgets('renders with height animation', (tester) async {
         final height = AnimatableValue(from: 50.0, to: 150.0);
         final act = SizedBoxAct(height: height);
-        final ctx = createActContext();
-        final track = createTrack();
+
         track.setProgress(0.5);
-        final animation = createDeferredAnimation(track, ctx);
+        final animation = createDeferredAnimation(track, actContext);
 
         await tester.pumpWidget(
           Directionality(
@@ -175,10 +167,9 @@ void main() {
         final width = AnimatableValue(from: 100.0, to: 200.0);
         final height = AnimatableValue(from: 50.0, to: 150.0);
         final act = SizedBoxAct(width: width, height: height);
-        final ctx = createActContext();
-        final track = createTrack();
+
         track.setProgress(0.5);
-        final animation = createDeferredAnimation(track, ctx);
+        final animation = createDeferredAnimation(track, actContext);
 
         await tester.pumpWidget(
           Directionality(
@@ -200,10 +191,9 @@ void main() {
       testWidgets('renders with alignment', (tester) async {
         final width = AnimatableValue(from: 100.0, to: 200.0);
         final act = SizedBoxAct(width: width, alignment: Alignment.topLeft);
-        final ctx = createActContext();
-        final track = createTrack();
+
         track.setProgress(0.5);
-        final animation = createDeferredAnimation(track, ctx);
+        final animation = createDeferredAnimation(track, actContext);
 
         await tester.pumpWidget(
           Directionality(
@@ -223,10 +213,9 @@ void main() {
       testWidgets('renders with progress at 0', (tester) async {
         final width = AnimatableValue(from: 100.0, to: 200.0);
         final act = SizedBoxAct(width: width);
-        final ctx = createActContext();
-        final track = createTrack();
+
         track.setProgress(0);
-        final animation = createDeferredAnimation(track, ctx);
+        final animation = createDeferredAnimation(track, actContext);
 
         await tester.pumpWidget(
           Directionality(
@@ -246,10 +235,9 @@ void main() {
       testWidgets('renders with progress at 1', (tester) async {
         final width = AnimatableValue(from: 100.0, to: 200.0);
         final act = SizedBoxAct(width: width);
-        final ctx = createActContext();
-        final track = createTrack();
+
         track.setProgress(1);
-        final animation = createDeferredAnimation(track, ctx);
+        final animation = createDeferredAnimation(track, actContext);
 
         await tester.pumpWidget(
           Directionality(

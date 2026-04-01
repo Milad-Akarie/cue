@@ -5,11 +5,10 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  final motion = CueMotion.linear(300.ms);
+  final actContext = ActContext(motion: motion, reverseMotion: motion);
+ 
 
-  ActContext createActContext() {
-    final motion = CueMotion.linear(300.ms);
-    return ActContext(motion: motion, reverseMotion: motion);
-  }
   group('PathMotionAct', () {
     group('key', () {
       test('has correct key name', () {
@@ -154,8 +153,8 @@ void main() {
         final path = Path()..lineTo(100, 0);
         final motion = CueMotion.linear(300.ms);
         final act = PathMotionAct(path: path, motion: motion);
-        final ctx = createActContext();
-        final resolved = act.resolve(ctx);
+        
+        final resolved = act.resolve(actContext);
         expect(resolved.motion, isNotNull);
       });
     });

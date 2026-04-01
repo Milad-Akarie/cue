@@ -8,16 +8,10 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  ActContext createActContext() {
-    final motion = CueMotion.linear(300.ms);
-    return ActContext(motion: motion, reverseMotion: motion);
-  }
-
-  CueTrack createTrack() {
-    final motion = CueMotion.linear(300.ms);
-    final config = TrackConfig(motion: motion, reverseMotion: motion);
-    return CueTrackImpl(config);
-  }
+  final motion = CueMotion.linear(300.ms);
+  final actContext = ActContext(motion: motion, reverseMotion: motion);
+  final track = CueTrackImpl(TrackConfig(motion: motion, reverseMotion: motion));
+  final timeline = CueTimelineImpl.fromMotion(motion);
 
   group('BlurAct', () {
     test('key is "Blur"', () {
@@ -83,15 +77,13 @@ void main() {
 
     testWidgets('apply wraps child in ImageFiltered', (tester) async {
       const act = BlurAct(from: 0.0, to: 10.0);
-      final ctx = createActContext();
-      final (animtable, _) = act.buildTweens(ctx);
+      final (animtable, _) = act.buildTweens(actContext);
 
-      final track = createTrack();
       track.setProgress(0.5);
 
       final animation = CueAnimationImpl<double>(
         parent: track,
-        token: ReleaseToken(track.config),
+        token: ReleaseToken(track.config, timeline),
         animtable: animtable,
       );
 
@@ -109,15 +101,13 @@ void main() {
 
     testWidgets('apply uses animation value for blur', (tester) async {
       const act = BlurAct(from: 0.0, to: 10.0);
-      final ctx = createActContext();
-      final (animtable, _) = act.buildTweens(ctx);
+      final (animtable, _) = act.buildTweens(actContext);
 
-      final track = createTrack();
       track.setProgress(0.5);
 
       final animation = CueAnimationImpl<double>(
         parent: track,
-        token: ReleaseToken(track.config),
+        token: ReleaseToken(track.config, timeline),
         animtable: animtable,
       );
 
@@ -220,15 +210,13 @@ void main() {
 
     testWidgets('apply wraps child in BackdropFilter', (tester) async {
       const act = BackdropBlurAct(from: 0.0, to: 10.0);
-      final ctx = createActContext();
-      final (animtable, _) = act.buildTweens(ctx);
+      final (animtable, _) = act.buildTweens(actContext);
 
-      final track = createTrack();
       track.setProgress(0.5);
 
       final animation = CueAnimationImpl<double>(
         parent: track,
-        token: ReleaseToken(track.config),
+        token: ReleaseToken(track.config , timeline),
         animtable: animtable,
       );
 
@@ -246,15 +234,13 @@ void main() {
 
     testWidgets('apply uses animation value for blur', (tester) async {
       const act = BackdropBlurAct(from: 0.0, to: 10.0);
-      final ctx = createActContext();
-      final (animtable, _) = act.buildTweens(ctx);
+      final (animtable, _) = act.buildTweens(actContext);
 
-      final track = createTrack();
       track.setProgress(0.5);
 
       final animation = CueAnimationImpl<double>(
         parent: track,
-        token: ReleaseToken(track.config),
+        token: ReleaseToken(track.config , timeline),
         animtable: animtable,
       );
 
@@ -274,15 +260,13 @@ void main() {
 
     testWidgets('apply uses custom blendMode', (tester) async {
       const act = BackdropBlurAct(from: 0.0, to: 10.0, blendMode: BlendMode.multiply);
-      final ctx = createActContext();
-      final (animtable, _) = act.buildTweens(ctx);
+      final (animtable, _) = act.buildTweens(actContext);
 
-      final track = createTrack();
       track.setProgress(0.5);
 
       final animation = CueAnimationImpl<double>(
         parent: track,
-        token: ReleaseToken(track.config),
+        token: ReleaseToken(track.config, timeline),
         animtable: animtable,
       );
 

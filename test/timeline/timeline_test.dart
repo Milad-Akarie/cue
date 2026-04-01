@@ -165,7 +165,7 @@ void main() {
 
         final otherMotion = CueMotion.linear(400.ms);
         final otherConfig = TrackConfig(motion: otherMotion, reverseMotion: otherMotion);
-        final invalidToken = ReleaseToken(otherConfig);
+        final invalidToken = ReleaseToken(otherConfig, timeline);
 
         timeline.release(invalidToken);
 

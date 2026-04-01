@@ -7,16 +7,10 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  ActContext createActContext() {
-    final motion = CueMotion.linear(300.ms);
-    return ActContext(motion: motion, reverseMotion: motion);
-  }
-
-  CueTrack createTrack() {
-    final motion = CueMotion.linear(300.ms);
-    final config = TrackConfig(motion: motion, reverseMotion: motion);
-    return CueTrackImpl(config);
-  }
+  final motion = CueMotion.linear(300.ms);
+  final actContext = ActContext(motion: motion, reverseMotion: motion);
+  final track = CueTrackImpl(TrackConfig(motion: motion, reverseMotion: motion));
+  final timeline = CueTimelineImpl.fromMotion(motion);
 
   group('AlignAct', () {
     test('key is "Align"', () {
@@ -65,7 +59,7 @@ void main() {
 
     test('transform resolves AlignmentGeometry to Alignment', () {
       const act = AlignAct();
-      final ctx = createActContext();
+      final ctx = actContext;
 
       final result = act.transform(ctx, Alignment.topLeft);
       expect(result, equals(Alignment.topLeft));
@@ -76,7 +70,7 @@ void main() {
 
     test('transform resolves AlignmentDirectional with textDirection', () {
       const act = AlignAct();
-      final ctx = createActContext().copyWith(textDirection: TextDirection.rtl);
+      final ctx = actContext.copyWith(textDirection: TextDirection.rtl);
 
       final directional = AlignmentDirectional.centerStart;
       final result = act.transform(ctx, directional);
@@ -85,8 +79,7 @@ void main() {
 
     test('transform returns null for null input', () {
       const act = AlignAct();
-      final ctx = createActContext();
-
+      final ctx = actContext;
       final result = act.transform(ctx, null);
       expect(result, isNull);
     });
@@ -111,15 +104,13 @@ void main() {
 
     testWidgets('apply wraps child in Align widget', (tester) async {
       const act = AlignAct(from: Alignment.topLeft, to: Alignment.bottomRight);
-      final ctx = createActContext();
-      final (animtable, _) = act.buildTweens(ctx);
+      final (animtable, _) = act.buildTweens(actContext);
 
-      final track = createTrack();
       track.setProgress(0.0);
 
       final animation = CueAnimationImpl<Alignment?>(
         parent: track,
-        token: ReleaseToken(track.config),
+        token: ReleaseToken(track.config, timeline),
         animtable: animtable,
       );
 
@@ -137,15 +128,14 @@ void main() {
 
     testWidgets('apply uses animation value for alignment', (tester) async {
       const act = AlignAct(from: Alignment.topLeft, to: Alignment.bottomRight);
-      final ctx = createActContext();
-      final (animtable, _) = act.buildTweens(ctx);
 
-      final track = createTrack();
+      final (animtable, _) = act.buildTweens(actContext);
+
       track.setProgress(0.5);
 
       final animation = CueAnimationImpl<Alignment?>(
         parent: track,
-        token: ReleaseToken(track.config),
+        token: ReleaseToken(track.config, timeline),
         animtable: animtable,
       );
 
@@ -165,11 +155,9 @@ void main() {
     testWidgets('apply defaults to Alignment.center when animation value is null', (tester) async {
       const act = AlignAct();
 
-      final track = createTrack();
-
       final animation = CueAnimationImpl<Alignment?>(
         parent: track,
-        token: ReleaseToken(track.config),
+        token: ReleaseToken(track.config, timeline),
         animtable: AlwaysStoppedAnimatable<Alignment?>(null),
       );
 

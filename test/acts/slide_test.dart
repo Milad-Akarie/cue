@@ -8,17 +8,13 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  CueMotion createMotion() => CueMotion.linear(300.ms);
+ 
 
-  ActContext createActContext() {
-    final motion = createMotion();
-    return ActContext(motion: motion, reverseMotion: motion);
-  }
+  final motion = CueMotion.linear(300.ms);
+  final actContext = ActContext(motion: motion, reverseMotion: motion);
+  final track = CueTrackImpl(TrackConfig(motion: motion, reverseMotion: motion));
+  final timeline = CueTimelineImpl.fromMotion(motion);
 
-  CueTrackImpl createTrack() {
-    final motion = createMotion();
-    return CueTrackImpl(TrackConfig(motion: motion, reverseMotion: motion));
-  }
 
   group('SlideAct', () {
     group('key', () {
@@ -35,15 +31,15 @@ void main() {
           to: const Offset(1, 1),
         );
         final animtableAct = act as AnimtableAct<Offset, Offset>;
-        final ctx = createActContext();
-        final (animtable, _) = animtableAct.buildTweens(ctx);
+        
+        final (animtable, _) = animtableAct.buildTweens(actContext);
 
-        final track = createTrack();
+        
         track.setProgress(0);
 
         final animation = CueAnimationImpl<Offset>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 
@@ -53,15 +49,15 @@ void main() {
       test('default constructor uses default values', () {
         final act = SlideAct();
         final animtableAct = act as AnimtableAct<Offset, Offset>;
-        final ctx = createActContext();
-        final (animtable, _) = animtableAct.buildTweens(ctx);
+        
+        final (animtable, _) = animtableAct.buildTweens(actContext);
 
-        final track = createTrack();
+        
         track.setProgress(0);
 
         final animation = CueAnimationImpl<Offset>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 
@@ -71,15 +67,15 @@ void main() {
       test('up constructor slides from bottom to center', () {
         final act = SlideAct.up();
         final animtableAct = act as AnimtableAct<Offset, Offset>;
-        final ctx = createActContext();
-        final (animtable, _) = animtableAct.buildTweens(ctx);
+        
+        final (animtable, _) = animtableAct.buildTweens(actContext);
 
-        final track = createTrack();
+        
         track.setProgress(0);
 
         final animation = CueAnimationImpl<Offset>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 
@@ -92,15 +88,15 @@ void main() {
       test('down constructor slides from top to center', () {
         final act = SlideAct.down();
         final animtableAct = act as AnimtableAct<Offset, Offset>;
-        final ctx = createActContext();
-        final (animtable, _) = animtableAct.buildTweens(ctx);
+        
+        final (animtable, _) = animtableAct.buildTweens(actContext);
 
-        final track = createTrack();
+        
         track.setProgress(0);
 
         final animation = CueAnimationImpl<Offset>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 
@@ -113,15 +109,15 @@ void main() {
       test('fromLeading constructor slides from left to center', () {
         final act = SlideAct.fromLeading();
         final animtableAct = act as AnimtableAct<Offset, Offset>;
-        final ctx = createActContext();
-        final (animtable, _) = animtableAct.buildTweens(ctx);
+        
+        final (animtable, _) = animtableAct.buildTweens(actContext);
 
-        final track = createTrack();
+        
         track.setProgress(0);
 
         final animation = CueAnimationImpl<Offset>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 
@@ -134,15 +130,15 @@ void main() {
       test('fromTrailing constructor slides from right to center', () {
         final act = SlideAct.fromTrailing();
         final animtableAct = act as AnimtableAct<Offset, Offset>;
-        final ctx = createActContext();
-        final (animtable, _) = animtableAct.buildTweens(ctx);
+        
+        final (animtable, _) = animtableAct.buildTweens(actContext);
 
-        final track = createTrack();
+        
         track.setProgress(0);
 
         final animation = CueAnimationImpl<Offset>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 
@@ -165,15 +161,15 @@ void main() {
       test('y constructor slides on Y axis', () {
         final act = SlideAct.y(from: -1, to: 0);
         final animtableAct = act as AnimtableAct<double, Offset>;
-        final ctx = createActContext();
-        final (animtable, _) = animtableAct.buildTweens(ctx);
+        
+        final (animtable, _) = animtableAct.buildTweens(actContext);
 
-        final track = createTrack();
+        
         track.setProgress(0);
 
         final animation = CueAnimationImpl<Offset>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 
@@ -196,15 +192,15 @@ void main() {
       test('fromX constructor slides on X axis', () {
         final act = SlideAct.fromX(from: -1, to: 0);
         final animtableAct = act as AnimtableAct<double, Offset>;
-        final ctx = createActContext();
-        final (animtable, _) = animtableAct.buildTweens(ctx);
+        
+        final (animtable, _) = animtableAct.buildTweens(actContext);
 
-        final track = createTrack();
+        
         track.setProgress(0);
 
         final animation = CueAnimationImpl<Offset>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 
@@ -235,15 +231,15 @@ void main() {
       testWidgets('wraps child in SlideTransition', (tester) async {
         final act = SlideAct(from: const Offset(-1, 0), to: Offset.zero);
         final animtableAct = act as AnimtableAct<Offset, Offset>;
-        final ctx = createActContext();
-        final (animtable, _) = animtableAct.buildTweens(ctx);
+        
+        final (animtable, _) = animtableAct.buildTweens(actContext);
 
-        final track = createTrack();
+        
         track.setProgress(0.5);
 
         final animation = CueAnimationImpl<Offset>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 

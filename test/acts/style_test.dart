@@ -7,16 +7,11 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  ActContext createActContext() {
-    final motion = CueMotion.linear(300.ms);
-    return ActContext(motion: motion, reverseMotion: motion);
-  }
+  final motion = CueMotion.linear(300.ms);
+  final actContext = ActContext(motion: motion, reverseMotion: motion);
+  final track = CueTrackImpl(TrackConfig(motion: motion, reverseMotion: motion));
+  final timeline = CueTimelineImpl.fromMotion(motion);
 
-  CueTrack createTrack() {
-    final motion = CueMotion.linear(300.ms);
-    final config = TrackConfig(motion: motion, reverseMotion: motion);
-    return CueTrackImpl(config);
-  }
 
   group('TextStyleAct', () {
     group('key', () {
@@ -77,8 +72,8 @@ void main() {
           to: TextStyle(fontSize: 18),
           motion: motion,
         );
-        final ctx = createActContext();
-        final resolved = act.resolve(ctx);
+        
+        final resolved = act.resolve(actContext);
         expect(resolved.motion, isNotNull);
       });
     });
@@ -90,15 +85,15 @@ void main() {
         from: TextStyle(fontSize: 14),
         to: TextStyle(fontSize: 28),
       );
-      final ctx = createActContext();
-      final (animtable, _) = act.buildTweens(ctx);
+      
+      final (animtable, _) = act.buildTweens(actContext);
 
-      final track = createTrack();
+      
       track.setProgress(0.5);
 
       final animation = CueAnimationImpl<TextStyle>(
         parent: track,
-        token: ReleaseToken(track.config),
+        token:  ReleaseToken(track.config, timeline),
         animtable: animtable,
       );
 
@@ -121,15 +116,15 @@ void main() {
         from: TextStyle(fontSize: 14),
         to: TextStyle(fontSize: 28),
       );
-      final ctx = createActContext();
-      final (animtable, _) = act.buildTweens(ctx);
+      
+      final (animtable, _) = act.buildTweens(actContext);
 
-      final track = createTrack();
+      
       track.setProgress(0);
 
       final animation = CueAnimationImpl<TextStyle>(
         parent: track,
-        token: ReleaseToken(track.config),
+        token:  ReleaseToken(track.config, timeline),
         animtable: animtable,
       );
 
@@ -206,15 +201,15 @@ void main() {
           from: IconThemeData(size: 24),
           to: IconThemeData(size: 48),
         );
-        final ctx = createActContext();
-        final (animtable, _) = act.buildTweens(ctx);
+        
+        final (animtable, _) = act.buildTweens(actContext);
 
-        final track = createTrack();
+        
         track.setProgress(0.5);
 
         final animation = CueAnimationImpl<IconThemeData>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 
@@ -241,15 +236,15 @@ void main() {
           from: IconThemeData(size: 24),
           to: IconThemeData(size: 48),
         );
-        final ctx = createActContext();
-        final (animtable, _) = act.buildTweens(ctx);
+        
+        final (animtable, _) = act.buildTweens(actContext);
 
-        final track = createTrack();
+        
         track.setProgress(0);
 
         final animation = CueAnimationImpl<IconThemeData>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 
@@ -281,8 +276,8 @@ void main() {
           to: IconThemeData(size: 32),
           motion: motion,
         );
-        final ctx = createActContext();
-        final resolved = act.resolve(ctx);
+        
+        final resolved = act.resolve(actContext);
         expect(resolved.motion, isNotNull);
       });
     });

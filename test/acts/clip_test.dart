@@ -6,10 +6,9 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
 
-  ActContext createActContext() {
-    final motion = CueMotion.linear(300.ms);
-    return ActContext(motion: motion, reverseMotion: motion);
-  }
+  final motion = CueMotion.linear(300.ms);
+  final actContext = ActContext(motion: motion, reverseMotion: motion);
+ 
 
   group('ClipAct', () {
     group('default constructor', () {
@@ -38,8 +37,8 @@ void main() {
 
       test('resolve returns ActContext with motion', () {
         const act = ClipAct();
-        final ctx = createActContext();
-        final resolved = act.resolve(ctx);
+        
+        final resolved = act.resolve(actContext);
 
         expect(resolved, isA<ActContext>());
       });

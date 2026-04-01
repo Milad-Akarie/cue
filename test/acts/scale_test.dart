@@ -7,16 +7,10 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  ActContext createActContext() {
-    final motion = CueMotion.linear(300.ms);
-    return ActContext(motion: motion, reverseMotion: motion);
-  }
-
-  CueTrack createTrack() {
-    final motion = CueMotion.linear(300.ms);
-    final config = TrackConfig(motion: motion, reverseMotion: motion);
-    return CueTrackImpl(config);
-  }
+  final motion = CueMotion.linear(300.ms);
+  final actContext = ActContext(motion: motion, reverseMotion: motion);
+  final track = CueTrackImpl(TrackConfig(motion: motion, reverseMotion: motion));
+  final timeline = CueTimelineImpl.fromMotion(motion);
 
   group('ScaleAct', () {
     group('key', () {
@@ -98,15 +92,15 @@ void main() {
     group('apply', () {
       testWidgets('wraps child in ScaleTransition', (tester) async {
         const act = ScaleAct(from: 1.0, to: 0.5);
-        final ctx = createActContext();
-        final (animtable, _) = act.buildTweens(ctx);
+        
+        final (animtable, _) = act.buildTweens(actContext);
 
-        final track = createTrack();
+        
         track.setProgress(0.5);
 
         final animation = CueAnimationImpl<double>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 
@@ -127,15 +121,15 @@ void main() {
 
       testWidgets('ScaleTransition uses animation', (tester) async {
         const act = ScaleAct(from: 1.0, to: 0.5);
-        final ctx = createActContext();
-        final (animtable, _) = act.buildTweens(ctx);
+        
+        final (animtable, _) = act.buildTweens(actContext);
 
-        final track = createTrack();
+        
         track.setProgress(0.5);
 
         final animation = CueAnimationImpl<double>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 
@@ -156,15 +150,15 @@ void main() {
 
       testWidgets('uses default alignment when not specified', (tester) async {
         const act = ScaleAct(from: 1.0, to: 0.5);
-        final ctx = createActContext();
-        final (animtable, _) = act.buildTweens(ctx);
+        
+        final (animtable, _) = act.buildTweens(actContext);
 
-        final track = createTrack();
+        
         track.setProgress(0.5);
 
         final animation = CueAnimationImpl<double>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 
@@ -185,15 +179,15 @@ void main() {
 
       testWidgets('uses specified alignment', (tester) async {
         const act = ScaleAct(from: 1.0, to: 0.5, alignment: Alignment.topLeft);
-        final ctx = createActContext();
-        final (animtable, _) = act.buildTweens(ctx);
+        
+        final (animtable, _) = act.buildTweens(actContext);
 
-        final track = createTrack();
+        
         track.setProgress(0.5);
 
         final animation = CueAnimationImpl<double>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 
@@ -218,15 +212,15 @@ void main() {
           to: 0.5,
           alignment: AlignmentDirectional.centerStart,
         );
-        final ctx = createActContext();
-        final (animtable, _) = act.buildTweens(ctx);
+        
+        final (animtable, _) = act.buildTweens(actContext);
 
-        final track = createTrack();
+        
         track.setProgress(0.5);
 
         final animation = CueAnimationImpl<double>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 
@@ -247,15 +241,15 @@ void main() {
 
       testWidgets('animation value affects scale at start', (tester) async {
         const act = ScaleAct(from: 1.0, to: 0.5);
-        final ctx = createActContext();
-        final (animtable, _) = act.buildTweens(ctx);
+        
+        final (animtable, _) = act.buildTweens(actContext);
 
-        final track = createTrack();
+        
         track.setProgress(0.0);
 
         final animation = CueAnimationImpl<double>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 
@@ -275,15 +269,15 @@ void main() {
 
       testWidgets('animation value affects scale at end', (tester) async {
         const act = ScaleAct(from: 1.0, to: 0.5);
-        final ctx = createActContext();
-        final (animtable, _) = act.buildTweens(ctx);
+        
+        final (animtable, _) = act.buildTweens(actContext);
 
-        final track = createTrack();
+        
         track.setProgress(1.0);
 
         final animation = CueAnimationImpl<double>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 
@@ -408,9 +402,9 @@ void main() {
     group('transform', () {
       test('transforms Stretch to Matrix4', () {
         const act = StretchAct();
-        final ctx = createActContext();
+        
 
-        final result = act.transform(ctx, const Stretch(x: 2.0, y: 0.5));
+        final result = act.transform(actContext, const Stretch(x: 2.0, y: 0.5));
         expect(result, isA<Matrix4>());
         expect(result.storage[0], closeTo(2.0, 0.001));
         expect(result.storage[5], closeTo(0.5, 0.001));
@@ -418,9 +412,9 @@ void main() {
 
       test('transforms Stretch.none to identity-like matrix', () {
         const act = StretchAct();
-        final ctx = createActContext();
+        
 
-        final result = act.transform(ctx, Stretch.none);
+        final result = act.transform(actContext, Stretch.none);
         expect(result, isA<Matrix4>());
         expect(result.storage[0], closeTo(1.0, 0.001));
         expect(result.storage[5], closeTo(1.0, 0.001));
@@ -443,15 +437,15 @@ void main() {
     group('apply', () {
       testWidgets('wraps child in Transform', (tester) async {
         const act = StretchAct(from: Stretch.none, to: Stretch(x: 2.0, y: 1.0));
-        final ctx = createActContext();
-        final (animtable, _) = act.buildTweens(ctx);
+        
+        final (animtable, _) = act.buildTweens(actContext);
 
-        final track = createTrack();
+        
         track.setProgress(0.5);
 
         final animation = CueAnimationImpl<Matrix4>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 
@@ -468,15 +462,15 @@ void main() {
 
       testWidgets('Transform uses animation value', (tester) async {
         const act = StretchAct(from: Stretch.none, to: Stretch(x: 2.0, y: 1.0));
-        final ctx = createActContext();
-        final (animtable, _) = act.buildTweens(ctx);
+        
+        final (animtable, _) = act.buildTweens(actContext);
 
-        final track = createTrack();
+        
         track.setProgress(0.0);
 
         final animation = CueAnimationImpl<Matrix4>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 

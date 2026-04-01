@@ -7,17 +7,11 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  CueMotion createMotion() => CueMotion.linear(300.ms);
+  final motion = CueMotion.linear(300.ms);
+  final actContext = ActContext(motion: motion, reverseMotion: motion);
+  final track = CueTrackImpl(TrackConfig(motion: motion, reverseMotion: motion));
+  final timeline = CueTimelineImpl.fromMotion(motion);
 
-  ActContext createActContext() {
-    final motion = createMotion();
-    return ActContext(motion: motion, reverseMotion: motion);
-  }
-
-  CueTrackImpl createTrack() {
-    final motion = createMotion();
-    return CueTrackImpl(TrackConfig(motion: motion, reverseMotion: motion));
-  }
 
   group('PositionAct', () {
     group('key', () {
@@ -46,15 +40,15 @@ void main() {
           to: Position(top: 0.5),
           size: Size(100, 200),
         );
-        final ctx = createActContext();
-        final (animtable, _) = act.buildTweens(ctx);
+        
+        final (animtable, _) = act.buildTweens(actContext);
 
-        final track = createTrack();
+        
         track.setProgress(0.5);
 
         final animation = CueAnimationImpl<Position>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 
@@ -88,15 +82,15 @@ void main() {
           from: Position(top: 0),
           to: Position(top: 100),
         );
-        final ctx = createActContext();
-        final (animtable, _) = act.buildTweens(ctx);
+        
+        final (animtable, _) = act.buildTweens(actContext);
 
-        final track = createTrack();
+        
         track.setProgress(0);
 
         final animation = CueAnimationImpl<Position>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 
@@ -111,15 +105,15 @@ void main() {
           from: Position(top: 0, start: 0, width: 50, height: 50),
           to: Position(top: 100, start: 100, width: 100, height: 100),
         );
-        final ctx = createActContext();
-        final (animtable, _) = act.buildTweens(ctx);
+        
+        final (animtable, _) = act.buildTweens(actContext);
 
-        final track = createTrack();
+        
         track.setProgress(0.5);
 
         final animation = CueAnimationImpl<Position>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 
@@ -137,15 +131,15 @@ void main() {
           from: Position(top: 0, start: 0),
           to: Position(top: 100, start: 100),
         );
-        final ctx = createActContext();
-        final (animtable, _) = act.buildTweens(ctx);
+        
+        final (animtable, _) = act.buildTweens(actContext);
 
-        final track = createTrack();
+        
         track.setProgress(0.5);
 
         final animation = CueAnimationImpl<Position>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token:  ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 

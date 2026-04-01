@@ -7,16 +7,10 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  ActContext createActContext() {
-    final motion = CueMotion.linear(300.ms);
-    return ActContext(motion: motion, reverseMotion: motion);
-  }
-
-  CueTrack createTrack() {
-    final motion = CueMotion.linear(300.ms);
-    final config = TrackConfig(motion: motion, reverseMotion: motion);
-    return CueTrackImpl(config);
-  }
+  final motion = CueMotion.linear(300.ms);
+  final actContext = ActContext(motion: motion, reverseMotion: motion);
+  final track = CueTrackImpl(TrackConfig(motion: motion, reverseMotion: motion));
+  final timeline = CueTimelineImpl.fromMotion(motion);
 
   group('TransformAct', () {
     group('key', () {
@@ -92,15 +86,14 @@ void main() {
       testWidgets('wraps child in AnimatedBuilder with Transform', (tester) async {
         final to = Matrix4.translationValues(100, 0, 0);
         final act = TransformAct(to: to);
-        final ctx = createActContext();
-        final (animtable, _) = act.buildTweens(ctx);
 
-        final track = createTrack();
+        final (animtable, _) = act.buildTweens(actContext);
+
         track.setProgress(0.5);
 
         final animation = CueAnimationImpl<Matrix4>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token: ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 
@@ -125,15 +118,14 @@ void main() {
           alignment: Alignment.center,
           origin: const Offset(10, 10),
         );
-        final ctx = createActContext();
-        final (animtable, _) = act.buildTweens(ctx);
 
-        final track = createTrack();
+        final (animtable, _) = act.buildTweens(actContext);
+
         track.setProgress(0);
 
         final animation = CueAnimationImpl<Matrix4>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token: ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 
@@ -238,15 +230,14 @@ void main() {
     group('apply', () {
       testWidgets('wraps child in AnimatedBuilder with Transform', (tester) async {
         final act = SkewAct(from: Skew.zero, to: Skew(x: 0.1, y: 0.1));
-        final ctx = createActContext();
-        final (animtable, _) = act.buildTweens(ctx);
 
-        final track = createTrack();
+        final (animtable, _) = act.buildTweens(actContext);
+
         track.setProgress(0.5);
 
         final animation = CueAnimationImpl<Matrix4>(
           parent: track,
-          token: ReleaseToken(track.config),
+          token: ReleaseToken(track.config, timeline),
           animtable: animtable,
         );
 
@@ -269,8 +260,8 @@ void main() {
       test('returns ActContext with motion', () {
         final motion = CueMotion.linear(300.ms);
         final act = SkewAct(motion: motion);
-        final ctx = createActContext();
-        final resolved = act.resolve(ctx);
+
+        final resolved = act.resolve(actContext);
         expect(resolved.motion, isNotNull);
       });
     });
