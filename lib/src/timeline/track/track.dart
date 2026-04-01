@@ -53,7 +53,7 @@ class CueTrackImpl extends CueTrack with AnimationLocalStatusListenersMixin {
   }
 
   @override
-  void setProgress(double t, {bool forward = true}) {
+  void setProgress(double t, {bool forward = true, bool alwaysNotify = false}) {
     assert(t >= 0.0 && t <= 1.0, 'Progress value must be between 0.0 and 1.0. Received: $t');
     _forward = forward;
     _needsPrepare = true;
@@ -71,8 +71,7 @@ class CueTrackImpl extends CueTrack with AnimationLocalStatusListenersMixin {
     }
     _localT = 0.0;
     _activeSim = null;
-
-    if (_value != value || _phase != phase) {
+    if (alwaysNotify || _value != value || _phase != phase) {
       _value = value;
       _phase = phase;
       notifyListeners();
@@ -98,7 +97,6 @@ class CueTrackImpl extends CueTrack with AnimationLocalStatusListenersMixin {
       return;
     }
 
-
     final active = forward ? motion : reverseMotion;
 
     if (from != null) {
@@ -122,7 +120,6 @@ class CueTrackImpl extends CueTrack with AnimationLocalStatusListenersMixin {
       _value = sim.x(_localT);
       _phase = sim.phase;
     }
-   
 
     final (targetValue, targetPhase) = target == null ? (null, null) : _valueAtProgress(target, forward);
     _activeSim = active.build(
@@ -222,7 +219,7 @@ abstract class CueTrack extends Animation<double> with AnimationLocalListenersMi
 
   void tick(double td);
 
-  void setProgress(double t, {bool forward = true});
+  void setProgress(double t, {bool forward = true, bool alwaysNotify = false});
 
   bool get isDone;
 

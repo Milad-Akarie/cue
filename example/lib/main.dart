@@ -45,43 +45,16 @@ class DemoPage extends StatefulWidget {
 }
 
 class _DemoPageState extends State<DemoPage> with TickerProviderStateMixin {
-
-  late final _controller = CueController(vsync: this, motion: .wobbly());
-  late final _animation = _controller.createAnimation(tween: Tween(begin: Offset.zero, end: const Offset(200, 0)));
+ 
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Cue Demo')),
-      body: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: () {
-          print('Tapped at ${DateTime.now()}');
-          _controller.fling(velocity: .5);
-        },
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            AnimatedBuilder(
-              animation: _animation,
-              builder: (context, _) {
-                final offset = _animation.value;
-                return Positioned(
-                  left: offset.dx - 25,
-                  top: offset.dy - 25,
-                  child: Container(
-                    width: 50,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      color: Colors.blue,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                );
-              },
-            ),
-          ],
-        ),
+      body: Row(
+        children: [
+        
+        ],
       ),
     );
   }

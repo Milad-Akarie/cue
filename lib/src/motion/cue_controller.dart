@@ -181,7 +181,10 @@ class CueController extends AnimationController {
   }
 
   @override
-  void reset() => timeline.reset();
+  void reset() {
+    timeline.reset();
+    super.value = 0.0;
+  }
 
   @override
   TickerFuture repeat({double? min, double? max, bool reverse = false, int? count, Duration? period}) {
@@ -213,7 +216,6 @@ class CueController extends AnimationController {
     if (target == value) {
       return TickerFuture.complete();
     }
-
     forward ??= target > value;
     _timeline.willAnimate(forward: forward);
     _timeline.prepare(forward: forward, target: target);

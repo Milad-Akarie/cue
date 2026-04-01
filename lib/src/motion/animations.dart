@@ -94,12 +94,18 @@ class RetargetableCueAnimation<T> extends CueAnimation<T> {
     required this.controller,
     required T initialValue,
     required this.token,
-  }) : _animatable = TweenAnimtable<T>(ConstantTween(initialValue));
+  }) : _animatable = _AlwaysStoppedAnimtable<T>(initialValue);
 
-  late TweenAnimtable<T> _animatable;
+  late CueAnimtable<T> _animatable;
 
   @override
   CueAnimtable<T> get animtable => _animatable;
+
+  void setValue(T newValue) {
+    controller.stop();
+    _animatable = _AlwaysStoppedAnimtable<T>(newValue);
+    parent.setProgress(1.0, alwaysNotify: true);
+  }
 
   void retarget(T newTarget, {bool forward = true}) {
     final currentValue = _animatable.evaluate(parent);
@@ -110,4 +116,11 @@ class RetargetableCueAnimation<T> extends CueAnimation<T> {
       controller.reverse(from: 1.0);
     }
   }
+}
+
+class _AlwaysStoppedAnimtable<T> extends CueAnimtable<T> {
+  final T value;
+  _AlwaysStoppedAnimtable(this.value);
+  @override
+  T evaluate(CueTrack track) => value;
 }
