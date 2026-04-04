@@ -204,6 +204,7 @@ class PositionActor extends SingleActorBase<Position> {
   Act get act => PositionAct.internal(
     from: from,
     to: to,
+    delay: delay,
     frames: frames,
     relativeTo: _relativeTo,
     motion: motion,

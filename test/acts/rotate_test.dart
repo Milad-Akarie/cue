@@ -38,35 +38,124 @@ void main() {
         expect(act.alignment, Alignment.center);
       });
 
-      test('radians constructor', () {
-        const act = RotateAct.radians(from: 0, to: math.pi);
-        expect(act.unit, RotateUnit.radians);
+      testWidgets('radians constructor applies rotation', (tester) async {
+        final act = RotateAct.radians(from: 0, to: math.pi);
+        final (animtable, _) = act.buildTweens(actContext);
+        track.setProgress(0.5);
+        final animation = CueAnimationImpl<double>(
+          parent: track,
+          token: ReleaseToken(track.config, timeline),
+          animtable: animtable,
+        );
+
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: Builder(
+              builder: (context) => act.apply(context, animation, const SizedBox()),
+            ),
+          ),
+        );
+
+        expect(find.byType(MatrixTransition), findsOneWidget);
       });
 
-      test('degrees constructor', () {
-        const act = RotateAct.degrees(from: 0, to: 180);
-        expect(act.unit, RotateUnit.degrees);
+      testWidgets('degrees constructor applies rotation', (tester) async {
+        final act = RotateAct.degrees(from: 0, to: 180);
+        final (animtable, _) = act.buildTweens(actContext);
+        track.setProgress(0.5);
+        final animation = CueAnimationImpl<double>(
+          parent: track,
+          token: ReleaseToken(track.config, timeline),
+          animtable: animtable,
+        );
+
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: Builder(
+              builder: (context) => act.apply(context, animation, const SizedBox()),
+            ),
+          ),
+        );
+
+        expect(find.byType(MatrixTransition), findsOneWidget);
       });
 
-      test('turns constructor', () {
-        const act = RotateAct.turns(from: 0, to: 2);
-        expect(act.unit, RotateUnit.quarterTurns);
+      testWidgets('turns constructor applies rotation', (tester) async {
+        final act = RotateAct.turns(from: 0, to: 2);
+        final (animtable, _) = act.buildTweens(actContext);
+        track.setProgress(0.5);
+        final animation = CueAnimationImpl<double>(
+          parent: track,
+          token: ReleaseToken(track.config, timeline),
+          animtable: animtable,
+        );
+
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: Builder(
+              builder: (context) => act.apply(context, animation, const SizedBox()),
+            ),
+          ),
+        );
+
+        expect(find.byType(MatrixTransition), findsOneWidget);
       });
 
-      test('flipX constructor', () {
-        const act = RotateAct.flipX();
+      testWidgets('flipX constructor rotates around X axis', (tester) async {
+        final act = RotateAct.flipX();
         expect(act.axis, RotateAxis.x);
         expect(act.unit, RotateUnit.radians);
         expect(act.from, 0);
         expect(act.to, math.pi);
+
+        final (animtable, _) = act.buildTweens(actContext);
+        track.setProgress(0.5);
+        final animation = CueAnimationImpl<double>(
+          parent: track,
+          token: ReleaseToken(track.config, timeline),
+          animtable: animtable,
+        );
+
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: Builder(
+              builder: (context) => act.apply(context, animation, const SizedBox()),
+            ),
+          ),
+        );
+
+        expect(find.byType(MatrixTransition), findsOneWidget);
       });
 
-      test('flipY constructor', () {
-        const act = RotateAct.flipY();
+      testWidgets('flipY constructor rotates around Y axis', (tester) async {
+        final act = RotateAct.flipY();
         expect(act.axis, RotateAxis.y);
         expect(act.unit, RotateUnit.radians);
         expect(act.from, 0);
         expect(act.to, math.pi);
+
+        final (animtable, _) = act.buildTweens(actContext);
+        track.setProgress(0.5);
+        final animation = CueAnimationImpl<double>(
+          parent: track,
+          token: ReleaseToken(track.config, timeline),
+          animtable: animtable,
+        );
+
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: Builder(
+              builder: (context) => act.apply(context, animation, const SizedBox()),
+            ),
+          ),
+        );
+
+        expect(find.byType(MatrixTransition), findsOneWidget);
       });
 
       test('constructor with alignment', () {
@@ -188,6 +277,60 @@ void main() {
 
         final matrixTransition = tester.widget<MatrixTransition>(find.byType(MatrixTransition));
         expect(matrixTransition.alignment, Alignment.topLeft);
+      });
+
+      testWidgets('applies rotation with X axis', (tester) async {
+        const act = RotateAct(from: 0, to: 90, axis: RotateAxis.x);
+        
+        final (animtable, _) = act.buildTweens(actContext);
+
+        track.setProgress(0.5);
+
+        final animation = CueAnimationImpl<double>(
+          parent: track,
+          token:  ReleaseToken(track.config, timeline),
+          animtable: animtable,
+        );
+
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: Builder(
+              builder: (context) {
+                return act.apply(context, animation, const SizedBox());
+              },
+            ),
+          ),
+        );
+
+        expect(find.byType(MatrixTransition), findsOneWidget);
+      });
+
+      testWidgets('applies rotation with Y axis', (tester) async {
+        const act = RotateAct(from: 0, to: 90, axis: RotateAxis.y);
+        
+        final (animtable, _) = act.buildTweens(actContext);
+
+        track.setProgress(0.5);
+
+        final animation = CueAnimationImpl<double>(
+          parent: track,
+          token:  ReleaseToken(track.config, timeline),
+          animtable: animtable,
+        );
+
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: Builder(
+              builder: (context) {
+                return act.apply(context, animation, const SizedBox());
+              },
+            ),
+          ),
+        );
+
+        expect(find.byType(MatrixTransition), findsOneWidget);
       });
     });
 

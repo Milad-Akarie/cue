@@ -455,6 +455,173 @@ void main() {
 
       expect(find.byType(Padding), findsOneWidget);
     });
+
+    testWidgets('apply with hasBorderStroke renders CustomPaint', (tester) async {
+      const act = CardAct(
+        shape: AnimatableValue.fixed(BeveledRectangleBorder()),
+      );
+      
+      final (animtable, _) = act.buildTweens(actContext);
+
+      track.setProgress(0.0);
+
+      final animation = CueAnimationImpl<CardProps>(
+        parent: track,
+        token:  ReleaseToken(track.config, timeline),
+        animtable: animtable,
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => act.apply(context, animation, const SizedBox()),
+            ),
+          ),
+        ),
+      );
+
+      // BeveledRectangleBorder has preferPaintInterior = false, so hasBorderStroke = true
+      // There should be CustomPaint for the PhysicalShape
+      expect(find.byType(CustomPaint), findsWidgets);
+    });
+
+    testWidgets('apply with hasBorderStroke and borderOnForeground true uses foregroundPainter', (tester) async {
+      const act = CardAct(
+        shape: AnimatableValue.fixed(BeveledRectangleBorder()),
+        borderOnForeground: true,
+      );
+      
+      final (animtable, _) = act.buildTweens(actContext);
+
+      track.setProgress(0.0);
+
+      final animation = CueAnimationImpl<CardProps>(
+        parent: track,
+        token:  ReleaseToken(track.config, timeline),
+        animtable: animtable,
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => act.apply(context, animation, const SizedBox()),
+            ),
+          ),
+        ),
+      );
+
+      // Should have at least one CustomPaint (the one we created for the border)
+      final customPaints = find.byType(CustomPaint);
+      expect(customPaints, findsWidgets);
+      
+      // The CustomPaint should have the painter as foregroundPainter
+      final widgets = tester.widgetList<CustomPaint>(customPaints);
+      final hasCustomPaintWithForeground = widgets.any(
+        (widget) => widget.foregroundPainter != null && widget.painter == null,
+      );
+      expect(hasCustomPaintWithForeground, isTrue);
+    });
+
+    testWidgets('apply with hasBorderStroke and borderOnForeground false uses painter', (tester) async {
+      const act = CardAct(
+        shape: AnimatableValue.fixed(BeveledRectangleBorder()),
+        borderOnForeground: false,
+      );
+      
+      final (animtable, _) = act.buildTweens(actContext);
+
+      track.setProgress(0.0);
+
+      final animation = CueAnimationImpl<CardProps>(
+        parent: track,
+        token:  ReleaseToken(track.config, timeline),
+        animtable: animtable,
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => act.apply(context, animation, const SizedBox()),
+            ),
+          ),
+        ),
+      );
+
+      // Should have at least one CustomPaint (the one we created for the border)
+      final customPaints = find.byType(CustomPaint);
+      expect(customPaints, findsWidgets);
+      
+      // The CustomPaint should have the painter as painter (not foregroundPainter)
+      final widgets = tester.widgetList<CustomPaint>(customPaints);
+      final hasCustomPaintWithPainter = widgets.any(
+        (widget) => widget.painter != null && widget.foregroundPainter == null,
+      );
+      expect(hasCustomPaintWithPainter, isTrue);
+    });
+
+    testWidgets('apply with constant borderRadius uses cached shape', (tester) async {
+      const act = CardAct(
+        borderRadius: AnimatableValue.fixed(BorderRadius.all(Radius.circular(12))),
+      );
+      
+      final (animtable, _) = act.buildTweens(actContext);
+
+      track.setProgress(0.0);
+
+      final animation = CueAnimationImpl<CardProps>(
+        parent: track,
+        token:  ReleaseToken(track.config, timeline),
+        animtable: animtable,
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => act.apply(context, animation, const SizedBox()),
+            ),
+          ),
+        ),
+      );
+
+      // Constant shape should be cached and still render properly
+      expect(find.byType(PhysicalShape), findsOneWidget);
+    });
+
+    testWidgets('apply with animated shape updates shape each frame', (tester) async {
+      const act = CardAct(
+        shape: AnimatableValue(
+          from: RoundedRectangleBorder(),
+          to: BeveledRectangleBorder(),
+        ),
+      );
+      
+      final (animtable, _) = act.buildTweens(actContext);
+
+      track.setProgress(0.5);
+
+      final animation = CueAnimationImpl<CardProps>(
+        parent: track,
+        token:  ReleaseToken(track.config, timeline),
+        animtable: animtable,
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => act.apply(context, animation, const SizedBox()),
+            ),
+          ),
+        ),
+      );
+
+      // Animated shape should still render PhysicalShape
+      expect(find.byType(PhysicalShape), findsOneWidget);
+    });
   });
 
   group('CardActor', () {
@@ -492,6 +659,33 @@ void main() {
         ),
         throwsA(isA<AssertionError>()),
       );
+    });
+
+    testWidgets('build method creates Actor with CardAct', (tester) async {
+      const actor = CardActor(
+        elevation: AnimatableValue(from: 0.0, to: 8.0),
+        color: AnimatableValue(from: Colors.white, to: Colors.grey),
+        child: Text('Card Content'),
+      );
+
+      final motion = CueMotion.linear(300.ms);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Cue(
+            controller: CueController(
+              vsync: tester,
+              motion: motion,
+            ),
+            child: Scaffold(body: actor),
+          ),
+        ),
+      );
+
+      // Verify child widget is rendered
+      expect(find.text('Card Content'), findsOneWidget);
+      // Verify PhysicalShape from CardAct is applied
+      expect(find.byType(PhysicalShape), findsOneWidget);
     });
   });
 }

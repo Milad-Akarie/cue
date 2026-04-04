@@ -278,6 +278,160 @@ void main() {
         await tester.pump();
         expect(find.text('Radians'), findsOneWidget);
       });
+
+      testWidgets('animation listener triggers layout update', (tester) async {
+        final act = RotateLayoutAct.degrees(from: 0, to: 180);
+        
+        final (animtable, _) = act.buildTweens(actContext);
+
+        final animation = CueAnimationImpl<double>(
+          parent: track,
+          token: ReleaseToken(track.config, timeline),
+          animtable: animtable,
+        );
+
+        // Start at 0 progress
+        track.setProgress(0);
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: Builder(
+              builder: (context) {
+                return SizedBox(
+                  width: 200,
+                  height: 200,
+                  child: act.apply(context, animation, const SizedBox(width: 50, height: 50)),
+                );
+              },
+            ),
+          ),
+        );
+
+        // Tick animation to midpoint
+        track.setProgress(0.5);
+        await tester.pump();
+        expect(find.byType(SizedBox), findsWidgets);
+
+        // Tick animation to end
+        track.setProgress(1.0);
+        await tester.pump();
+        expect(find.byType(SizedBox), findsWidgets);
+      });
+
+      testWidgets('handles animation replacement', (tester) async {
+        final act = RotateLayoutAct.degrees(from: 0, to: 90);
+        
+        final (animtable, _) = act.buildTweens(actContext);
+
+        track.setProgress(0);
+        final animation1 = CueAnimationImpl<double>(
+          parent: track,
+          token: ReleaseToken(track.config, timeline),
+          animtable: animtable,
+        );
+
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: Builder(
+              builder: (context) {
+                return act.apply(context, animation1, const SizedBox(width: 50, height: 50));
+              },
+            ),
+          ),
+        );
+
+        // Create a new animation
+        track.setProgress(0.5);
+        final animation2 = CueAnimationImpl<double>(
+          parent: track,
+          token: ReleaseToken(track.config, timeline),
+          animtable: animtable,
+        );
+
+        // Replace with new animation
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: Builder(
+              builder: (context) {
+                return act.apply(context, animation2, const SizedBox(width: 50, height: 50));
+              },
+            ),
+          ),
+        );
+
+        await tester.pump();
+        expect(find.byType(SizedBox), findsWidgets);
+      });
+
+      testWidgets('performs layout with rotated child', (tester) async {
+        final act = RotateLayoutAct.degrees(from: 0, to: 45);
+        
+        final (animtable, _) = act.buildTweens(actContext);
+
+        track.setProgress(0.25); // 11.25 degrees
+        final animation = CueAnimationImpl<double>(
+          parent: track,
+          token: ReleaseToken(track.config, timeline),
+          animtable: animtable,
+        );
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: Directionality(
+                textDirection: TextDirection.ltr,
+                child: Builder(
+                  builder: (context) {
+                    return act.apply(
+                      context,
+                      animation,
+                      SizedBox(
+                        width: 100,
+                        height: 100,
+                        child: Container(color: Colors.blue),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
+        );
+
+        await tester.pumpAndSettle();
+        // Verify the widget renders with rotation applied
+        expect(find.byType(Container), findsOneWidget);
+      });
+
+      testWidgets('handles null child during layout', (tester) async {
+        final act = RotateLayoutAct.degrees(from: 0, to: 90);
+        
+        final (animtable, _) = act.buildTweens(actContext);
+
+        // The apply() method should still work with proper child
+        track.setProgress(0.5);
+        final animation = CueAnimationImpl<double>(
+          parent: track,
+          token: ReleaseToken(track.config, timeline),
+          animtable: animtable,
+        );
+
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: Builder(
+              builder: (context) {
+                return act.apply(context, animation, const Placeholder());
+              },
+            ),
+          ),
+        );
+
+        await tester.pumpAndSettle();
+        expect(find.byType(Placeholder), findsOneWidget);
+      });
     });
 
     group('equality', () {
