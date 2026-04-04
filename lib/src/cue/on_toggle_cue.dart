@@ -1,6 +1,6 @@
 part of 'cue.dart';
 
-class OnToggleCue extends OnMountCue {
+class OnToggleCue extends SelfAnimatedCue {
   const OnToggleCue({
     super.key,
     required super.child,
@@ -30,7 +30,7 @@ class _ToggledStageState extends SelfAnimatedCueState<OnToggleCue> {
     if (widget.skipFirstAnimation) {
       controller.value = widget.toggled ? 1.0 : 0.0;
     } else {
-      _toggle();
+      _toggle(true);
     }
   }
 
@@ -42,10 +42,10 @@ class _ToggledStageState extends SelfAnimatedCueState<OnToggleCue> {
     }
   }
 
-  void _toggle() async {
-    if (widget.toggled) {
+  void _toggle([bool force = false]) async {
+    if (widget.toggled && (!controller.isCompleted || force)) {
       controller.forward();
-    } else {
+    } else if (!widget.toggled && (!controller.isDismissed || force)) {
       controller.reverse();
     }
   }

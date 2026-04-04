@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:cue/cue.dart';
-import 'package:cue/src/cue/cue.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -105,7 +104,7 @@ void main() {
       );
       final state = tester.state(cueFinder) as dynamic;
       expect(state.debugName, 'ProgressCue');
-      expect(state.timeline, isNotNull);
+      expect(state.controller.timeline, isNotNull);
     });
 
     testWidgets('dispose removes listenable listener', (tester) async {

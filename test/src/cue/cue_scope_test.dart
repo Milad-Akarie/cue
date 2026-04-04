@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:cue/cue.dart';
-import 'package:cue/src/cue/cue.dart';
-import 'package:cue/src/timeline/track/track_config.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('CueScope', () {
     testWidgets('of() retrieves scope from context', (tester) async {
-      final timeline = CueTimelineImpl.fromMotion(CueMotion.linear(300.ms));
+      final controller = CueController(
+        vsync: tester,
+        motion: CueMotion.linear(300.ms),
+      );
       late CueScope scope;
 
       await tester.pumpWidget(
         MaterialApp(
           home: Cue(
-            controller: timeline,
+            controller: controller,
             child: Builder(
               builder: (context) {
                 scope = CueScope.of(context);
@@ -26,8 +27,8 @@ void main() {
         ),
       );
 
-      expect(scope.controller, same(timeline));
-      expect(scope.mainConfig, equals(timeline.mainTrackConfig));
+      expect(scope.controller, same(controller));
+      expect(scope.reanimateFromCurrent, isFalse);
     });
 
     testWidgets('of() throws assert when no CueScope in context', (tester) async {
@@ -46,19 +47,23 @@ void main() {
       );
     });
 
-    testWidgets('updateShouldNotify returns true when timeline changes', (tester) async {
-      final timeline1 = CueTimelineImpl.fromMotion(CueMotion.linear(300.ms));
-      final timeline2 = CueTimelineImpl.fromMotion(CueMotion.linear(500.ms));
+    testWidgets('updateShouldNotify returns true when controller changes', (tester) async {
+      final controller1 = CueController(
+        vsync: tester,
+        motion: CueMotion.linear(300.ms),
+      );
+      final controller2 = CueController(
+        vsync: tester,
+        motion: CueMotion.linear(500.ms),
+      );
 
       final scope1 = CueScope(
-        controller: timeline1,
-        mainConfig: timeline1.mainTrackConfig,
+        controller: controller1,
         reanimateFromCurrent: false,
         child: const SizedBox(),
       );
       final scope2 = CueScope(
-        controller: timeline2,
-        mainConfig: timeline2.mainTrackConfig,
+        controller: controller2,
         reanimateFromCurrent: false,
         child: const SizedBox(),
       );
@@ -67,17 +72,18 @@ void main() {
     });
 
     testWidgets('updateShouldNotify returns true when reanimateFromCurrent changes', (tester) async {
-      final timeline = CueTimelineImpl.fromMotion(CueMotion.linear(300.ms));
+      final controller = CueController(
+        vsync: tester,
+        motion: CueMotion.linear(300.ms),
+      );
 
       final scope1 = CueScope(
-        controller: timeline,
-        mainConfig: timeline.mainTrackConfig,
+        controller: controller,
         reanimateFromCurrent: false,
         child: const SizedBox(),
       );
       final scope2 = CueScope(
-        controller: timeline,
-        mainConfig: timeline.mainTrackConfig,
+        controller: controller,
         reanimateFromCurrent: true,
         child: const SizedBox(),
       );
@@ -85,47 +91,19 @@ void main() {
       expect(scope1.updateShouldNotify(scope2), isTrue);
     });
 
-    testWidgets('updateShouldNotify returns true when mainConfig changes', (tester) async {
-      final config1 = TrackConfig(
-        motion: CueMotion.linear(300.ms),
-        reverseMotion: CueMotion.linear(300.ms),
-      );
-      final config2 = TrackConfig(
-        motion: CueMotion.linear(500.ms),
-        reverseMotion: CueMotion.linear(500.ms),
-      );
-
-      final timeline = CueTimelineImpl.fromMotion(CueMotion.linear(300.ms));
-
-      final scope1 = CueScope(
-        controller: timeline,
-        mainConfig: config1,
-        reanimateFromCurrent: false,
-        child: const SizedBox(),
-      );
-      final scope2 = CueScope(
-        controller: timeline,
-        mainConfig: config2,
-        reanimateFromCurrent: false,
-        child: const SizedBox(),
-      );
-
-      expect(scope1.updateShouldNotify(scope2), isTrue);
-    });
-
     testWidgets('updateShouldNotify returns false when nothing changes', (tester) async {
-      final timeline = CueTimelineImpl.fromMotion(CueMotion.linear(300.ms));
-      final config = timeline.mainTrackConfig;
+      final controller = CueController(
+        vsync: tester,
+        motion: CueMotion.linear(300.ms),
+      );
 
       final scope1 = CueScope(
-        controller: timeline,
-        mainConfig: config,
+        controller: controller,
         reanimateFromCurrent: false,
         child: const SizedBox(),
       );
       final scope2 = CueScope(
-        controller: timeline,
-        mainConfig: config,
+        controller: controller,
         reanimateFromCurrent: false,
         child: const SizedBox(),
       );
@@ -134,10 +112,12 @@ void main() {
     });
 
     testWidgets('reanimateFromCurrent is accessible', (tester) async {
-      final timeline = CueTimelineImpl.fromMotion(CueMotion.linear(300.ms));
+      final controller = CueController(
+        vsync: tester,
+        motion: CueMotion.linear(300.ms),
+      );
       final scope = CueScope(
-        controller: timeline,
-        mainConfig: timeline.mainTrackConfig,
+        controller: controller,
         reanimateFromCurrent: true,
         child: const SizedBox(),
       );

@@ -8,11 +8,14 @@ void main() {
 
   group('Cue factory', () {
     testWidgets('Cue() creates a ControlledCue', (tester) async {
-      final timeline = CueTimelineImpl.fromMotion(CueMotion.linear(300.ms));
+      final controller = CueController(
+        vsync: tester,
+        motion: CueMotion.linear(300.ms),
+      );
       await tester.pumpWidget(
         MaterialApp(
           home: Cue(
-            controller: timeline,
+            controller: controller,
             child: const Text('hello'),
           ),
         ),
@@ -21,13 +24,16 @@ void main() {
       expect(find.text('hello'), findsOneWidget);
     });
 
-    testWidgets('Cue() exposes timeline via CueScope', (tester) async {
-      final timeline = CueTimelineImpl.fromMotion(CueMotion.linear(300.ms));
+    testWidgets('Cue() exposes controller via CueScope', (tester) async {
+      final controller = CueController(
+        vsync: tester,
+        motion: CueMotion.linear(300.ms),
+      );
       late CueScope scope;
       await tester.pumpWidget(
         MaterialApp(
           home: Cue(
-            controller: timeline,
+            controller: controller,
             child: Builder(
               builder: (context) {
                 scope = CueScope.of(context);
@@ -38,18 +44,21 @@ void main() {
         ),
       );
 
-      expect(scope.controller, same(timeline));
+      expect(scope.controller, same(controller));
       expect(scope.reanimateFromCurrent, isFalse);
     });
   });
 
   group('CueState', () {
     testWidgets('build wraps child with Actor when acts provided', (tester) async {
-      final timeline = CueTimelineImpl.fromMotion(CueMotion.linear(300.ms));
+      final controller = CueController(
+        vsync: tester,
+        motion: CueMotion.linear(300.ms),
+      );
       await tester.pumpWidget(
         MaterialApp(
           home: Cue(
-            controller: timeline,
+            controller: controller,
             acts: const [OpacityAct(from: 0.0, to: 1.0)],
             child: const Text('acted'),
           ),
@@ -61,11 +70,14 @@ void main() {
     });
 
     testWidgets('build without acts does not add Actor', (tester) async {
-      final timeline = CueTimelineImpl.fromMotion(CueMotion.linear(300.ms));
+      final controller = CueController(
+        vsync: tester,
+        motion: CueMotion.linear(300.ms),
+      );
       await tester.pumpWidget(
         MaterialApp(
           home: Cue(
-            controller: timeline,
+            controller: controller,
             child: const Text('plain'),
           ),
         ),

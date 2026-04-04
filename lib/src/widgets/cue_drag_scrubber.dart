@@ -14,6 +14,12 @@ enum CueDragReleaseMode {
   none,
 }
 
+enum CueScrubDirection {
+  forward,
+  reverse,
+  auto,
+}
+
 /// A widget that scrubs the active [CueController] by dragging.
 ///
 /// The controller is resolved in priority order:
@@ -40,9 +46,13 @@ class CueDragScrubber extends StatefulWidget {
     this.axis = Axis.vertical,
     this.releaseMode = CueDragReleaseMode.fling,
     this.forceLinearScrubing = true,
+    this.hitTestBehavior,
+    this.scrubDirection = CueScrubDirection.auto,
   });
 
+  final HitTestBehavior? hitTestBehavior;
   final bool forceLinearScrubing;
+  final CueScrubDirection scrubDirection;
 
   /// The widget below this widget in the tree.
   final Widget child;
@@ -81,9 +91,15 @@ class _CueDragScrubberState extends State<CueDragScrubber> {
   }
 
   double _primaryOffset(Offset o) => widget.axis == Axis.vertical ? o.dy : o.dx;
+  bool _scrubForward = true;
 
   void _onDragStart(DragStartDetails d) {
     final controller = _resolveController();
+    _scrubForward = switch (widget.scrubDirection) {
+      CueScrubDirection.auto => controller.status.isForwardOrCompleted,
+      CueScrubDirection.forward => true,
+      CueScrubDirection.reverse => false,
+    };
     controller.stop();
     _startProgress = controller.timeline.progress;
     _startOffset = _primaryOffset(d.localPosition);
@@ -95,7 +111,7 @@ class _CueDragScrubberState extends State<CueDragScrubber> {
     final progress = (_startProgress + delta / widget.distance).clamp(0.0, 1.0);
     controller.setProgress(
       progress,
-      forward: controller.status.isForwardOrCompleted,
+      forward: _scrubForward,
       forceLinear: widget.forceLinearScrubing,
     );
   }
@@ -132,6 +148,7 @@ class _CueDragScrubberState extends State<CueDragScrubber> {
   Widget build(BuildContext context) {
     final isVertical = widget.axis == Axis.vertical;
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onVerticalDragStart: isVertical ? _onDragStart : null,
       onVerticalDragUpdate: isVertical ? _onDragUpdate : null,
       onVerticalDragEnd: isVertical ? _onDragEnd : null,

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:cue/cue.dart';
 import 'package:cue/src/cue/cue.dart';
 
 void main() {

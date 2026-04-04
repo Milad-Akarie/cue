@@ -172,14 +172,17 @@ void main() {
 
   group('TranslateAct.fromX widget tests', () {
     testWidgets('applies horizontal translation', (tester) async {
-      final timeline = CueTimelineImpl.fromMotion(CueMotion.linear(Duration(milliseconds: 300)));
+      final controller = CueController(
+        vsync: tester,
+        motion: CueMotion.linear(Duration(milliseconds: 300)),
+      );
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
           child: Cue(
-            controller: timeline,
+            controller: controller,
             acts: [TranslateAct.fromX(from: 0, to: 100)],
-            child: Container(width: 50, height: 50),
+            child: SizedBox(width: 50, height: 50),
           ),
         ),
       );
@@ -191,14 +194,17 @@ void main() {
 
   group('TranslateAct.y widget tests', () {
     testWidgets('applies vertical translation', (tester) async {
-      final timeline = CueTimelineImpl.fromMotion(CueMotion.linear(Duration(milliseconds: 300)));
+      final controller = CueController(
+        vsync: tester,
+        motion: CueMotion.linear(Duration(milliseconds: 300)),
+      );
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
           child: Cue(
-            controller: timeline,
+            controller: controller,
             acts: [TranslateAct.y(from: 0, to: 100)],
-            child: Container(width: 50, height: 50),
+            child: SizedBox(width: 50, height: 50),
           ),
         ),
       );
@@ -243,7 +249,10 @@ void main() {
 
     testWidgets('fromGlobal applies translation', (tester) async {
       final targetKey = GlobalKey();
-      final timeline = CueTimelineImpl.fromMotion(CueMotion.linear(Duration(milliseconds: 300)));
+      final controller = CueController(
+        vsync: tester,
+        motion: CueMotion.linear(Duration(milliseconds: 300)),
+      );
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
@@ -256,7 +265,7 @@ void main() {
                 child: SizedBox(width: 50, height: 50),
               ),
               Cue(
-                controller: timeline,
+                controller: controller,
                 acts: [TranslateAct.fromGlobal(offset: Offset(100, 100))],
                 child: SizedBox(width: 50, height: 50),
               ),
@@ -270,14 +279,17 @@ void main() {
     });
 
     testWidgets('fromGlobalRect applies translation', (tester) async {
-      final timeline = CueTimelineImpl.fromMotion(CueMotion.linear(Duration(milliseconds: 300)));
+      final controller = CueController(
+        vsync: tester,
+        motion: CueMotion.linear(Duration(milliseconds: 300)),
+      );
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
           child: Stack(
             children: [
               Cue(
-                controller: timeline,
+                controller: controller,
                 acts: [TranslateAct.fromGlobalRect(Rect.fromLTWH(100, 100, 200, 200))],
                 child: SizedBox(width: 50, height: 50),
               ),
@@ -292,7 +304,10 @@ void main() {
 
     testWidgets('fromGlobal with globalKey applies translation', (tester) async {
       final targetKey = GlobalKey();
-      final timeline = CueTimelineImpl.fromMotion(CueMotion.linear(Duration(milliseconds: 300)));
+      final controller = CueController(
+        vsync: tester,
+        motion: CueMotion.linear(Duration(milliseconds: 300)),
+      );
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
@@ -305,7 +320,7 @@ void main() {
                 child: SizedBox(width: 50, height: 50),
               ),
               Cue(
-                controller: timeline,
+                controller: controller,
                 acts: [TranslateAct.fromGlobalKey(targetKey)],
                 child: SizedBox(width: 50, height: 50),
               ),
@@ -319,16 +334,19 @@ void main() {
     });
 
     testWidgets('fromGlobal updates when offset changes', (tester) async {
-      final timeline = CueTimelineImpl.fromMotion(CueMotion.linear(Duration(milliseconds: 300)));
+      final controller = CueController(
+        vsync: tester,
+        motion: CueMotion.linear(Duration(milliseconds: 300)),
+      );
 
       // First render
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
           child: Cue(
-            controller: timeline,
+            controller: controller,
             acts: [TranslateAct.fromGlobal(offset: Offset(100, 100))],
-            child: Container(width: 50, height: 50),
+            child: SizedBox(width: 50, height: 50),
           ),
         ),
       );
@@ -340,7 +358,7 @@ void main() {
         Directionality(
           textDirection: TextDirection.ltr,
           child: Cue(
-            controller: timeline,
+            controller: controller,
             acts: [TranslateAct.fromGlobal(offset: Offset(200, 200))],
             child: SizedBox(width: 50, height: 50),
           ),
@@ -352,14 +370,17 @@ void main() {
     });
 
     testWidgets('fromGlobalRect updates when rect changes', (tester) async {
-      final timeline = CueTimelineImpl.fromMotion(CueMotion.linear(Duration(milliseconds: 300)));
+      final controller = CueController(
+        vsync: tester,
+        motion: CueMotion.linear(Duration(milliseconds: 300)),
+      );
 
       // First render
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
           child: Cue(
-            controller: timeline,
+            controller: controller,
             acts: [TranslateAct.fromGlobalRect(Rect.fromLTWH(100, 100, 200, 200))],
             child: SizedBox(width: 50, height: 50),
           ),
@@ -373,7 +394,7 @@ void main() {
         Directionality(
           textDirection: TextDirection.ltr,
           child: Cue(
-            controller: timeline,
+            controller: controller,
             acts: [TranslateAct.fromGlobalRect(Rect.fromLTWH(150, 150, 250, 250))],
             child: SizedBox(width: 50, height: 50),
           ),
@@ -386,7 +407,10 @@ void main() {
 
     testWidgets('fromGlobal with valid globalKey measures correctly', (tester) async {
       final targetKey = GlobalKey();
-      final timeline = CueTimelineImpl.fromMotion(CueMotion.linear(Duration(milliseconds: 300)));
+      final controller = CueController(
+        vsync: tester,
+        motion: CueMotion.linear(Duration(milliseconds: 300)),
+      );
 
       await tester.pumpWidget(
         Directionality(
@@ -400,7 +424,7 @@ void main() {
                 child: SizedBox(width: 50, height: 50),
               ),
               Cue(
-                controller: timeline,
+                controller: controller,
                 acts: [TranslateAct.fromGlobalKey(targetKey)],
                 child: SizedBox(width: 50, height: 50),
               ),

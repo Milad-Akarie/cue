@@ -1,7 +1,5 @@
 import 'package:cue/cue.dart';
-import 'package:example/examples/delete_confirmation.dart';
-import 'package:example/examples/slack_style_fab.dart';
-import 'package:example/examples/smooth_toggle.dart';
+import 'package:example/examples/draggable_panel.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -15,18 +13,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Multi track animation demo',
+      title: 'Wallet App',
       darkTheme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFF6C63FF),
           brightness: Brightness.dark,
         ),
       ),
-      // themeMode: .dark,
-      theme: ThemeData(
-        splashFactory: NoSplash.splashFactory,
-        colorScheme: .fromSeed(seedColor: const Color(0xFF6C63FF)),
-      ),
+      themeMode: ThemeMode.dark,
       home: const DemoPage(),
       builder: (context, child) {
         if (kDebugMode) {
@@ -37,39 +31,19 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-class DemoPage extends StatefulWidget {
+ class DemoPage extends StatefulWidget {
   const DemoPage({super.key});
 
   @override
   State<DemoPage> createState() => _DemoPageState();
 }
 
-class _DemoPageState extends State<DemoPage> with TickerProviderStateMixin {
-  // late final _controller = CueController(vsync: this, motion: .curved(400.ms , curve:  Curves.easeInOut));
-
-  final _dragExtent = 250.0;
-  bool _isDraggedDown = false;
-
+class _DemoPageState extends State<DemoPage> {
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Multi-track animation'),
-      ),
-      body: SizedBox.expand(
-        child: Padding(
-          padding: const EdgeInsets.all(32.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-               
-            ],
-          ),
-        ),
-      ),
+    return  Scaffold(
+      appBar: AppBar(title: const Text('Demo')),
+      body: DraggablePanel(),
     );
   }
 }

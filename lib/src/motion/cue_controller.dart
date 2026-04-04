@@ -59,7 +59,6 @@ class CueController extends AnimationController {
     TweenBuilder<T>? tweenBuilder,
   }) {
     final mainConfig = timeline.mainTrack.config;
-
     final context = TweenActBase.resolveMotion(
       ActContext(
         motion: motion ?? mainConfig.motion,

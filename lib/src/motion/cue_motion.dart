@@ -18,15 +18,16 @@ abstract class CueMotion {
     false => build(SimulationBuildData.reverse(phase: phase ?? totalPhases - 1)),
   };
 
-
   CueMotion delayed(Duration delay) => DelayedMotion(this, delay);
 
-  const factory CueMotion.curved(
-    Duration duration, {
-    required Curve curve,
-  }) = TimedMotion.curved;
-
+  const factory CueMotion.curved(Duration duration, {required Curve curve}) = TimedMotion.curved;
   const factory CueMotion.linear(Duration duration) = TimedMotion;
+  const factory CueMotion.easeIn(Duration duration) = TimedMotion.easeIn;
+  const factory CueMotion.easeOut(Duration duration) = TimedMotion.easeOut;
+  const factory CueMotion.easeInOut(Duration duration) = TimedMotion.easeInOut;
+  const factory CueMotion.easeOutBack(Duration duration) = TimedMotion.easeOutBack;
+  const factory CueMotion.easeInBack(Duration duration) = TimedMotion.easeInBack;
+  const factory CueMotion.fastOutSlowIn(Duration duration) = TimedMotion.fastOutSlowIn;
 
   static const none = TimedMotion(Duration.zero);
 
@@ -109,7 +110,7 @@ abstract class CueMotion {
     bool snapToEnd,
   }) = Spring.effect;
 
-   const factory CueMotion.effectSlow({
+  const factory CueMotion.effectSlow({
     double mass,
     double stiffness,
     double dampingRatio,
@@ -130,7 +131,12 @@ class TimedMotion extends CueMotion {
   final Curve? curve;
   const TimedMotion(this.baseDuration) : curve = null;
   const TimedMotion.curved(this.baseDuration, {required Curve this.curve});
-
+  const TimedMotion.easeIn(this.baseDuration) : curve = Curves.easeIn;
+  const TimedMotion.easeOut(this.baseDuration) : curve = Curves.easeOut;
+  const TimedMotion.easeInOut(this.baseDuration) : curve = Curves.easeInOut;
+  const TimedMotion.easeOutBack(this.baseDuration) : curve = Curves.easeOutBack;
+  const TimedMotion.easeInBack(this.baseDuration) : curve = Curves.easeInBack;
+  const TimedMotion.fastOutSlowIn(this.baseDuration) : curve = Curves.fastOutSlowIn;
   @override
   final Duration baseDuration;
 
@@ -154,7 +160,6 @@ class TimedMotion extends CueMotion {
       to: data.endValue,
     );
   }
-
 }
 
 abstract class SimulationMotion<S extends CueSimulation> extends CueMotion {
@@ -227,7 +232,6 @@ class DelayedMotion extends CueMotion {
 
   @override
   int get hashCode => Object.hash(base, delay);
-
 }
 
 class SimulationBuildData {

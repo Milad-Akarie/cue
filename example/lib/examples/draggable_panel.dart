@@ -43,7 +43,10 @@ class _DraggablePanelState extends State<DraggablePanel> {
                 children: [
                   Expanded(
                     child: Actor(
-                      acts: [.scale(from: 1.1), .slideY(from: .3)],
+                      acts: [
+                        .scale(from: 1.1),
+                        .slideY(from: .3),
+                      ],
                       child: Card(
                         child: Padding(
                           padding: const EdgeInsets.all(16.0),
@@ -54,7 +57,10 @@ class _DraggablePanelState extends State<DraggablePanel> {
                   ),
                   Expanded(
                     child: Actor(
-                      acts: [.scale(from: 1.1), .slideY(from: .3)],
+                      acts: [
+                        .scale(from: 1.1),
+                        .slideY(from: .3),
+                      ],
                       child: Card(
                         child: Padding(
                           padding: const EdgeInsets.all(16.0),
@@ -106,7 +112,6 @@ class _DraggablePanelState extends State<DraggablePanel> {
                               crossAxisAlignment: .start,
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                // title
                                 Text(
                                   'Cute Cow',
                                   style: theme.textTheme.headlineMedium!.copyWith(

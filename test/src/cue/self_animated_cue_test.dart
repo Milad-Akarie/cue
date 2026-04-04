@@ -29,7 +29,7 @@ void main() {
         );
 
         final state = tester.state<OnMountCueState>(find.byType(OnMountCue));
-        expect(state.controller, same(state.controller.timeline));
+        expect(state.controller.timeline, isA<CueTimeline>());
       });
 
       testWidgets('dispose cleans up controller', (tester) async {

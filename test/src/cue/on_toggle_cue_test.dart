@@ -18,7 +18,7 @@ void main() {
         ),
       );
 
-      final state = tester.state(find.byType(OnToggleCue)) as dynamic;
+      final state = tester.state(find.byType(OnToggleCue)) as SelfAnimatedCueState;
       expect(state.controller.value, equals(1.0));
     });
 
@@ -33,7 +33,7 @@ void main() {
         ),
       );
 
-      final state = tester.state(find.byType(OnToggleCue)) as dynamic;
+      final state = tester.state(find.byType(OnToggleCue)) as SelfAnimatedCueState;
       expect(state.controller.value, equals(0.0));
     });
 
@@ -64,8 +64,8 @@ void main() {
           ),
         ),
       );
-
-      final state = tester.state(find.byType(OnToggleCue)) as dynamic;
+      final state = tester.state(find.byType(OnToggleCue)) as SelfAnimatedCueState;
+     print(state.controller.status);
       expect(state.controller.status, equals(AnimationStatus.reverse));
     });
 

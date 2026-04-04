@@ -226,7 +226,9 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
     final cycleDone = tracks.values.every((entry) => entry.track.isDone);
     if (!cycleDone) return false;
 
+
     final config = _repeatConfig;
+
     if (config == null) return true;
 
     if (config.count != null) {
@@ -276,6 +278,7 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
 
 abstract class CueTimeline extends Simulation with EventNotifier<TimelineEvent> {
   void prepare({required bool forward, double? from, double? target, double? velocity});
+
   void prepareForRepeat(RepeatConfig config);
 
   void willAnimate({required bool forward});
