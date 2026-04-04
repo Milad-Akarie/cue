@@ -1,3 +1,5 @@
+import 'package:cue/src/timeline/track/track.dart';
+import 'package:cue/src/timeline/track/track_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:cue/cue.dart';
@@ -293,11 +295,13 @@ void main() {
 
       expect(
         () => act.buildTweens(context),
-        throwsA(isA<StateError>().having(
-          (error) => error.message,
-          'message',
-          contains('DeferredTweenAct does not build a tween directly'),
-        )),
+        throwsA(
+          isA<StateError>().having(
+            (error) => error.message,
+            'message',
+            contains('DeferredTweenAct does not build a tween directly'),
+          ),
+        ),
       );
     });
 
@@ -308,13 +312,48 @@ void main() {
       // If this fails, an AssertionError is thrown with the message on line 16
 
       final testAct = _TestDeferredTweenAct();
-      final wrongAnimation = AlwaysStoppedAnimation<double>(0.5)
-          as Animation<Object?>;
+      final wrongAnimation = AlwaysStoppedAnimation<double>(0.5) as Animation<Object?>;
 
       // We can't easily test this without a real BuildContext, so we verify
       // that the code path exists by checking the act is properly constructed
       expect(testAct.key, equals(const ActKey('Test')));
       expect(wrongAnimation, isA<Animation>());
+    });
+
+    testWidgets('DeferredTweenAct.build throws with non-DeferredCueAnimation', (tester) async {
+      final act = _TestDeferredTweenAct();
+      final motion = CueMotion.linear(100.ms);
+      final controller = CueController(
+        vsync: TestVSync(),
+        motion: motion,
+      );
+
+      addTearDown(controller.dispose);
+
+      // This should throw an AssertionError because we're passing a regular
+      // CueAnimation<Offset> instead of a DeferredCueAnimation<double>
+      await tester.pumpWidget(
+        Builder(
+          builder: (context) {
+            final animation = controller.tweenTrack<Offset>(
+              from: Offset.zero,
+              to: const Offset(100, 100),
+            );
+            // The following line should trigger the assertion in DeferredTweenAct.build
+            // because animation is CueAnimation<Offset>, not DeferredCueAnimation<double>
+            act.build(context, animation as Animation<Object?>, const SizedBox());
+            return const SizedBox();
+          },
+        ),
+      );
+
+      // Verify that the expected error was caught by the framework
+      final exception = tester.takeException();
+      expect(exception, isA<AssertionError>());
+      expect(
+        exception.toString(),
+        contains('Expected animation of type DeferredCueAnimation<double>'),
+      );
     });
   });
 }
