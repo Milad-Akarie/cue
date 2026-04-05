@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:cue/src/core/phase.dart';
+import 'package:cue/src/core/keyframes.dart';
 import 'package:cue/src/motion/cue_motion.dart';
 
 void main() {

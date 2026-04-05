@@ -2,7 +2,7 @@ export 'src/widgets/cue_model_transition.dart';
 export 'src/cue/cue.dart'
     show Cue, CueScope, CuePageController, CueTabController, CueIndexController, IndexedCueController, SelfAnimatedCue;
 export 'src/motion/animations.dart';
-export 'src/core/phase.dart';
+export 'src/core/keyframes.dart';
 export 'src/cue/cue_debug_provider.dart';
 export 'src/motion/spring_motion.dart';
 export 'src/acts/base/act.dart' hide PathClipAct, AxisClipAct;

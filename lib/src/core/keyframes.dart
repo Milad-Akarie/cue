@@ -2,13 +2,33 @@ import 'package:cue/cue.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+/// Base class for keyframe types.
+///
+/// Keyframes represent target values at specific points in an animation.
+/// Concrete implementations define how timing is specified:
+/// - [Keyframe]: Uses explicit [CueMotion] objects
+/// - [FractionalKeyframe]: Uses normalized positions (0-1) within a duration
 abstract class KeyframeBase<T extends Object?> {
+  /// The target value at this keyframe.
   final T value;
   const KeyframeBase._(this.value);
 }
 
+/// A keyframe positioned at a fractional point (0-1) within a duration.
+///
+/// The [at] value represents the normalized position within the total duration.
+/// Duration can be provided inline or inherited from parent/default motion.
+/// For spring-based motions, the pre-calculated settle duration is used.
+///
+/// Use the [FractionalKeyframe.key] shorthand constructor for more readable syntax:
+/// ```dart
+/// .key(100.0, at: 0.5, curve: Curves.easeOut)
+/// ```
 class FractionalKeyframe<T> extends KeyframeBase<T> {
+  /// The normalized position (0-1) of this keyframe within the duration.
   final double at;
+  
+  /// Optional curve to apply during motion towards this keyframe.
   final Curve? curve;
 
   const FractionalKeyframe(super.value, {required this.at, this.curve})
@@ -45,7 +65,17 @@ class FractionalKeyframe<T> extends KeyframeBase<T> {
   }
 }
 
+/// A keyframe with explicit motion timing.
+///
+/// The [motion] defines how long the animation takes to reach this keyframe
+/// from the previous one. Motion is extracted and applied sequentially.
+///
+/// Use the [Keyframe.key] shorthand constructor for more readable syntax:
+/// ```dart
+/// .key(100.0, motion: Spring.smooth())
+/// ```
 class Keyframe<T> extends KeyframeBase<T> {
+  /// The motion describing how to animate towards this keyframe.
   final CueMotion motion;
 
   const Keyframe(super.value, {required this.motion}) : super._();
@@ -73,9 +103,37 @@ class Keyframe<T> extends KeyframeBase<T> {
   }
 }
 
+/// Base abstraction for keyframe sequences.
+///
+/// Provides two variants for specifying keyframe sequences:
+/// - [Keyframes()]: Uses explicit [CueMotion] objects between frames
+/// - [Keyframes.fractional()]: Uses normalized positions with a total duration
+///
+/// Both variants can be reversed and mapped to transform values.
+///
+/// Build readable keyframe sequences using the `.key()` shorthand constructors:
+/// ```dart
+/// // Motion-based keyframes
+/// Keyframes([
+///   .key(100.0, motion: Spring.smooth()),
+///   .key(200.0, motion: Spring.bouncy()),
+/// ])
+///
+/// // Fractional keyframes
+/// Keyframes.fractional([
+///   .key(100.0, at: 0.0),
+///   .key(200.0, at: 0.5),
+///   .key(150.0, at: 1.0),
+/// ], duration: Duration(seconds: 1))
+/// ```
 sealed class Keyframes<T> {
+  /// Creates a keyframe sequence with explicit motion timing.
   const factory Keyframes(List<Keyframe<T>> frames) = MotionKeyframes<T>;
 
+  /// Creates a keyframe sequence with fractional positioning.
+  ///
+  /// The [duration] can be provided inline or inherited from parent/default motion.
+  /// For spring-based default motions, the pre-calculated settle duration is used.
   const factory Keyframes.fractional(
     List<FractionalKeyframe<T>> frames, {
     Duration? duration,
@@ -90,7 +148,12 @@ sealed class Keyframes<T> {
   Keyframes<T> get reversed;
 }
 
+/// Keyframe sequence with explicit motion timing between frames.
+///
+/// Each frame specifies its own [CueMotion] to determine animation timing
+/// from the previous frame. Motions are extracted and applied sequentially.
 final class MotionKeyframes<T> implements Keyframes<T> {
+  /// The ordered list of keyframes with explicit motion.
   final List<Keyframe<T>> frames;
   const MotionKeyframes(this.frames);
 
@@ -141,8 +204,17 @@ final class MotionKeyframes<T> implements Keyframes<T> {
   }
 }
 
+/// Keyframe sequence positioned at fractional points within a duration.
+///
+/// Frames are positioned using normalized values (0-1). The total [duration]
+/// can be provided inline or inherited. Motion is calculated based on
+/// fractional positions within the duration.
 final class FractionalKeyframes<T> implements Keyframes<T> {
+  /// The ordered list of keyframes with fractional positioning.
   final List<FractionalKeyframe<T>> frames;
+  
+  /// Optional total duration for the entire sequence.
+  /// If null, duration is inherited from parent or default motion.
   final Duration? duration;
   const FractionalKeyframes(this.frames, {this.duration});
 
@@ -181,6 +253,14 @@ final class FractionalKeyframes<T> implements Keyframes<T> {
     return frames.last.value;
   }
 
+  /// Extracts motion durations based on fractional keyframe positions.
+  ///
+  /// Calculates the motion between consecutive keyframes based on their
+  /// normalized positions and the total [duration]. Curve is preserved
+  /// from each keyframe.
+  ///
+  /// [includeFirst]: If true, includes motion to the first keyframe.
+  /// [duration]: The total duration to distribute across keyframes.
   List<CueMotion> extractMotion({bool includeFirst = false, required Duration duration}) {
     // Remove duplicates (keep last) and track curves
     final Map<double, Curve?> frameCurves = {};
@@ -236,8 +316,15 @@ final class FractionalKeyframes<T> implements Keyframes<T> {
   }
 }
 
+/// Represents a single animation segment (tween) from [begin] to [end] value.
+///
+/// Phases are resolved from keyframe sequences and converted to actual
+/// tween implementations later in the animation pipeline.
 class Phase<T extends Object?> {
+  /// The starting value for this animation segment.
   final T begin;
+  
+  /// The ending value for this animation segment.
   final T end;
 
   const Phase({
@@ -255,6 +342,14 @@ class Phase<T extends Object?> {
 
   bool get isAlwaysStopped => begin == end;
 
+  /// Resolves fractional keyframes into animation phases.
+  ///
+  /// Converts [FractionalKeyframe]s into [Phase] segments with optional
+  /// starting value [from]. Handles deduplication and sorting by position.
+  /// [transform] converts each keyframe value to the target type.
+  ///
+  /// [forReverse]: If true, the starting value is appended at the end
+  /// instead of prepended, for reversed animations.
   static List<Phase<R>> resolveFractionalFrames<T extends Object?, R extends Object?>(
     List<FractionalKeyframe<T>> frames, {
     T? from,
@@ -329,6 +424,14 @@ class Phase<T extends Object?> {
     return phases;
   }
 
+  /// Resolves motion keyframes into animation phases.
+  ///
+  /// Converts [Keyframe]s into [Phase] segments with optional
+  /// starting value [from]. [transform] converts each keyframe value
+  /// to the target type.
+  ///
+  /// [forReverse]: If true, the starting value is appended at the end
+  /// instead of prepended, for reversed animations.
   static List<Phase<R>> resolveMotionFrames<T extends Object?, R extends Object?>(
     List<Keyframe<T>> frames, {
     T? from,
