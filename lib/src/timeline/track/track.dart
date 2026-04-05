@@ -4,7 +4,18 @@ import 'package:cue/src/motion/cue_simulation.dart';
 import 'package:cue/src/timeline/track/track_config.dart';
 import 'package:flutter/material.dart';
 
+/// A single animation track that manages forward and reverse animations.
+///
+/// Tracks are the building blocks of timelines. Each track:
+/// - Drives a specific animation with forward and reverse motions
+/// - Maintains progress (0-1) and computed animation values
+/// - Respects the track's [ReverseBehaviorType] configuration
+/// - Can be prepared for animation or have progress set directly
+///
+/// Tracks are typically managed by a [CueTimeline] which coordinates
+/// multiple tracks with different timings into a unified animation.
 class CueTrackImpl extends CueTrack with AnimationLocalStatusListenersMixin {
+  /// The configuration defining forward and reverse animation timing.
   @override
   final TrackConfig config;
 
@@ -23,9 +34,11 @@ class CueTrackImpl extends CueTrack with AnimationLocalStatusListenersMixin {
   late final CueSimulation _seekableSim = config.motion.buildBase();
   late final CueSimulation _seekableReverseSim = config.reverseMotion.buildBase(forward: false);
 
+  /// Duration of the forward animation in seconds.
   @override
   double get forwardDuration => _seekableSim.duration;
 
+  /// Duration of the reverse animation in seconds.
   @override
   double get reverseDuration => _seekableReverseSim.duration;
 
@@ -39,9 +52,14 @@ class CueTrackImpl extends CueTrack with AnimationLocalStatusListenersMixin {
 
   CueTrackImpl(this.config);
 
+  /// The current computed animation value.
+  ///
+  /// Reflects all motion curves and phases. For spring-based motions this
+  /// may momentarily exceed 0-1 due to overshoot. Always 0-1 for curve-based motions.
   @override
   double get value => _value;
 
+  /// Current animation status (forward, reverse, completed, dismissed).
   @override
   AnimationStatus get status => _status;
 
@@ -53,6 +71,16 @@ class CueTrackImpl extends CueTrack with AnimationLocalStatusListenersMixin {
     return sim.valueAtProgress(progress, forceLinear: forceLinear);
   }
 
+  /// Sets animation progress directly to a normalized value (0-1).
+  ///
+  /// Immediately updates the animation value without time-based stepping.
+  /// Useful for seeking or scrubbing. Marks the track as needing [prepare]
+  /// before the next [tick] call.
+  ///
+  /// [t] - Progress value (0-1)
+  /// [forward] - Whether to use forward or reverse motion
+  /// [alwaysNotify] - Force notifying listeners even if value didn't change
+  /// [forceLinear] - Ignore curves/springs and use linear interpolation
   @override
   void setProgress(double t, {bool forward = true, bool alwaysNotify = false , bool forceLinear = false}) {
     assert(t >= 0.0 && t <= 1.0, 'Progress value must be between 0.0 and 1.0. Received: $t');
@@ -80,6 +108,20 @@ class CueTrackImpl extends CueTrack with AnimationLocalStatusListenersMixin {
     _upateStatus();
   }
 
+  /// Prepares the track for animation playback.
+  ///
+  /// Must be called before [tick]. Sets up the internal simulation with
+  /// start/end values resolved from current progress and [reverseType].
+  ///
+  /// Respects reverse behavior:
+  /// - `exclusive`: Track is dismissed immediately on forward — only drives reverse
+  /// - `none`: Track is dismissed immediately on reverse — only drives forward
+  /// - `mirror` (default): Drives both directions
+  ///
+  /// [forward] - Direction to animate
+  /// [from] - Starting progress override (default: current progress)
+  /// [target] - Target progress override (default: 1.0 forward, 0.0 reverse)
+  /// [exteranlVelocity] - Initial velocity for spring handoff/momentum
   @override
   void prepare({required bool forward, double? from, double? target, double? exteranlVelocity}) {
     _needsPrepare = false;
@@ -155,6 +197,11 @@ class CueTrackImpl extends CueTrack with AnimationLocalStatusListenersMixin {
     }
   }
 
+  /// Advances animation by a time delta (in seconds).
+  ///
+  /// Called repeatedly by the timeline each frame. Updates progress, value,
+  /// phase, and status. Once animation completes, further ticks are no-ops.
+  /// [prepare] must be called before ticking after a [setProgress] call.
   @override
   void tick(double td) {
     assert(!_needsPrepare || _done, 'Tick() is called before prepare().');
@@ -183,15 +230,18 @@ class CueTrackImpl extends CueTrack with AnimationLocalStatusListenersMixin {
     }
   }
 
+  /// Whether animation has finished naturally or reached its boundary progress.
   @override
   bool get isDone => _done;
 
+  /// Current animation velocity (rate of change of value).
   @override
   double get velocity {
     if (_activeSim == null) return 0.0;
     return _activeSim!.dx(_localT);
   }
 
+  /// Current animation phase index (for multi-phase motions).
   @override
   int get phase => _phase;
 
@@ -205,31 +255,46 @@ class CueTrackImpl extends CueTrack with AnimationLocalStatusListenersMixin {
 }
 
 abstract class CueTrack extends Animation<double> with AnimationLocalListenersMixin {
+  /// Prepares the track for animation playback.
+  /// Must be called before [tick] when resuming from a [setProgress] call.
   void prepare({required bool forward, double? from, double? target, double? exteranlVelocity});
 
+  /// Track configuration with forward and reverse motion.
   TrackConfig get config;
 
+  /// Reverse behavior type from config.
   ReverseBehaviorType get reverseType => config.reverseType;
 
+  /// Forward motion from config.
   CueMotion get motion => config.motion;
 
+  /// Reverse motion from config.
   CueMotion get reverseMotion => config.reverseMotion;
 
+  /// Duration of forward animation (in seconds).
   double get forwardDuration;
 
+  /// Duration of reverse animation (in seconds).
   double get reverseDuration;
 
+  /// Advance animation by time delta (in seconds).
   void tick(double td);
 
+  /// Set animation progress directly (0-1, normalized).
   void setProgress(double t, {bool forward = true, bool alwaysNotify = false, bool forceLinear = false});
 
+  /// Whether animation has finished.
   bool get isDone;
 
+  /// Current animation velocity (rate of change).
   double get velocity;
 
+  /// Current progress (0-1, normalized).
   double get progress;
 
+  /// Current phase index for multi-phase motions.
   int get phase;
 
+  /// Whether track is in reverse or dismissed state.
   bool get isReverseOrDismissed => status == .reverse || status == .dismissed;
 }
