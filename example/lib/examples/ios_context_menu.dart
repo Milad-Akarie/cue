@@ -52,7 +52,6 @@ class IosContextMenu extends StatelessWidget {
             return Padding(
               padding: EdgeInsets.only(
                 top: kToolbarHeight + MediaQuery.viewPaddingOf(context).top,
-                bottom: 68,
               ),
               child: ClipRect(
                 child: Column(
@@ -60,6 +59,7 @@ class IosContextMenu extends StatelessWidget {
                   mainAxisAlignment: isInTopHalf ? .end : .start,
                   crossAxisAlignment: .start,
                   children: [
+                    SizedBox(height: 40),
                     SizedBox(
                       width: 300,
                       child: Actor(

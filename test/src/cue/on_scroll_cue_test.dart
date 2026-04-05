@@ -208,7 +208,6 @@ void main() {
 
       // Now remove the scroll cue widget - should not crash if
       // scroll callbacks fire after removal
-      final state = tester.state(find.byType(StatefulBuilder)) as State;
       // Navigate away or remove the widget to unmount it
       await tester.pumpWidget(
         MaterialApp(

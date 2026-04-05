@@ -18,6 +18,7 @@ abstract class CueMotion {
     false => build(SimulationBuildData.reverse(phase: phase ?? totalPhases - 1)),
   };
 
+  @internal
   CueMotion delayed(Duration delay) => DelayedMotion(this, delay);
 
   const factory CueMotion.linear(Duration duration) = TimedMotion;

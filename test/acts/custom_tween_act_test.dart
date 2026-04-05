@@ -445,7 +445,7 @@ void main() {
 
   group('CustomTweenAct equality', () {
     test('two instances with same parameters are equal', () {
-      final builder = (BuildContext context, CueAnimation<double> animation) => const SizedBox();
+      SizedBox builder(BuildContext context, CueAnimation<double> animation) => const SizedBox();
       
       final act1 = CustomTweenAct<double>(
         from: 0.0,
@@ -510,7 +510,7 @@ void main() {
     });
 
     test('instances with different from values are not equal', () {
-      final builder = (BuildContext context, CueAnimation<double> animation) => const SizedBox();
+      SizedBox builder(BuildContext context, CueAnimation<double> animation) => const SizedBox();
       
       final act1 = CustomTweenAct<double>(
         from: 0.0,
@@ -528,7 +528,7 @@ void main() {
     });
 
     test('instances with different to values are not equal', () {
-      final builder = (BuildContext context, CueAnimation<double> animation) => const SizedBox();
+      SizedBox builder(BuildContext context, CueAnimation<double> animation) => const SizedBox();
       
       final act1 = CustomTweenAct<double>(
         from: 0.0,
@@ -562,7 +562,7 @@ void main() {
     });
 
     test('hashCode is equal for equal instances', () {
-      final builder = (BuildContext context, CueAnimation<double> animation) => const SizedBox();
+      SizedBox builder(BuildContext context, CueAnimation<double> animation) => const SizedBox();
       
       final act1 = CustomTweenAct<double>(
         from: 0.0,

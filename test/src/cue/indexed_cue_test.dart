@@ -640,7 +640,6 @@ void main() {
     });
 
     testWidgets('jumpToPage updates destination', (tester) async {
-      final pageController = PageController(initialPage: 0);
       late CuePageController controller;
 
       await tester.pumpWidget(
@@ -697,9 +696,11 @@ void main() {
         wasAnimating = controller.isAnimating;
       });
 
+
       expect(controller.isAnimating, isTrue);
       await tester.pumpAndSettle();
       expect(controller.isAnimating, isFalse);
+      expect(wasAnimating, isFalse);
     });
 
     testWidgets('globalOffset with no clients returns initialPage', (tester) async {

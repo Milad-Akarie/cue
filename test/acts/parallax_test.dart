@@ -681,8 +681,6 @@ void main() {
         track.setProgress(0.5);
         final animation = createDeferredAnimation(track, actContext);
 
-        int tapCount = 0;
-
         await tester.pumpWidget(
           Directionality(
             textDirection: TextDirection.ltr,
@@ -694,12 +692,7 @@ void main() {
                   return act.apply(
                     context,
                     animation,
-                    GestureDetector(
-                      onTap: () {
-                        tapCount++;
-                      },
-                      child: const SizedBox(width: 300, height: 200),
-                    ),
+                    const SizedBox(width: 300, height: 200),
                   );
                 },
               ),
