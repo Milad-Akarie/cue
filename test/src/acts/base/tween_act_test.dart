@@ -30,7 +30,7 @@ void main() {
       final frames = MotionKeyframes<int>([
         Keyframe(1, motion: m1),
         Keyframe(2, motion: m2),
-      ]);
+      ], motion: CueMotion.none);
 
       final context = ActContext(motion: defaultMotion, reverseMotion: reverseMotion);
       final reverse = ReverseBehavior<int>.mirror();
@@ -54,7 +54,7 @@ void main() {
       final frames = MotionKeyframes<int>([
         Keyframe(1, motion: m1),
         Keyframe(2, motion: m2),
-      ]);
+      ], motion: CueMotion.none);
 
       final context = ActContext(motion: defaultMotion, reverseMotion: reverseMotion);
       final reverse = ReverseBehavior<int>.mirror();
@@ -74,8 +74,8 @@ void main() {
 
     test('with FractionalKeyframes and duration', () {
       final frames = FractionalKeyframes<int>([
-        FractionalKeyframe(1, at: 0.0),
-        FractionalKeyframe(2, at: 1.0),
+        FKeyframe(1, at: 0.0),
+        FKeyframe(2, at: 1.0),
       ], duration: const Duration(milliseconds: 500));
 
       final context = ActContext(motion: defaultMotion, reverseMotion: reverseMotion);
@@ -95,8 +95,8 @@ void main() {
 
     test('with FractionalKeyframes no duration uses context motion baseDuration', () {
       final frames = FractionalKeyframes<int>([
-        FractionalKeyframe(1, at: 0.0),
-        FractionalKeyframe(2, at: 1.0),
+        FKeyframe(1, at: 0.0),
+        FKeyframe(2, at: 1.0),
       ], duration: null);
 
       final context = ActContext(motion: defaultMotion, reverseMotion: reverseMotion);
@@ -120,7 +120,7 @@ void main() {
       final frames = MotionKeyframes<int>([
         Keyframe(1, motion: m1),
         Keyframe(2, motion: m2),
-      ]);
+      ], motion: CueMotion.none);
 
       final context = ActContext(motion: defaultMotion, reverseMotion: reverseMotion);
       final reverse = ReverseBehavior<int>.mirror(motion: CueMotion.linear(const Duration(milliseconds: 150)));
@@ -141,8 +141,8 @@ void main() {
 
     test('reverse frames with FractionalKeyframes', () {
       final frames = FractionalKeyframes<int>([
-        FractionalKeyframe(1, at: 0.0),
-        FractionalKeyframe(2, at: 1.0),
+        FKeyframe(1, at: 0.0),
+        FKeyframe(2, at: 1.0),
       ], duration: const Duration(milliseconds: 500));
 
       final context = ActContext(motion: defaultMotion, reverseMotion: reverseMotion);
@@ -294,7 +294,7 @@ void main() {
     });
 
     test('mapValues with frames', () {
-      final frames = FractionalKeyframes<int>([FractionalKeyframe(5, at: 0.5)]);
+      final frames = FractionalKeyframes<int>([FKeyframe(5, at: 0.5)]);
       final reverse = KFReverseBehavior<int>.to(frames);
       final mapped = reverse.mapValues<double>((v) => v.toDouble() * 2);
 
@@ -404,9 +404,9 @@ void main() {
 
     test('with MotionKeyframes returns SegmentedAnimtable', () {
       final frames = MotionKeyframes<int>([
-        Keyframe(10, motion: CueMotion.linear(const Duration(milliseconds: 100))),
-        Keyframe(20, motion: CueMotion.linear(const Duration(milliseconds: 100))),
-      ]);
+        Keyframe(10),
+        Keyframe(20),
+      ], motion: .linear(100.ms));
 
       final act = CueTweenBuildHelper<int>(
         from: 10,
@@ -425,9 +425,9 @@ void main() {
 
     test('with MotionKeyframes and forReverse=true passes flag to Phase resolver', () {
       final frames = MotionKeyframes<int>([
-        Keyframe(10, motion: CueMotion.linear(const Duration(milliseconds: 100))),
-        Keyframe(20, motion: CueMotion.linear(const Duration(milliseconds: 100))),
-      ]);
+        Keyframe(10),
+        Keyframe(20),
+      ], motion: .linear(100.ms));
 
       final act = CueTweenBuildHelper<int>(
         from: 10,
@@ -456,8 +456,8 @@ void main() {
 
     test('with FractionalKeyframes returns SegmentedAnimtable', () {
       final frames = FractionalKeyframes<int>([
-        FractionalKeyframe(10, at: 0.0),
-        FractionalKeyframe(20, at: 1.0),
+        FKeyframe(10, at: 0.0),
+        FKeyframe(20, at: 1.0),
       ], duration: const Duration(milliseconds: 500));
 
       final act = CueTweenBuildHelper<int>(
@@ -477,8 +477,8 @@ void main() {
 
     test('with FractionalKeyframes and forReverse=true', () {
       final frames = FractionalKeyframes<int>([
-        FractionalKeyframe(10, at: 0.0),
-        FractionalKeyframe(20, at: 1.0),
+        FKeyframe(10, at: 0.0),
+        FKeyframe(20, at: 1.0),
       ], duration: const Duration(milliseconds: 500));
 
       final act = CueTweenBuildHelper<int>(
@@ -504,7 +504,7 @@ void main() {
         tweenBuilder: (f, t) => Tween(begin: f, end: t),
       );
       final result = act.resolveTween(
-         context,
+        context,
         from: 10,
         to: 25,
         keyframes: null,
@@ -516,10 +516,10 @@ void main() {
 
     test('with multiple MotionKeyframes segments creates multiple segments', () {
       final frames = MotionKeyframes<int>([
-        Keyframe(10, motion: CueMotion.linear(const Duration(milliseconds: 100))),
-        Keyframe(20, motion: CueMotion.linear(const Duration(milliseconds: 100))),
-        Keyframe(30, motion: CueMotion.linear(const Duration(milliseconds: 100))),
-      ]);
+        Keyframe(10),
+        Keyframe(20),
+        Keyframe(30),
+      ], motion: .linear(100.ms));
 
       final act = CueTweenBuildHelper<int>(
         from: 10,
@@ -538,9 +538,9 @@ void main() {
 
     test('initialKeyframe is used correctly in Phase resolution', () {
       final frames = MotionKeyframes<int>([
-        Keyframe(10, motion: CueMotion.linear(const Duration(milliseconds: 100))),
-        Keyframe(20, motion: CueMotion.linear(const Duration(milliseconds: 100))),
-      ]);
+        Keyframe(10),
+        Keyframe(20),
+      ], motion: .linear(100.ms));
 
       final act = CueTweenBuildHelper<int>(
         from: 5,
@@ -594,15 +594,15 @@ void main() {
 
     test('with keyframed constructor uses FractionalKeyframes', () {
       final frames = FractionalKeyframes<int>([
-        FractionalKeyframe(10, at: 0.0),
-        FractionalKeyframe(20, at: 1.0),
+        FKeyframe(10, at: 0.0),
+        FKeyframe(20, at: 1.0),
       ]);
 
       final act = CueTweenBuildHelper<int>(
         frames: frames,
         tweenBuilder: (f, t) => Tween(begin: f, end: t),
       );
-      
+
       final result = act.resolveTween(
         context,
         from: null,

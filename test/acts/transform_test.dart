@@ -74,9 +74,9 @@ void main() {
     group('keyframed constructor', () {
       test('accepts frames', () {
         final frames = Keyframes<Matrix4>([
-          Keyframe(Matrix4.identity(), motion: CueMotion.linear(100.ms)),
-          Keyframe(Matrix4.translationValues(100, 0, 0), motion: CueMotion.linear(100.ms)),
-        ]);
+          Keyframe(Matrix4.identity()),
+          Keyframe(Matrix4.translationValues(100, 0, 0)),
+        ] , motion: CueMotion.linear(100.ms));
         final act = TransformAct.keyframed(frames: frames);
         expect(act.frames, frames);
       });
@@ -219,9 +219,9 @@ void main() {
     group('keyframed constructor', () {
       test('accepts frames', () {
         final frames = Keyframes<Skew>([
-          Keyframe(Skew.zero, motion: CueMotion.linear(100.ms)),
-          Keyframe(Skew(x: 0.1, y: 0), motion: CueMotion.linear(100.ms)),
-        ]);
+          Keyframe(Skew.zero),
+          Keyframe(Skew(x: 0.1, y: 0)),
+        ] , motion: CueMotion.linear(100.ms));
         final act = SkewAct.keyframed(frames: frames);
         expect(act.frames, frames);
       });

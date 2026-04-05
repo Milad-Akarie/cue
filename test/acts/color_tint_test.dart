@@ -68,9 +68,9 @@ void main() {
 
       test('keyframed constructor sets frames', () {
         final frames = FractionalKeyframes<Color?>([
-          FractionalKeyframe(Colors.red, at: 0.0),
-          FractionalKeyframe(Colors.green, at: 0.5),
-          FractionalKeyframe(Colors.blue, at: 1.0),
+          FKeyframe(Colors.red, at: 0.0),
+          FKeyframe(Colors.green, at: 0.5),
+          FKeyframe(Colors.blue, at: 1.0),
         ]);
         final act = ColorTintAct.keyframed(
           frames: frames,
@@ -82,8 +82,8 @@ void main() {
 
       test('keyframed constructor with reverse', () {
         final frames = FractionalKeyframes<Color?>([
-          FractionalKeyframe(Colors.red, at: 0.0),
-          FractionalKeyframe(Colors.blue, at: 1.0),
+          FKeyframe(Colors.red, at: 0.0),
+          FKeyframe(Colors.blue, at: 1.0),
         ]);
         const reverse = KFReverseBehavior<Color?>.mirror();
         final act = ColorTintAct.keyframed(frames: frames, reverse: reverse);

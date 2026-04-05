@@ -110,17 +110,17 @@ void main() {
     group('keyframed constructor', () {
       test('accepts frames', () {
         final frames = Keyframes<double>([
-          Keyframe(0, motion: CueMotion.linear(100.ms)),
-          Keyframe(90, motion: CueMotion.linear(100.ms)),
-        ]);
+          Keyframe(0),
+          Keyframe(90),
+        ], motion: CueMotion.linear(100.ms));
         final act = RotateLayoutAct.keyframed(frames: frames);
         expect(act.frames, frames);
       });
 
       test('default unit is radians for keyframed', () {
         final frames = Keyframes<double>([
-          Keyframe(0, motion: CueMotion.linear(100.ms)),
-        ]);
+          Keyframe(0),
+        ], motion: CueMotion.linear(100.ms));
         final act = RotateLayoutAct.keyframed(frames: frames);
         expect(act.unit, RotateUnit.radians);
       });

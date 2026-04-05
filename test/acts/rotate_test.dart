@@ -188,8 +188,8 @@ void main() {
 
       test('keyframed constructor sets frames', () {
         final frames = FractionalKeyframes<double>([
-          FractionalKeyframe(0.0, at: 0.0),
-          FractionalKeyframe(math.pi, at: 1.0),
+          FKeyframe(0.0, at: 0.0),
+          FKeyframe(math.pi, at: 1.0),
         ]);
         final act = RotateAct.keyframed(frames: frames);
         expect(act.frames, frames);
@@ -430,8 +430,8 @@ void main() {
 
       test('keyframed constructor sets frames', () {
         final frames = FractionalKeyframes<Rotation3D>([
-          FractionalKeyframe(Rotation3D.zero, at: 0.0),
-          FractionalKeyframe(const Rotation3D(y: 180), at: 1.0),
+          FKeyframe(Rotation3D.zero, at: 0.0),
+          FKeyframe(const Rotation3D(y: 180), at: 1.0),
         ]);
         final act = Rotate3DAct.keyframed(frames: frames);
         expect(act.frames, frames);

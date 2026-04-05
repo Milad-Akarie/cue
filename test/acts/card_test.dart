@@ -223,8 +223,8 @@ void main() {
 
     test('keyframed constructor', () {
       final frames = FractionalKeyframes<CardProps>([
-        FractionalKeyframe(const CardProps(elevation: 0), at: 0.0),
-        FractionalKeyframe(const CardProps(elevation: 8), at: 1.0),
+        FKeyframe(const CardProps(elevation: 0), at: 0.0),
+        FKeyframe(const CardProps(elevation: 8), at: 1.0),
       ]);
       final act = CardAct.keyframed(frames: frames);
       expect(act.frames, equals(frames));
@@ -232,8 +232,8 @@ void main() {
 
     test('keyframed constructor with delay', () {
       final frames = FractionalKeyframes<CardProps>([
-        FractionalKeyframe(const CardProps(elevation: 0), at: 0.0),
-        FractionalKeyframe(const CardProps(elevation: 8), at: 1.0),
+        FKeyframe(const CardProps(elevation: 0), at: 0.0),
+        FKeyframe(const CardProps(elevation: 8), at: 1.0),
       ]);
       const delay = Duration(milliseconds: 150);
       final act = CardAct.keyframed(frames: frames, delay: delay);
@@ -243,8 +243,8 @@ void main() {
 
     test('keyframed constructor with reverse', () {
       final frames = FractionalKeyframes<CardProps>([
-        FractionalKeyframe(const CardProps(elevation: 0), at: 0.0),
-        FractionalKeyframe(const CardProps(elevation: 8), at: 1.0),
+        FKeyframe(const CardProps(elevation: 0), at: 0.0),
+        FKeyframe(const CardProps(elevation: 8), at: 1.0),
       ]);
       const reverse = KFReverseBehavior<CardProps>.mirror();
       final act = CardAct.keyframed(frames: frames, reverse: reverse);
@@ -285,8 +285,8 @@ void main() {
 
     test('resolve with keyframed', () {
       final frames = FractionalKeyframes<CardProps>([
-        FractionalKeyframe(const CardProps(elevation: 0), at: 0.0),
-        FractionalKeyframe(const CardProps(elevation: 8), at: 1.0),
+        FKeyframe(const CardProps(elevation: 0), at: 0.0),
+        FKeyframe(const CardProps(elevation: 8), at: 1.0),
       ]);
       final act = CardAct.keyframed(frames: frames);
       

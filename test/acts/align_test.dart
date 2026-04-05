@@ -50,8 +50,8 @@ void main() {
 
     test('keyframed constructor', () {
       final frames = FractionalKeyframes<AlignmentGeometry>([
-        FractionalKeyframe(Alignment.topLeft, at: 0.0),
-        FractionalKeyframe(Alignment.bottomRight, at: 1.0),
+        FKeyframe(Alignment.topLeft, at: 0.0),
+        FKeyframe(Alignment.bottomRight, at: 1.0),
       ]);
       final act = AlignAct.keyframed(frames: frames);
       expect(act.frames, equals(frames));

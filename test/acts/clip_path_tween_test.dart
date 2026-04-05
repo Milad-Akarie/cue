@@ -185,9 +185,9 @@ void main() {
 
     test('TweenActor.keyframed creates valid instance', () {
       final frames = MotionKeyframes<double>([
-        Keyframe.key(0.0, motion: CueMotion.none),
-        Keyframe.key(1.0, motion: CueMotion.none),
-      ]);
+        Keyframe.key(0.0),
+        Keyframe.key(1.0),
+      ], motion: .none);
       final actor = TweenActor<double>.keyframed(
         frames: frames,
         builder: (context, animation) => Container(),

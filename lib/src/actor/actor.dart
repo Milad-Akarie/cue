@@ -1,15 +1,237 @@
 import 'package:cue/cue.dart';
+import 'package:cue/src/timeline/event_notifier.dart';
 import 'package:cue/src/timeline/track/track_config.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
+/// A widget that applies one or more animation [Act]s to its [child].
+///
+/// ## Overview
+///
+/// [Actor] is the core visual building block for Cue animations. It wraps a
+/// child widget with a list of [acts] — declarative descriptions of how the
+/// widget should look at different points in the animation.
+///
+/// **Actor is passive.** It does not trigger or control animations on its own.
+/// All animation progress is driven externally by the nearest ancestor [Cue]
+/// widget, which exposes a [CueScope] via [InheritedWidget]. Actor reads that
+/// scope and reacts to it. Without an ancestor [Cue], an Actor has no effect.
+///
+/// The typical pattern is:
+/// ```dart
+/// Cue.onToggle(
+///   toggled: isExpanded,
+///   motion: .smooth(),
+///   child: Actor(
+///     acts: [.fadeIn(), .slideUp()],
+///     child: MyWidget(),
+///   ),
+/// )
+/// ```
+///
+/// ## Motion
+///
+/// Motion controls the timing and easing of all acts within this Actor.
+/// The resolution order is:
+///
+/// 1. If an individual act specifies its own `motion`, that is used for that act including both forward and reverse motion unless specified.
+/// 2. Otherwise, the Actor's [motion] is used as the default for all acts.
+/// 3. If [motion] is null, the Actor inherits from the parent [Cue] widget. -> timeline.defaultConfig
+///
+/// **Reverse motion follows the same rule independently.**
+/// If [reverseMotion] is not provided, [motion] doubles as the reverse motion too.
+/// Reverse motion is NOT inherited from the parent [Cue] widget when [motion]
+/// is explicitly set — [motion] is used for both directions unless [reverseMotion]
+/// is explicitly specified.
+///
+/// ```dart
+/// // motion: CueMotion.smooth() applies to both forward and reverse
+/// Actor(
+///   motion: .smooth(),
+///   acts: [.fadeIn(), .slideUp()],
+///   child: MyWidget(),
+/// )
+///
+/// // Different timing for forward and reverse
+/// Actor(
+///   motion: .smooth(),
+///   reverseMotion: .linear(200.ms),
+///   acts: [.fadeIn(), .slideUp()],
+///   child: MyWidget(),
+/// )
+///
+/// // An individual act can override the Actor's motion
+/// Actor(
+///   motion: .smooth(),           // default for all acts
+///   acts: [
+///     .fadeIn(),                               // uses .smooth() for both directions
+///     .scale(to: 1.1, motion: .bouncy()),      // overrides with its own motion
+///   ],
+///   child: MyWidget(),
+/// )
+/// ```
+///
+/// ## Default `from` values
+///
+/// Most acts have sensible identity defaults for `from`, so you rarely need to
+/// specify it explicitly:
+/// - Transform acts (`.scale`, `.rotate`, `.translate`, etc.) default to identity (no transform)
+/// - `.opacity` defaults to `from: 1.0`; `.fadeIn()` defaults to `from: 0.0`
+/// - `.blur` defaults to `from: 0.0`
+///
+/// When no meaningful identity exists, `from` is required by the act's constructor.
+///
+/// ## Rules
+///
+/// **Only one Act of each type (key) may be used per Actor.** Using two Acts with
+/// the same key throws a [StateError] at runtime. Note that some seemingly
+/// different acts share a key — all slide variants (`.slide()`, `.slideX()`,
+/// `.slideY()`, `.slideUp()`, etc.) share the same key and **cannot be combined**:
+///
+/// ```dart
+/// // Not allowed — duplicate ScaleAct
+/// Actor(acts: [.scale(to: 1.2), .scale(to: 0.8)], child: widget)
+///
+/// // Not allowed — slideUp and slideY share the same key
+/// Actor(acts: [.slideUp(), .slideY(from: -0.5)], child: widget)
+/// ```
+///
+/// ## Shorthand factory constructors
+///
+/// Acts can be created via shorthand `Act.` factories or direct class constructors:
+///
+/// ```dart
+/// Actor(
+///   acts: [
+///     .scale(from: 0.8),  // to: 1.0 is default
+///     .fadeIn(),
+///     .slideUp(),
+///     .blur(from: 8),     // to: 0.0 is default
+///   ],
+///   child: MyWidget(),
+/// )
+/// ```
+///
+/// ## Keyframe animations
+///
+/// Acts support keyframed sequences via [Keyframes] or [Keyframes.fractional].
+/// Use the `.key()` shorthand constructor for a more readable syntax.
+/// Each key represents a **target value** to animate towards, not a starting point.
+///
+/// ```dart
+/// // Motion-based keyframes — motion is required at the Keyframes level;
+/// // per-frame motion is an optional override.
+/// Actor(
+///   acts: [
+///     TranslateAct.keyframed(
+///       frames: Keyframes([
+///         .key(Offset(100, 0)),                    // uses Keyframes-level motion
+///         .key(Offset.zero, motion: .bouncy()),    // per-frame override
+///       ], motion: .smooth()),
+///     ),
+///   ],
+///   child: MyWidget(),
+/// )
+/// ```
+///
+/// For acts with no implicit starting value (e.g. `SizedBoxAct`), the first key
+/// defines the initial value — it is not animated to; it is the starting point.
+/// Any motion on the first key is ignored:
+///
+/// ```dart
+/// Actor(
+///   acts: [
+///     SizedBoxAct.keyframed(
+///       frames: Keyframes([
+///         .key(Size(80, 80)),     // initial value, not animated to
+///         .key(Size(200, 80)),
+///         .key(Size(80, 80)),
+///       ], motion: .smooth()),
+///     ),
+///   ],
+///   child: MyWidget(),
+/// )
+/// ```
+///
+/// ```dart
+/// // Fractional keyframes — frames positioned at fractions of the total duration.
+/// // An optional curve can be set at the Keyframes level (applies to all frames)
+/// // or at the individual key level (overrides the Keyframes-level curve for that frame).
+/// Actor(
+///   acts: [
+///     TranslateAct.keyframed(
+///       frames: Keyframes.fractional([
+///         .key(Offset(100, 0), at: 0.5),
+///         .key(Offset.zero, at: 1.0, curve: Curves.easeOut),  // per-frame override
+///       ], curve: Curves.easeIn),  // default curve for all frames
+///     ),
+///   ],
+///   child: MyWidget(),
+/// )
+/// ```
+///
+/// ## Delays
+///
+/// [delay] and [reverseDelay] set a base time offset for this Actor. Any delay
+/// on an individual act is **added on top** of the Actor's delay:
+///
+/// ```dart
+/// // Actor delay: 100ms, act delay: 200ms → act plays after 300ms total
+/// Actor(
+///   delay: 100.ms,
+///   acts: [
+///     .fadeIn(delay: 200.ms),   // plays after 300ms
+///     .slideUp(),               // plays after 100ms (Actor delay only)
+///   ],
+///   child: Item(),
+/// )
+/// ```
+///
+/// ## Animation cache
+///
+/// Actor maintains an internal cache of built animations keyed by [ActKey].
+/// Animations are only rebuilt when the corresponding act or its configuration
+/// actually changes — if an act is identical to its previous value, the cached
+/// animation is reused. Acts removed from the list have their animations released
+/// immediately.
+///
+/// When `fromCurrentValue: true` is set on [Cue.onChange], Actor captures the
+/// current animated value of each act just before a re-animation begins and
+/// passes it as the implicit `from` to the new animation. This ensures smooth
+/// transitions when acts change mid-flight without a visible jump.
 class Actor extends StatefulWidget {
+  /// The list of animation acts to apply to [child].
+  ///
+  /// **Each Act type must appear at most once.** Duplicates of the same type
+  /// (e.g. two [ScaleAct]s) will throw a [StateError] at runtime.
   final List<Act> acts;
+
+  /// The widget to animate.
   final Widget child;
+
+  /// Optional motion override for all acts in this Actor.
+  /// When null, inherits the parent [Cue] widget's motion.
   final CueMotion? motion;
+
+  /// Optional motion override for the reverse pass.
+  /// When null, falls back to [motion], then to the parent's reverse motion.
   final CueMotion? reverseMotion;
+
+  /// Delay before the forward animation starts.
   final Duration delay;
+
+  /// Delay before the reverse animation starts.
   final Duration reverseDelay;
+
+  /// Wraps the animated widget in a [RepaintBoundary].
+  ///
+  /// Defaults to `false`. When multiple Actors animate within the same widget
+  /// subtree, it is more efficient to wrap the entire section in a single
+  /// [RepaintBoundary] at a higher level rather than adding one per Actor.
+  /// Adding too many repaint boundaries can backfire — each boundary introduces
+  /// its own compositing layer, which increases memory usage and layer traversal
+  /// overhead. Only set this to `true` for isolated, expensive widgets that
+  /// animate independently of their surroundings.
   final bool addRepaintBoundary;
 
   const Actor({
@@ -128,7 +350,7 @@ class ActorState extends State<Actor> {
     _animationSnapshots.clear();
   }
 
-  VoidCallback? _eventsDisposer;
+  EventDisposer? _eventsDisposer;
 
   @override
   void didChangeDependencies() {
@@ -183,6 +405,12 @@ class _CacheEntry {
   Object? get value => animation.value;
 }
 
+/// A convenience base class for widgets that wrap a single [Act] in an [Actor].
+///
+/// Provides the same interface as [Actor] but for a single act type,
+/// avoiding the need to manually construct an Actor with a one-item list.
+///
+/// Supports both tween-based and [Keyframes]-based construction.
 abstract class SingleActorBase<T> extends StatelessWidget {
   final Widget child;
   final ReverseBehavior<T> reverse;

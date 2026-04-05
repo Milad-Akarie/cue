@@ -48,9 +48,9 @@ void main() {
 
     test('translateX keyframed equality', () {
       final frames = MotionKeyframes<double>([
-        Keyframe.key(0.0, motion: CueMotion.none),
-        Keyframe.key(100.0, motion: CueMotion.none),
-      ]);
+        Keyframe.key(0.0),
+        Keyframe.key(100.0),
+      ] , motion: CueMotion.none);
       final a = TranslateAct.keyframedX(frames: frames);
       final b = TranslateAct.keyframedX(frames: frames);
       expect(a, equals(b));
@@ -58,9 +58,9 @@ void main() {
 
     test('translateY keyframed equality', () {
       final frames = MotionKeyframes<double>([
-        Keyframe.key(0.0, motion: CueMotion.none),
-        Keyframe.key(100.0, motion: CueMotion.none),
-      ]);
+        Keyframe.key(0.0),
+        Keyframe.key(100.0),
+      ] , motion: CueMotion.none);
       final a = TranslateAct.keyframedY(frames: frames);
       final b = TranslateAct.keyframedY(frames: frames);
       expect(a, equals(b));
@@ -98,11 +98,11 @@ void main() {
 
     test('translateX keyframed with different frames not equal', () {
       final framesA = MotionKeyframes<double>([
-        Keyframe.key(0.0, motion: CueMotion.none),
-      ]);
+        Keyframe.key(0.0),
+      ] , motion: CueMotion.none);
       final framesB = MotionKeyframes<double>([
-        Keyframe.key(100.0, motion: CueMotion.none),
-      ]);
+        Keyframe.key(100.0),
+      ] , motion: CueMotion.none);
       final a = TranslateAct.keyframedX(frames: framesA);
       final b = TranslateAct.keyframedX(frames: framesB);
       expect(a, isNot(equals(b)));
@@ -110,11 +110,11 @@ void main() {
 
     test('translateY keyframed with different frames not equal', () {
       final framesA = MotionKeyframes<double>([
-        Keyframe.key(0.0, motion: CueMotion.none),
-      ]);
+        Keyframe.key(0.0),
+      ] , motion: CueMotion.none);
       final framesB = MotionKeyframes<double>([
-        Keyframe.key(100.0, motion: CueMotion.none),
-      ]);
+        Keyframe.key(100.0),
+      ] , motion: CueMotion.none);
       final a = TranslateAct.keyframedY(frames: framesA);
       final b = TranslateAct.keyframedY(frames: framesB);
       expect(a, isNot(equals(b)));
@@ -122,8 +122,8 @@ void main() {
 
     test('translateX keyframed with different delay not equal', () {
       final frames = MotionKeyframes<double>([
-        Keyframe.key(0.0, motion: CueMotion.none),
-      ]);
+        Keyframe.key(0.0),
+      ] , motion: CueMotion.none);
       final a = TranslateAct.keyframedX(frames: frames, delay: Duration(milliseconds: 100));
       final b = TranslateAct.keyframedX(frames: frames, delay: Duration(milliseconds: 200));
       expect(a, isNot(equals(b)));
@@ -131,8 +131,8 @@ void main() {
 
     test('translateY keyframed with different delay not equal', () {
       final frames = MotionKeyframes<double>([
-        Keyframe.key(0.0, motion: CueMotion.none),
-      ]);
+        Keyframe.key(0.0),
+      ] , motion: CueMotion.none);
       final a = TranslateAct.keyframedY(frames: frames, delay: Duration(milliseconds: 100));
       final b = TranslateAct.keyframedY(frames: frames, delay: Duration(milliseconds: 200));
       expect(a, isNot(equals(b)));

@@ -63,8 +63,8 @@ void main() {
 
       test('keyframed constructor sets frames', () {
         final frames = FractionalKeyframes<Offset>([
-          FractionalKeyframe(Offset.zero, at: 0),
-          FractionalKeyframe(const Offset(50, 50), at: 1),
+          FKeyframe(Offset.zero, at: 0),
+          FKeyframe(const Offset(50, 50), at: 1),
         ]);
         final act = TranslateAct.keyframed(frames: frames);
         final tweenAct = act as TweenActBase<Offset, Offset>;
@@ -94,8 +94,8 @@ void main() {
 
       test('keyframedX constructor sets frames on X axis', () {
         final frames = FractionalKeyframes<double>([
-          FractionalKeyframe(0.0, at: 0),
-          FractionalKeyframe(100.0, at: 1),
+          FKeyframe(0.0, at: 0),
+          FKeyframe(100.0, at: 1),
         ]);
         final act = TranslateAct.keyframedX(frames: frames);
         final tweenAct = act as TweenActBase<double, Offset>;
@@ -125,8 +125,8 @@ void main() {
 
       test('keyframedY constructor sets frames on Y axis', () {
         final frames = FractionalKeyframes<double>([
-          FractionalKeyframe(0.0, at: 0),
-          FractionalKeyframe(50.0, at: 1),
+          FKeyframe(0.0, at: 0),
+          FKeyframe(50.0, at: 1),
         ]);
         final act = TranslateAct.keyframedY(frames: frames);
         final tweenAct = act as TweenActBase<double, Offset>;

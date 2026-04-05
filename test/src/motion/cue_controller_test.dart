@@ -731,9 +731,9 @@ void main() {
         final controller = _createController();
 
         final frames = Keyframes<double>([
-          Keyframe<double>(0.0, motion: CueMotion.linear(100.ms)),
-          Keyframe<double>(100.0, motion: CueMotion.linear(100.ms)),
-        ]);
+          Keyframe<double>(0.0),
+          Keyframe<double>(100.0),
+        ], motion: .linear(100.ms));
 
         final animation = controller.keyframedTrack<double>(frames: frames);
 
@@ -745,9 +745,9 @@ void main() {
         final controller = _createController(motion: CueMotion.linear(200.ms));
 
         final frames = Keyframes<double>([
-          Keyframe<double>(0.0, motion: CueMotion.linear(100.ms)),
-          Keyframe<double>(100.0, motion: CueMotion.linear(100.ms)),
-        ]);
+          Keyframe<double>(0.0),
+          Keyframe<double>(100.0),
+        ], motion: .linear(100.ms));
 
         final animation = controller.keyframedTrack<double>(frames: frames);
 
@@ -765,9 +765,9 @@ void main() {
         final controller = _createController(motion: CueMotion.linear(200.ms));
 
         final frames = Keyframes<double>([
-          Keyframe<double>(0.0, motion: CueMotion.linear(100.ms)),
-          Keyframe<double>(100.0, motion: CueMotion.linear(100.ms)),
-        ]);
+          Keyframe<double>(0.0),
+          Keyframe<double>(100.0),
+        ], motion: CueMotion.linear(100.ms));
 
         final animation = controller.keyframedTrack<double>(
           frames: frames,
@@ -781,9 +781,9 @@ void main() {
         final controller = _createController(motion: CueMotion.linear(200.ms));
 
         final frames = Keyframes<double>([
-          Keyframe<double>(0.0, motion: CueMotion.linear(100.ms)),
-          Keyframe<double>(100.0, motion: CueMotion.linear(100.ms)),
-        ]);
+          Keyframe<double>(0.0),
+          Keyframe<double>(100.0),
+        ], motion: CueMotion.linear(100.ms));
 
         final animation = controller.keyframedTrack<double>(
           frames: frames,
@@ -797,9 +797,9 @@ void main() {
         final controller = _createController(motion: CueMotion.linear(200.ms));
 
         final frames = Keyframes<double>([
-          Keyframe<double>(0.0, motion: CueMotion.linear(100.ms)),
-          Keyframe<double>(100.0, motion: CueMotion.linear(100.ms)),
-        ]);
+          Keyframe<double>(0.0),
+          Keyframe<double>(100.0),
+        ], motion: CueMotion.linear(100.ms));
 
         final animation = controller.keyframedTrack<double>(
           frames: frames,
@@ -813,9 +813,9 @@ void main() {
         final controller = _createController(motion: CueMotion.linear(200.ms));
 
         final frames = Keyframes<double>([
-          Keyframe<double>(0.0, motion: CueMotion.linear(100.ms)),
-          Keyframe<double>(100.0, motion: CueMotion.linear(100.ms)),
-        ]);
+          Keyframe<double>(0.0),
+          Keyframe<double>(100.0),
+        ], motion: CueMotion.linear(100.ms));
 
         final animation = controller.keyframedTrack<double>(
           frames: frames,
@@ -829,9 +829,9 @@ void main() {
         final controller = _createController(motion: CueMotion.linear(200.ms));
 
         final frames = Keyframes<double>([
-          Keyframe<double>(0.0, motion: CueMotion.linear(100.ms)),
-          Keyframe<double>(100.0, motion: CueMotion.linear(100.ms)),
-        ]);
+          Keyframe<double>(0.0),
+          Keyframe<double>(100.0),
+        ], motion: CueMotion.linear(100.ms));
 
         final animation = controller.keyframedTrack<double>(
           frames: frames,
@@ -845,9 +845,9 @@ void main() {
         final controller = _createController(motion: CueMotion.linear(200.ms));
 
         final frames = Keyframes<String>([
-          Keyframe<String>('start', motion: CueMotion.linear(100.ms)),
-          Keyframe<String>('end', motion: CueMotion.linear(100.ms)),
-        ]);
+          Keyframe<String>('start'),
+          Keyframe<String>('end'),
+        ], motion: CueMotion.linear(100.ms));
 
         final animation = controller.keyframedTrack<String>(frames: frames);
 
@@ -859,9 +859,9 @@ void main() {
         final controller = _createController(motion: CueMotion.linear(200.ms));
 
         final frames = Keyframes<Color>([
-          Keyframe<Color>(Colors.red, motion: CueMotion.linear(100.ms)),
-          Keyframe<Color>(Colors.blue, motion: CueMotion.linear(100.ms)),
-        ]);
+          Keyframe<Color>(Colors.red),
+          Keyframe<Color>(Colors.blue),
+        ], motion: CueMotion.linear(100.ms));
 
         final animation = controller.keyframedTrack<Color>(frames: frames);
 
@@ -873,10 +873,10 @@ void main() {
         final controller = _createController(motion: CueMotion.linear(300.ms));
 
         final frames = Keyframes<double>([
-          Keyframe<double>(0.0, motion: CueMotion.linear(100.ms)),
-          Keyframe<double>(50.0, motion: CueMotion.linear(100.ms)),
-          Keyframe<double>(100.0, motion: CueMotion.linear(100.ms)),
-        ]);
+          Keyframe<double>(0.0),
+          Keyframe<double>(50.0),
+          Keyframe<double>(100.0),
+        ], motion: CueMotion.linear(100.ms));
 
         final animation = controller.keyframedTrack<double>(frames: frames);
 

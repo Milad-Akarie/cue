@@ -90,18 +90,18 @@ void main() {
 
       test('keyframed constructor sets frames', () {
         final frames = Keyframes<FractionalSize>([
-          Keyframe(FractionalSize(widthFactor: 0.5), motion: CueMotion.linear(300.ms)),
-          Keyframe(FractionalSize(widthFactor: 1.0), motion: CueMotion.linear(300.ms)),
-        ]);
+          Keyframe(FractionalSize(widthFactor: 0.5)),
+          Keyframe(FractionalSize(widthFactor: 1.0)),
+        ], motion: .linear(300.ms));
         final act = FractionalSizeAct.keyframed(frames: frames);
         expect(act.frames, frames);
       });
 
       test('keyframed constructor with delay', () {
         final frames = Keyframes<FractionalSize>([
-          Keyframe(FractionalSize(widthFactor: 0.5), motion: CueMotion.linear(300.ms)),
-          Keyframe(FractionalSize(widthFactor: 1.0), motion: CueMotion.linear(300.ms)),
-        ]);
+          Keyframe(FractionalSize(widthFactor: 0.5)),
+          Keyframe(FractionalSize(widthFactor: 1.0)),
+        ], motion: .linear(300.ms));
         final act = FractionalSizeAct.keyframed(
           frames: frames,
           delay: Duration(milliseconds: 100),
@@ -112,9 +112,9 @@ void main() {
 
       test('keyframed constructor with reverse', () {
         final frames = Keyframes<FractionalSize>([
-          Keyframe(FractionalSize(widthFactor: 0.5), motion: CueMotion.linear(300.ms)),
-          Keyframe(FractionalSize(widthFactor: 1.0), motion: CueMotion.linear(300.ms)),
-        ]);
+          Keyframe(FractionalSize(widthFactor: 0.5)),
+          Keyframe(FractionalSize(widthFactor: 1.0)),
+        ], motion: .linear(300.ms));
         const reverse = ReverseBehavior<FractionalSize>.mirror();
         final act = FractionalSizeAct.keyframed(
           frames: frames,
@@ -126,9 +126,9 @@ void main() {
 
       test('keyframed constructor with all parameters', () {
         final frames = Keyframes<FractionalSize>([
-          Keyframe(FractionalSize(widthFactor: 0.5), motion: CueMotion.linear(300.ms)),
-          Keyframe(FractionalSize(widthFactor: 1.0), motion: CueMotion.linear(300.ms)),
-        ]);
+          Keyframe(FractionalSize(widthFactor: 0.5)),
+          Keyframe(FractionalSize(widthFactor: 1.0)),
+        ], motion: .linear(300.ms));
         const reverse = ReverseBehavior<FractionalSize>.none();
         final act = FractionalSizeAct.keyframed(
           frames: frames,
@@ -184,9 +184,9 @@ void main() {
 
       test('creates animtable from keyframed constructor', () {
         final frames = Keyframes<FractionalSize>([
-          Keyframe(FractionalSize(widthFactor: 0.5), motion: CueMotion.linear(300.ms)),
-          Keyframe(FractionalSize(widthFactor: 1.0), motion: CueMotion.linear(300.ms)),
-        ]);
+          Keyframe(FractionalSize(widthFactor: 0.5)),
+          Keyframe(FractionalSize(widthFactor: 1.0)),
+        ], motion: .linear(300.ms));
         final act = FractionalSizeAct.keyframed(frames: frames);
 
         final (animtable, _) = act.buildTweens(actContext);
@@ -520,9 +520,9 @@ void main() {
 
       test('resolve with keyframed constructor', () {
         final frames = Keyframes<FractionalSize>([
-          Keyframe(FractionalSize(widthFactor: 0.5), motion: CueMotion.linear(300.ms)),
-          Keyframe(FractionalSize(widthFactor: 1.0), motion: CueMotion.linear(300.ms)),
-        ]);
+          Keyframe(FractionalSize(widthFactor: 0.5)),
+          Keyframe(FractionalSize(widthFactor: 1.0)),
+        ], motion: .linear(300.ms));
         final act = FractionalSizeAct.keyframed(frames: frames);
         final context = ActContext(motion: CueMotion.linear(300.ms), reverseMotion: CueMotion.linear(300.ms));
 
@@ -585,13 +585,13 @@ void main() {
 
       test('keyframed acts with different frames are not equal', () {
         final frames1 = Keyframes<FractionalSize>([
-          Keyframe(FractionalSize(widthFactor: 0.5), motion: CueMotion.linear(300.ms)),
-          Keyframe(FractionalSize(widthFactor: 1.0), motion: CueMotion.linear(300.ms)),
-        ]);
+          Keyframe(FractionalSize(widthFactor: 0.5)),
+          Keyframe(FractionalSize(widthFactor: 1.0)),
+        ], motion: .linear(300.ms));
         final frames2 = Keyframes<FractionalSize>([
-          Keyframe(FractionalSize(widthFactor: 0.3), motion: CueMotion.linear(300.ms)),
-          Keyframe(FractionalSize(widthFactor: 0.9), motion: CueMotion.linear(300.ms)),
-        ]);
+          Keyframe(FractionalSize(widthFactor: 0.3)),
+          Keyframe(FractionalSize(widthFactor: 0.9)),
+        ], motion: .linear(300.ms));
         final act1 = FractionalSizeAct.keyframed(frames: frames1);
         final act2 = FractionalSizeAct.keyframed(frames: frames2);
         expect(act1, isNot(act2));
@@ -599,9 +599,9 @@ void main() {
 
       test('keyframed acts with same frames are equal', () {
         final frames = Keyframes<FractionalSize>([
-          Keyframe(FractionalSize(widthFactor: 0.5), motion: CueMotion.linear(300.ms)),
-          Keyframe(FractionalSize(widthFactor: 1.0), motion: CueMotion.linear(300.ms)),
-        ]);
+          Keyframe(FractionalSize(widthFactor: 0.5)),
+          Keyframe(FractionalSize(widthFactor: 1.0)),
+        ], motion: .linear(300.ms));
         final act1 = FractionalSizeAct.keyframed(frames: frames);
         final act2 = FractionalSizeAct.keyframed(frames: frames);
         expect(act1, act2);

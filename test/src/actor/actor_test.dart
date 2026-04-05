@@ -512,8 +512,8 @@ void main() {
 
     testWidgets('keyframed constructor with frames', (tester) async {
       final frames = FractionalKeyframes<double>([
-        FractionalKeyframe(1.0, at: 0.0),
-        FractionalKeyframe(1.5, at: 1.0),
+        FKeyframe(1.0, at: 0.0),
+        FKeyframe(1.5, at: 1.0),
       ]);
 
       await tester.pumpWidget(
@@ -535,8 +535,8 @@ void main() {
 
     testWidgets('keyframed constructor with delay and reverseDelay', (tester) async {
       final frames = FractionalKeyframes<double>([
-        FractionalKeyframe(1.0, at: 0.0),
-        FractionalKeyframe(1.5, at: 1.0),
+        FKeyframe(1.0, at: 0.0),
+        FKeyframe(1.5, at: 1.0),
       ]);
 
       await tester.pumpWidget(
@@ -560,8 +560,8 @@ void main() {
 
     testWidgets('keyframed constructor with reverse behavior', (tester) async {
       final frames = FractionalKeyframes<double>([
-        FractionalKeyframe(1.0, at: 0.0),
-        FractionalKeyframe(1.5, at: 1.0),
+        FKeyframe(1.0, at: 0.0),
+        FKeyframe(1.5, at: 1.0),
       ]);
 
       await tester.pumpWidget(
@@ -595,8 +595,8 @@ void main() {
 
     testWidgets('getters return null for keyframed constructor', (tester) async {
       final frames = FractionalKeyframes<double>([
-        FractionalKeyframe(1.0, at: 0.0),
-        FractionalKeyframe(2.0, at: 1.0),
+        FKeyframe(1.0, at: 0.0),
+        FKeyframe(2.0, at: 1.0),
       ]);
 
       final actor = ScaleActor.keyframes(

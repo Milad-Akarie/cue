@@ -80,25 +80,25 @@ void main() {
     group('keyframed constructor', () {
       test('accepts frames', () {
         final frames = Keyframes<Size>([
-          Keyframe(const Size(100, 100), motion: CueMotion.linear(100.ms)),
-          Keyframe(const Size(200, 200), motion: CueMotion.linear(100.ms)),
-        ]);
+          Keyframe(const Size(100, 100)),
+          Keyframe(const Size(200, 200)),
+        ], motion: CueMotion.linear(100.ms));
         final act = SizedBoxAct.keyframed(frames: frames);
         expect(act.frames, frames);
       });
 
       test('accepts alignment', () {
         final frames = Keyframes<Size>([
-          Keyframe(const Size(100, 100), motion: CueMotion.linear(100.ms)),
-        ]);
+          Keyframe(const Size(100, 100)),
+        ] , motion: CueMotion.linear(100.ms));
         final act = SizedBoxAct.keyframed(frames: frames, alignment: Alignment.bottomRight);
         expect(act.alignment, Alignment.bottomRight);
       });
 
       test('accepts delay', () {
         final frames = Keyframes<Size>([
-          Keyframe(const Size(100, 100), motion: CueMotion.linear(100.ms)),
-        ]);
+          Keyframe(const Size(100, 100)),
+        ] , motion: CueMotion.linear(100.ms));
         final act = SizedBoxAct.keyframed(frames: frames, delay: 100.ms);
         expect(act.delay, 100.ms);
       });
@@ -311,9 +311,9 @@ void main() {
     group('keyframed apply', () {
       testWidgets('renders keyframed animation', (tester) async {
         final frames = Keyframes<Size>([
-          Keyframe(const Size(100, 100), motion: CueMotion.linear(100.ms)),
-          Keyframe(const Size(200, 200), motion: CueMotion.linear(100.ms)),
-        ]);
+          Keyframe(const Size(100, 100)),
+          Keyframe(const Size(200, 200)),
+        ], motion: CueMotion.linear(100.ms));
         final act = SizedBoxAct.keyframed(frames: frames);
 
         track.setProgress(0.5);
@@ -336,9 +336,9 @@ void main() {
 
       testWidgets('renders keyframed with custom alignment', (tester) async {
         final frames = Keyframes<Size>([
-          Keyframe(const Size(100, 100), motion: CueMotion.linear(100.ms)),
-          Keyframe(const Size(200, 200), motion: CueMotion.linear(100.ms)),
-        ]);
+          Keyframe(const Size(100, 100)),
+          Keyframe(const Size(200, 200)),
+        ], motion: CueMotion.linear(100.ms));
         final act = SizedBoxAct.keyframed(
           frames: frames,
           alignment: Alignment.bottomRight,
@@ -632,9 +632,9 @@ void main() {
 
       testWidgets('handles keyframed reverse behavior', (tester) async {
         final frames = Keyframes<Size>([
-          Keyframe(const Size(100, 100), motion: CueMotion.linear(100.ms)),
-          Keyframe(const Size(200, 200), motion: CueMotion.linear(100.ms)),
-        ]);
+          Keyframe(const Size(100, 100)),
+          Keyframe(const Size(200, 200)),
+        ] , motion: CueMotion.linear(100.ms));
         final reverse = KFReverseBehavior<Size>.mirror();
         final act = SizedBoxAct.keyframed(frames: frames, reverse: reverse);
 

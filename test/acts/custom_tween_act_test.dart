@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-
-  
   group('Lerpable', () {
     test('is abstract class', () {
       expect(Lerpable, isA<Type>());
@@ -224,9 +222,9 @@ void main() {
 
     test('keyframed constructor accepts frames', () {
       final frames = Keyframes<double>([
-        Keyframe(0.0, motion: CueMotion.linear(300.ms)),
-        Keyframe(100.0, motion: CueMotion.linear(300.ms)),
-      ]);
+        Keyframe(0.0),
+        Keyframe(100.0),
+      ], motion: .linear(300.ms));
       final actor = TweenActor<double>.keyframed(
         frames: frames,
         builder: (context, animation) => const SizedBox(),
@@ -236,9 +234,9 @@ void main() {
 
     test('keyframed constructor accepts delay', () {
       final frames = Keyframes<double>([
-        Keyframe(0.0, motion: CueMotion.linear(300.ms)),
-        Keyframe(100.0, motion: CueMotion.linear(300.ms)),
-      ]);
+        Keyframe(0.0),
+        Keyframe(100.0),
+      ], motion: .linear(300.ms));
       const delay = Duration(milliseconds: 150);
       final actor = TweenActor<double>.keyframed(
         frames: frames,
@@ -250,9 +248,9 @@ void main() {
 
     test('keyframed constructor accepts reverse', () {
       final frames = Keyframes<double>([
-        Keyframe(0.0, motion: CueMotion.linear(300.ms)),
-        Keyframe(100.0, motion: CueMotion.linear(300.ms)),
-      ]);
+        Keyframe(0.0),
+        Keyframe(100.0),
+      ], motion: .linear(300.ms));
       final actor = TweenActor<double>.keyframed(
         frames: frames,
         builder: (context, animation) => const SizedBox(),
@@ -292,7 +290,7 @@ void main() {
     test('createSingleTween with Lerpable creates proper interpolation', () {
       const from = AnimatedValues(scale: 1.0, opacity: 0.0);
       const to = AnimatedValues(scale: 2.0, opacity: 1.0);
-      
+
       // Verify that lerpTo works correctly for interpolation
       final interpolated = from.lerpTo(to, 0.5);
       expect(interpolated.scale, closeTo(1.5, 0.01));
@@ -307,20 +305,20 @@ void main() {
         tweenBuilder: customTween,
         builder: (context, animation) => const SizedBox(),
       );
-      
+
       expect(actor.tweenBuilder, equals(customTween));
     });
 
     test('createSingleTween preserves AnimatedValues properties', () {
       const from = AnimatedValues(scale: 1.0, opacity: 0.0, blur: 0.0);
       const to = AnimatedValues(scale: 2.0, opacity: 1.0, blur: 10.0);
-      
+
       final actor = TweenActor<AnimatedValues>(
         from: from,
         to: to,
         builder: (context, animation) => const SizedBox(),
       );
-      
+
       expect((actor.from as AnimatedValues).scale, equals(1.0));
       expect((actor.from as AnimatedValues).opacity, equals(0.0));
       expect((actor.from as AnimatedValues).blur, equals(0.0));
@@ -344,7 +342,7 @@ void main() {
         rotation: 1.0,
         blur: 10.0,
       );
-      
+
       final mid = from.lerpTo(to, 0.5);
       expect(mid.scale, closeTo(1.5, 0.01));
       expect(mid.opacity, closeTo(0.5, 0.01));
@@ -371,7 +369,7 @@ void main() {
     test('creates InlineFnTween for Lerpable', () {
       const from = AnimatedValues(scale: 1.0, opacity: 0.0);
       const to = AnimatedValues(scale: 2.0, opacity: 1.0);
-      
+
       final act = CustomTweenAct<AnimatedValues>(
         from: from,
         to: to,
@@ -385,7 +383,7 @@ void main() {
     test('InlineFnTween interpolates correctly', () {
       const from = AnimatedValues(scale: 1.0, opacity: 0.0);
       const to = AnimatedValues(scale: 2.0, opacity: 1.0);
-      
+
       final act = CustomTweenAct<AnimatedValues>(
         from: from,
         to: to,
@@ -394,7 +392,7 @@ void main() {
 
       final tween = act.createSingleTween(from, to) as InlineFnTween<AnimatedValues>;
       final midpoint = tween.lerp(0.5);
-      
+
       expect(midpoint.scale, closeTo(1.5, 0.01));
       expect(midpoint.opacity, closeTo(0.5, 0.01));
     });
@@ -413,7 +411,7 @@ void main() {
     test('InlineFnTween stores correct begin and end', () {
       const from = AnimatedValues(scale: 1.0);
       const to = AnimatedValues(scale: 2.0);
-      
+
       final act = CustomTweenAct<AnimatedValues>(
         from: from,
         to: to,
@@ -429,7 +427,7 @@ void main() {
       const from = AnimatedValues(scale: 1.0);
       const to = AnimatedValues(scale: 2.0);
       final customTween = Tween<AnimatedValues>(begin: from, end: to);
-      
+
       final act = CustomTweenAct<AnimatedValues>(
         from: from,
         to: to,
@@ -446,19 +444,19 @@ void main() {
   group('CustomTweenAct equality', () {
     test('two instances with same parameters are equal', () {
       SizedBox builder(BuildContext context, CueAnimation<double> animation) => const SizedBox();
-      
+
       final act1 = CustomTweenAct<double>(
         from: 0.0,
         to: 100.0,
         builder: builder,
       );
-      
+
       final act2 = CustomTweenAct<double>(
         from: 0.0,
         to: 100.0,
         builder: builder,
       );
-      
+
       expect(act1, equals(act2));
     });
 
@@ -468,7 +466,7 @@ void main() {
         to: 100.0,
         builder: (context, animation) => const SizedBox(),
       );
-      
+
       expect(act, equals(act));
     });
 
@@ -478,70 +476,70 @@ void main() {
         to: 100.0,
         builder: (context, animation) => const SizedBox(),
       );
-      
+
       final act2 = CustomTweenAct<double>(
         from: 0.0,
         to: 100.0,
         builder: (context, animation) => const Placeholder(),
       );
-      
+
       expect(act1, isNot(equals(act2)));
     });
 
     test('instances with different tweenBuilders are not equal', () {
       final tween1 = Tween<double>(begin: 0.0, end: 100.0);
       final tween2 = Tween<double>(begin: 0.0, end: 200.0);
-      
+
       final act1 = CustomTweenAct<double>(
         from: 0.0,
         to: 100.0,
         tweenBuilder: tween1,
         builder: (context, animation) => const SizedBox(),
       );
-      
+
       final act2 = CustomTweenAct<double>(
         from: 0.0,
         to: 100.0,
         tweenBuilder: tween2,
         builder: (context, animation) => const SizedBox(),
       );
-      
+
       expect(act1, isNot(equals(act2)));
     });
 
     test('instances with different from values are not equal', () {
       SizedBox builder(BuildContext context, CueAnimation<double> animation) => const SizedBox();
-      
+
       final act1 = CustomTweenAct<double>(
         from: 0.0,
         to: 100.0,
         builder: builder,
       );
-      
+
       final act2 = CustomTweenAct<double>(
         from: 50.0,
         to: 100.0,
         builder: builder,
       );
-      
+
       expect(act1, isNot(equals(act2)));
     });
 
     test('instances with different to values are not equal', () {
       SizedBox builder(BuildContext context, CueAnimation<double> animation) => const SizedBox();
-      
+
       final act1 = CustomTweenAct<double>(
         from: 0.0,
         to: 100.0,
         builder: builder,
       );
-      
+
       final act2 = CustomTweenAct<double>(
         from: 0.0,
         to: 200.0,
         builder: builder,
       );
-      
+
       expect(act1, isNot(equals(act2)));
     });
 
@@ -551,31 +549,31 @@ void main() {
         to: 100.0,
         builder: (context, animation) => const SizedBox(),
       );
-      
+
       final act2 = CustomTweenAct<int>(
         from: 0,
         to: 100,
         builder: (context, animation) => const SizedBox(),
       );
-      
+
       expect(act1, isNot(equals(act2)));
     });
 
     test('hashCode is equal for equal instances', () {
       SizedBox builder(BuildContext context, CueAnimation<double> animation) => const SizedBox();
-      
+
       final act1 = CustomTweenAct<double>(
         from: 0.0,
         to: 100.0,
         builder: builder,
       );
-      
+
       final act2 = CustomTweenAct<double>(
         from: 0.0,
         to: 100.0,
         builder: builder,
       );
-      
+
       expect(act1.hashCode, equals(act2.hashCode));
     });
 
@@ -585,34 +583,34 @@ void main() {
         to: 100.0,
         builder: (context, animation) => const SizedBox(),
       );
-      
+
       final act2 = CustomTweenAct<double>(
         from: 0.0,
         to: 100.0,
         builder: (context, animation) => const Placeholder(),
       );
-      
+
       expect(act1.hashCode, isNot(equals(act2.hashCode)));
     });
 
     test('hashCode differs for instances with different tweenBuilders', () {
       final tween1 = Tween<double>(begin: 0.0, end: 100.0);
       final tween2 = Tween<double>(begin: 0.0, end: 200.0);
-      
+
       final act1 = CustomTweenAct<double>(
         from: 0.0,
         to: 100.0,
         tweenBuilder: tween1,
         builder: (context, animation) => const SizedBox(),
       );
-      
+
       final act2 = CustomTweenAct<double>(
         from: 0.0,
         to: 100.0,
         tweenBuilder: tween2,
         builder: (context, animation) => const SizedBox(),
       );
-      
+
       expect(act1.hashCode, isNot(equals(act2.hashCode)));
     });
   });

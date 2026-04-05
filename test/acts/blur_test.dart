@@ -147,8 +147,8 @@ void main() {
 
     test('keyframed constructor', () {
       final frames = FractionalKeyframes<double>([
-        FractionalKeyframe(0.0, at: 0.0),
-        FractionalKeyframe(10.0, at: 1.0),
+        FKeyframe(0.0, at: 0.0),
+        FKeyframe(10.0, at: 1.0),
       ]);
       final act = BlurAct.keyframed(frames: frames);
       expect(act.frames, equals(frames));
@@ -271,8 +271,8 @@ void main() {
 
     test('keyframed constructor', () {
       final frames = FractionalKeyframes<double>([
-        FractionalKeyframe(0.0, at: 0.0),
-        FractionalKeyframe(10.0, at: 1.0),
+        FKeyframe(0.0, at: 0.0),
+        FKeyframe(10.0, at: 1.0),
       ]);
       final act = BackdropBlurAct.keyframed(frames: frames);
       expect(act.frames, equals(frames));
@@ -280,8 +280,8 @@ void main() {
 
     test('keyframed constructor with custom blendMode', () {
       final frames = FractionalKeyframes<double>([
-        FractionalKeyframe(0.0, at: 0.0),
-        FractionalKeyframe(10.0, at: 1.0),
+        FKeyframe(0.0, at: 0.0),
+        FKeyframe(10.0, at: 1.0),
       ]);
       final act = BackdropBlurAct.keyframed(frames: frames, blendMode: BlendMode.screen);
       expect(act.blendMode, equals(BlendMode.screen));

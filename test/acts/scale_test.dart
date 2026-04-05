@@ -80,9 +80,9 @@ void main() {
 
       test('keyframed constructor sets frames', () {
         final frames = FractionalKeyframes<double>([
-          FractionalKeyframe(1.0, at: 0.0),
-          FractionalKeyframe(0.5, at: 0.5),
-          FractionalKeyframe(1.0, at: 1.0),
+          FKeyframe(1.0, at: 0.0),
+          FKeyframe(0.5, at: 0.5),
+          FKeyframe(1.0, at: 1.0),
         ]);
         final act = ScaleAct.keyframed(frames: frames);
         expect(act.frames, frames);
@@ -391,8 +391,8 @@ void main() {
 
       test('keyframed constructor sets frames', () {
         final frames = FractionalKeyframes<Stretch>([
-          FractionalKeyframe(Stretch.none, at: 0.0),
-          FractionalKeyframe(Stretch(x: 2.0, y: 1.0), at: 1.0),
+          FKeyframe(Stretch.none, at: 0.0),
+          FKeyframe(Stretch(x: 2.0, y: 1.0), at: 1.0),
         ]);
         final act = StretchAct.keyframed(frames: frames);
         expect(act.frames, frames);

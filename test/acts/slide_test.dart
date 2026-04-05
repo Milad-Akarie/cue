@@ -230,8 +230,8 @@ void main() {
 
       test('keyframed constructor sets frames', () {
         final frames = FractionalKeyframes<Offset>([
-          FractionalKeyframe(const Offset(0, 0), at: 0),
-          FractionalKeyframe(const Offset(1, 1), at: 1),
+          FKeyframe(const Offset(0, 0), at: 0),
+          FKeyframe(const Offset(1, 1), at: 1),
         ]);
         final act = SlideAct.keyframed(frames: frames);
         final tweenAct = act as TweenActBase<Offset, Offset>;
@@ -241,8 +241,8 @@ void main() {
       test('keyframed constructor with reverse', () {
         final reverse = KFReverseBehavior<Offset>.mirror();
         final frames = FractionalKeyframes<Offset>([
-          FractionalKeyframe(const Offset(0, 0), at: 0),
-          FractionalKeyframe(const Offset(1, 1), at: 1),
+          FKeyframe(const Offset(0, 0), at: 0),
+          FKeyframe(const Offset(1, 1), at: 1),
         ]);
         final act = SlideAct.keyframed(frames: frames, reverse: reverse);
         final tweenAct = act as TweenActBase<Offset, Offset>;
@@ -251,8 +251,8 @@ void main() {
 
       test('keyframed constructor with delay', () {
         final frames = FractionalKeyframes<Offset>([
-          FractionalKeyframe(const Offset(0, 0), at: 0),
-          FractionalKeyframe(const Offset(1, 1), at: 1),
+          FKeyframe(const Offset(0, 0), at: 0),
+          FKeyframe(const Offset(1, 1), at: 1),
         ]);
         final act = SlideAct.keyframed(frames: frames, delay: 100.ms);
         final tweenAct = act as TweenActBase<Offset, Offset>;
@@ -302,8 +302,8 @@ void main() {
 
       test('keyframedY constructor sets frames on Y axis', () {
         final frames = FractionalKeyframes<double>([
-          FractionalKeyframe(0.0, at: 0),
-          FractionalKeyframe(1.0, at: 1),
+          FKeyframe(0.0, at: 0),
+          FKeyframe(1.0, at: 1),
         ]);
         final act = SlideAct.keyframedY(frames: frames);
         final tweenAct = act as TweenActBase<double, Offset>;
@@ -313,8 +313,8 @@ void main() {
       test('keyframedY constructor with reverse', () {
         final reverse = KFReverseBehavior<double>.mirror();
         final frames = FractionalKeyframes<double>([
-          FractionalKeyframe(0.0, at: 0),
-          FractionalKeyframe(1.0, at: 1),
+          FKeyframe(0.0, at: 0),
+          FKeyframe(1.0, at: 1),
         ]);
         final act = SlideAct.keyframedY(frames: frames, reverse: reverse);
         final tweenAct = act as TweenActBase<double, Offset>;
@@ -323,8 +323,8 @@ void main() {
 
       test('keyframedY constructor with delay', () {
         final frames = FractionalKeyframes<double>([
-          FractionalKeyframe(0.0, at: 0),
-          FractionalKeyframe(1.0, at: 1),
+          FKeyframe(0.0, at: 0),
+          FKeyframe(1.0, at: 1),
         ]);
         final act = SlideAct.keyframedY(frames: frames, delay: 100.ms);
         final tweenAct = act as TweenActBase<double, Offset>;
@@ -374,8 +374,8 @@ void main() {
 
       test('keyframedX constructor sets frames on X axis', () {
         final frames = FractionalKeyframes<double>([
-          FractionalKeyframe(0.0, at: 0),
-          FractionalKeyframe(1.0, at: 1),
+          FKeyframe(0.0, at: 0),
+          FKeyframe(1.0, at: 1),
         ]);
         final act = SlideAct.keyframedX(frames: frames);
         final tweenAct = act as TweenActBase<double, Offset>;
@@ -385,8 +385,8 @@ void main() {
       test('keyframedX constructor with reverse', () {
         final reverse = KFReverseBehavior<double>.mirror();
         final frames = FractionalKeyframes<double>([
-          FractionalKeyframe(0.0, at: 0),
-          FractionalKeyframe(1.0, at: 1),
+          FKeyframe(0.0, at: 0),
+          FKeyframe(1.0, at: 1),
         ]);
         final act = SlideAct.keyframedX(frames: frames, reverse: reverse);
         final tweenAct = act as TweenActBase<double, Offset>;
@@ -395,8 +395,8 @@ void main() {
 
       test('keyframedX constructor with delay', () {
         final frames = FractionalKeyframes<double>([
-          FractionalKeyframe(0.0, at: 0),
-          FractionalKeyframe(1.0, at: 1),
+          FKeyframe(0.0, at: 0),
+          FKeyframe(1.0, at: 1),
         ]);
         final act = SlideAct.keyframedX(frames: frames, delay: 100.ms);
         final tweenAct = act as TweenActBase<double, Offset>;

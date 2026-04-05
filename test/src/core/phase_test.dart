@@ -11,15 +11,15 @@ void main() {
     });
 
     test('single fractional keyframe returns constant phase', () {
-      final frames = [FractionalKeyframe.key(100.0, at: 0.0)];
+      final frames = [FKeyframe.key(100.0, at: 0.0)];
       final phases = Phase.resolveFractionalFrames<double, double>(frames, transform: (v) => v);
       expect(phases, [const Phase(begin: 100.0, end: 100.0)]);
     });
 
     test('two fractional keyframes produce one phase', () {
       final frames = [
-        FractionalKeyframe.key(0.0, at: 0.0),
-        FractionalKeyframe.key(100.0, at: 1.0),
+        FKeyframe.key(0.0, at: 0.0),
+        FKeyframe.key(100.0, at: 1.0),
       ];
       final phases = Phase.resolveFractionalFrames<double, double>(frames, transform: (v) => v);
       expect(phases, [const Phase(begin: 0.0, end: 100.0)]);
@@ -27,15 +27,14 @@ void main() {
 
     test('duplicates at same time keep last value', () {
       final frames = [
-        FractionalKeyframe.key(10.0, at: 0.0),
-        FractionalKeyframe.key(20.0, at: 0.0),
-        FractionalKeyframe.key(30.0, at: 1.0),
+        FKeyframe.key(10.0, at: 0.0),
+        FKeyframe.key(20.0, at: 0.0),
+        FKeyframe.key(30.0, at: 1.0),
       ];
       final phases = Phase.resolveFractionalFrames<double, double>(frames, transform: (v) => v);
       // First time 0.0 should use last value 20.0 -> phase: 20 -> 30
       expect(phases, [const Phase(begin: 20.0, end: 30.0)]);
     });
-
   });
 
   group('Phase.resolveMotionFrames', () {
@@ -96,15 +95,15 @@ void main() {
 
   group('FractionalKeyframe equality', () {
     test('identical FractionalKeyframe are equal', () {
-      const a = FractionalKeyframe.key(42, at: 0.5);
-      const b = FractionalKeyframe.key(42, at: 0.5);
+      const a = FKeyframe.key(42, at: 0.5);
+      const b = FKeyframe.key(42, at: 0.5);
       expect(a, equals(b));
     });
     test('different value or at or curve are not equal', () {
-      const a = FractionalKeyframe.key(42, at: 0.5);
-      const b = FractionalKeyframe.key(43, at: 0.5);
-      const c = FractionalKeyframe.key(42, at: 0.6);
-      const d = FractionalKeyframe.key(42, at: 0.5, curve: Curves.easeIn);
+      const a = FKeyframe.key(42, at: 0.5);
+      const b = FKeyframe.key(43, at: 0.5);
+      const c = FKeyframe.key(42, at: 0.6);
+      const d = FKeyframe.key(42, at: 0.5, curve: Curves.easeIn);
       expect(a, isNot(equals(b)));
       expect(a, isNot(equals(c)));
       expect(a, isNot(equals(d)));
@@ -113,48 +112,48 @@ void main() {
 
   group('MotionKeyframes and FractionalKeyframes equality', () {
     test('identical MotionKeyframes are equal', () {
-      final a = MotionKeyframes([Keyframe.key(1, motion: CueMotion.none), Keyframe.key(2, motion: CueMotion.none)]);
-      final b = MotionKeyframes([Keyframe.key(1, motion: CueMotion.none), Keyframe.key(2, motion: CueMotion.none)]);
+      final a = MotionKeyframes([Keyframe.key(1), Keyframe.key(2)], motion: .none);
+      final b = MotionKeyframes([Keyframe.key(1), Keyframe.key(2)], motion: .none);
       expect(a, equals(b));
     });
     test('different MotionKeyframes are not equal', () {
-      final a = MotionKeyframes([Keyframe.key(1, motion: CueMotion.none)]);
-      final b = MotionKeyframes([Keyframe.key(2, motion: CueMotion.none)]);
+      final a = MotionKeyframes([Keyframe.key(1)], motion: .none);
+      final b = MotionKeyframes([Keyframe.key(2)], motion: .none);
       expect(a, isNot(equals(b)));
     });
     test('identical FractionalKeyframes are equal', () {
-      final a = FractionalKeyframes([FractionalKeyframe.key(1, at: 0.1), FractionalKeyframe.key(2, at: 0.2)]);
-      final b = FractionalKeyframes([FractionalKeyframe.key(1, at: 0.1), FractionalKeyframe.key(2, at: 0.2)]);
+      final a = FractionalKeyframes([FKeyframe.key(1, at: 0.1), FKeyframe.key(2, at: 0.2)]);
+      final b = FractionalKeyframes([FKeyframe.key(1, at: 0.1), FKeyframe.key(2, at: 0.2)]);
       expect(a, equals(b));
     });
     test('different FractionalKeyframes are not equal', () {
-      final a = FractionalKeyframes([FractionalKeyframe.key(1, at: 0.1)]);
-      final b = FractionalKeyframes([FractionalKeyframe.key(2, at: 0.1)]);
+      final a = FractionalKeyframes([FKeyframe.key(1, at: 0.1)]);
+      final b = FractionalKeyframes([FKeyframe.key(2, at: 0.1)]);
       expect(a, isNot(equals(b)));
     });
     test('FractionalKeyframes with different durations are not equal', () {
-      final a = FractionalKeyframes([FractionalKeyframe.key(1, at: 0.1)], duration: Duration(seconds: 1));
-      final b = FractionalKeyframes([FractionalKeyframe.key(1, at: 0.1)], duration: Duration(seconds: 2));
+      final a = FractionalKeyframes([FKeyframe.key(1, at: 0.1)], duration: Duration(seconds: 1));
+      final b = FractionalKeyframes([FKeyframe.key(1, at: 0.1)], duration: Duration(seconds: 2));
       expect(a, isNot(equals(b)));
     });
 
     test('Keyframes factory equality for MotionKeyframes', () {
-      final a = Keyframes([Keyframe.key(1, motion: CueMotion.none)]);
-      final b = MotionKeyframes([Keyframe.key(1, motion: CueMotion.none)]);
+      final a = Keyframes([Keyframe.key(1)], motion: CueMotion.none);
+      final b = MotionKeyframes([Keyframe.key(1)], motion: CueMotion.none);
       expect(a, equals(b));
     });
 
     test('Keyframes.fractional factory equality for FractionalKeyframes', () {
-      final a = Keyframes.fractional([FractionalKeyframe.key(1, at: 0.1)], duration: const Duration(milliseconds: 100));
-      final b = FractionalKeyframes([FractionalKeyframe.key(1, at: 0.1)], duration: const Duration(milliseconds: 100));
+      final a = Keyframes.fractional([FKeyframe.key(1, at: 0.1)], duration: const Duration(milliseconds: 100));
+      final b = FractionalKeyframes([FKeyframe.key(1, at: 0.1)], duration: const Duration(milliseconds: 100));
       expect(a, equals(b));
     });
 
     test('MotionKeyframes.mapValues and reversed behavior', () {
       final original = MotionKeyframes<int>([
-        Keyframe.key(1, motion: CueMotion.none),
-        Keyframe.key(2, motion: CueMotion.none),
-      ]);
+        Keyframe.key(1),
+        Keyframe.key(2),
+      ], motion: CueMotion.none);
 
       final mapped = original.mapValues((v) => 'x$v');
       expect(mapped.values, equals(['x1', 'x2']));
@@ -165,9 +164,9 @@ void main() {
 
     test('FractionalKeyframes.mapValues and reversed behavior', () {
       final original = FractionalKeyframes<int>([
-        FractionalKeyframe.key(10, at: 0.0),
-        FractionalKeyframe.key(20, at: 0.5),
-        FractionalKeyframe.key(30, at: 1.0),
+        FKeyframe.key(10, at: 0.0),
+        FKeyframe.key(20, at: 0.5),
+        FKeyframe.key(30, at: 1.0),
       ], duration: const Duration(milliseconds: 1000));
 
       final mapped = original.mapValues((v) => v * 2);
@@ -189,24 +188,24 @@ void main() {
     });
 
     test('MotionKeyframes extractMotion edge cases', () {
-      final single = MotionKeyframes([Keyframe(1, motion: CueMotion.none)]);
+      final single = MotionKeyframes([Keyframe(1)], motion: CueMotion.none);
       // extractMotion without includeFirst and only one frame -> empty
       expect(single.extractMotion(), isEmpty);
 
       final frames = MotionKeyframes([
-        Keyframe(1, motion: CueMotion.none),
+        Keyframe(1),
         Keyframe(2, motion: CueMotion.linear(const Duration(milliseconds: 100))),
-      ]);
+      ], motion: CueMotion.none);
       final motions = frames.extractMotion();
       expect(motions.length, equals(1));
     });
 
     test('FractionalKeyframes.extractMotion respects curves and dedup', () {
       final frames = FractionalKeyframes([
-        FractionalKeyframe(1, at: 0.0, curve: Curves.easeIn),
-        FractionalKeyframe(2, at: 0.5),
-        FractionalKeyframe(3, at: 0.5, curve: Curves.easeOut),
-        FractionalKeyframe(4, at: 1.0),
+        FKeyframe(1, at: 0.0, curve: Curves.easeIn),
+        FKeyframe(2, at: 0.5),
+        FKeyframe(3, at: 0.5, curve: Curves.easeOut),
+        FKeyframe(4, at: 1.0),
       ], duration: const Duration(milliseconds: 1000));
 
       final motions = frames.extractMotion(includeFirst: true, duration: const Duration(milliseconds: 1000));
@@ -216,10 +215,15 @@ void main() {
 
     test('resolveFractionalFrames with forReverse adds from at end', () {
       final frames = [
-        FractionalKeyframe('x', at: 0.2),
-        FractionalKeyframe('y', at: 0.8),
+        FKeyframe('x', at: 0.2),
+        FKeyframe('y', at: 0.8),
       ];
-      final resolved = Phase.resolveFractionalFrames<String, String>(frames, from: 'from', forReverse: true, transform: (v) => v);
+      final resolved = Phase.resolveFractionalFrames<String, String>(
+        frames,
+        from: 'from',
+        forReverse: true,
+        transform: (v) => v,
+      );
       // forReverse true with from provided inserts from at end, so phases count should be 2
       expect(resolved.length, equals(2));
     });

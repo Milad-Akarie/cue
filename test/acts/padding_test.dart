@@ -52,8 +52,8 @@ void main() {
 
       test('keyframed constructor sets frames', () {
         final frames = FractionalKeyframes<EdgeInsetsGeometry>([
-          FractionalKeyframe(EdgeInsets.zero, at: 0.0),
-          FractionalKeyframe(EdgeInsets.all(20), at: 1.0),
+          FKeyframe(EdgeInsets.zero, at: 0.0),
+          FKeyframe(EdgeInsets.all(20), at: 1.0),
         ]);
         final act = PaddingAct.keyframed(frames: frames);
         expect(act.frames, frames);

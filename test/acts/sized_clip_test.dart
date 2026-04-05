@@ -184,16 +184,16 @@ void main() {
 
     test('keyframed constructor accepts frames', () {
       final frames = Keyframes<NSize>([
-        Keyframe(NSize.square(100.0), motion: CueMotion.linear(300.ms)),
-      ]);
+        Keyframe(NSize.square(100.0)),
+      ] , motion: CueMotion.linear(300.ms));
       final act = SizedClipAct.keyframed(frames: frames);
       expect(act.frames, isNotNull);
     });
 
     test('keyframed constructor accepts alignment', () {
       final frames = Keyframes<NSize>([
-        Keyframe(NSize.square(100.0), motion: CueMotion.linear(300.ms)),
-      ]);
+        Keyframe(NSize.square(100.0)),
+      ] , motion: CueMotion.linear(300.ms));
       final act = SizedClipAct.keyframed(frames: frames, alignment: Alignment.center);
       expect(act.alignment, equals(Alignment.center));
     });
@@ -454,9 +454,9 @@ void main() {
         final timeline = CueTimelineImpl.fromMotion(motion);
 
         final frames = Keyframes<NSize>([
-          Keyframe(NSize.square(100), motion: CueMotion.linear(150.ms)),
-          Keyframe(NSize.square(200), motion: CueMotion.linear(150.ms)),
-        ]);
+          Keyframe(NSize.square(100)),
+          Keyframe(NSize.square(200)),
+        ] , motion: CueMotion.linear(150.ms));
         final act = SizedClipAct.keyframed(frames: frames);
 
         track.setProgress(0.5);

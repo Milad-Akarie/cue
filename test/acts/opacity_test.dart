@@ -88,9 +88,9 @@ void main() {
 
       test('keyframed constructor sets frames', () {
         final frames = FractionalKeyframes<double>([
-          FractionalKeyframe(1.0, at: 0.0),
-          FractionalKeyframe(0.5, at: 0.5),
-          FractionalKeyframe(0.0, at: 1.0),
+          FKeyframe(1.0, at: 0.0),
+          FKeyframe(0.5, at: 0.5),
+          FKeyframe(0.0, at: 1.0),
         ]);
         final act = OpacityAct.keyframed(frames: frames);
         expect(act.frames, frames);
@@ -98,8 +98,8 @@ void main() {
 
       test('keyframed constructor with reverse', () {
         final frames = FractionalKeyframes<double>([
-          FractionalKeyframe(1.0, at: 0.0),
-          FractionalKeyframe(0.0, at: 1.0),
+          FKeyframe(1.0, at: 0.0),
+          FKeyframe(0.0, at: 1.0),
         ]);
         const reverse = KFReverseBehavior<double>.mirror();
         final act = OpacityAct.keyframed(frames: frames, reverse: reverse);

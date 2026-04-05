@@ -116,18 +116,18 @@ void main() {
 
       test('keyframed constructor sets frames', () {
         final frames = Keyframes<Decoration>([
-          Keyframe(BoxDecoration(color: Colors.red), motion: CueMotion.linear(300.ms)),
-          Keyframe(BoxDecoration(color: Colors.blue), motion: CueMotion.linear(300.ms)),
-        ]);
+          Keyframe(BoxDecoration(color: Colors.red)),
+          Keyframe(BoxDecoration(color: Colors.blue)),
+        ], motion: .linear(300.ms));
         final act = DecoratedBoxAct.keyframed(frames: frames);
         expect(act.frames, frames);
       });
 
       test('keyframed constructor accepts delay', () {
         final frames = Keyframes<Decoration>([
-          Keyframe(BoxDecoration(color: Colors.red), motion: CueMotion.linear(300.ms)),
-          Keyframe(BoxDecoration(color: Colors.blue), motion: CueMotion.linear(300.ms)),
-        ]);
+          Keyframe(BoxDecoration(color: Colors.red)),
+          Keyframe(BoxDecoration(color: Colors.blue)),
+        ], motion: .linear(300.ms));
         const delay = Duration(milliseconds: 150);
         final act = DecoratedBoxAct.keyframed(frames: frames, delay: delay);
         expect(act.delay, equals(delay));
@@ -135,9 +135,9 @@ void main() {
 
       test('keyframed constructor accepts reverse', () {
         final frames = Keyframes<Decoration>([
-          Keyframe(BoxDecoration(color: Colors.red), motion: CueMotion.linear(300.ms)),
-          Keyframe(BoxDecoration(color: Colors.blue), motion: CueMotion.linear(300.ms)),
-        ]);
+          Keyframe(BoxDecoration(color: Colors.red)),
+          Keyframe(BoxDecoration(color: Colors.blue)),
+        ], motion: .linear(300.ms));
         const reverse = KFReverseBehavior<Decoration>.mirror();
         final act = DecoratedBoxAct.keyframed(frames: frames, reverse: reverse);
         expect(act.reverse, reverse);
@@ -145,9 +145,9 @@ void main() {
 
       test('keyframed constructor accepts position', () {
         final frames = Keyframes<Decoration>([
-          Keyframe(BoxDecoration(color: Colors.red), motion: CueMotion.linear(300.ms)),
-          Keyframe(BoxDecoration(color: Colors.blue), motion: CueMotion.linear(300.ms)),
-        ]);
+          Keyframe(BoxDecoration(color: Colors.red)),
+          Keyframe(BoxDecoration(color: Colors.blue)),
+        ], motion: .linear(300.ms));
         final act = DecoratedBoxAct.keyframed(
           frames: frames,
           position: DecorationPosition.foreground,
@@ -157,9 +157,9 @@ void main() {
 
       test('keyframed constructor accepts image', () {
         final frames = Keyframes<Decoration>([
-          Keyframe(BoxDecoration(color: Colors.red), motion: CueMotion.linear(300.ms)),
-          Keyframe(BoxDecoration(color: Colors.blue), motion: CueMotion.linear(300.ms)),
-        ]);
+          Keyframe(BoxDecoration(color: Colors.red)),
+          Keyframe(BoxDecoration(color: Colors.blue)),
+        ], motion: .linear(300.ms));
         final act = DecoratedBoxAct.keyframed(
           frames: frames,
           image: const DecorationImage(image: AssetImage('test.png')),

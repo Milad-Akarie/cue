@@ -56,9 +56,9 @@ void main() {
     group('keyframed constructor', () {
       test('accepts frames', () {
         final frames = Keyframes<TextStyle>([
-          Keyframe(TextStyle(fontSize: 14), motion: CueMotion.linear(100.ms)),
-          Keyframe(TextStyle(fontSize: 18), motion: CueMotion.linear(100.ms)),
-        ]);
+          Keyframe(TextStyle(fontSize: 14)),
+          Keyframe(TextStyle(fontSize: 18)),
+        ] , motion: CueMotion.linear(100.ms));
         final act = TextStyleAct.keyframed(frames: frames);
         expect(act.frames, frames);
       });
@@ -187,9 +187,9 @@ void main() {
     group('keyframed constructor', () {
       test('accepts frames', () {
         final frames = Keyframes<IconThemeData>([
-          Keyframe(IconThemeData(size: 24), motion: CueMotion.linear(100.ms)),
-          Keyframe(IconThemeData(size: 32), motion: CueMotion.linear(100.ms)),
-        ]);
+          Keyframe(IconThemeData(size: 24)),
+          Keyframe(IconThemeData(size: 32)),
+        ] , motion: CueMotion.linear(100.ms));
         final act = IconThemeAct.keyframed(frames: frames);
         expect(act.frames, frames);
       });

@@ -140,9 +140,9 @@ void main() {
 
     test('DecoratedBoxAct.keyframed creates valid instance', () {
       final frames = MotionKeyframes<Decoration>([
-        Keyframe.key(BoxDecoration(color: Color(0xFF000000)), motion: CueMotion.none),
-        Keyframe.key(BoxDecoration(color: Color(0xFFFFFFFF)), motion: CueMotion.none),
-      ]);
+        Keyframe.key(BoxDecoration(color: Color(0xFF000000))),
+        Keyframe.key(BoxDecoration(color: Color(0xFFFFFFFF))),
+      ], motion: .none);
       final act = DecoratedBoxAct.keyframed(frames: frames);
       expect(act.frames, equals(frames));
       expect(act.color, isNull);

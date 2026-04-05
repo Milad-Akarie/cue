@@ -246,27 +246,27 @@ void main() {
     });
 
     test('to with same frames are equal', () {
-      final frames = MotionKeyframes([Keyframe.key(0.5, motion: CueMotion.none)]);
+      final frames = MotionKeyframes([Keyframe.key(0.5)],motion: CueMotion.none);
       final a = KFReverseBehavior<double>.to(frames);
       final b = KFReverseBehavior<double>.to(frames);
       expect(a, equals(b));
     });
 
     test('to with different frames are not equal', () {
-      final a = KFReverseBehavior<double>.to(MotionKeyframes([Keyframe.key(0.5, motion: CueMotion.none)]));
-      final b = KFReverseBehavior<double>.to(MotionKeyframes([Keyframe.key(0.8, motion: CueMotion.none)]));
+      final a = KFReverseBehavior<double>.to(MotionKeyframes([Keyframe.key(0.5)], motion: CueMotion.none));
+      final b = KFReverseBehavior<double>.to(MotionKeyframes([Keyframe.key(0.8)], motion: CueMotion.none));
       expect(a, isNot(equals(b)));
     });
 
     test('to with same delay are equal', () {
-      final frames = MotionKeyframes([Keyframe.key(0.5, motion: CueMotion.none)]);
+      final frames = MotionKeyframes([Keyframe.key(0.5)], motion: CueMotion.none);
       final a = KFReverseBehavior<double>.to(frames, delay: const Duration(milliseconds: 50));
       final b = KFReverseBehavior<double>.to(frames, delay: const Duration(milliseconds: 50));
       expect(a, equals(b));
     });
 
     test('to with different delay are not equal', () {
-      final frames = MotionKeyframes([Keyframe.key(0.5, motion: CueMotion.none)]);
+      final frames = MotionKeyframes([Keyframe.key(0.5)], motion: CueMotion.none);
       final a = KFReverseBehavior<double>.to(frames, delay: const Duration(milliseconds: 50));
       final b = KFReverseBehavior<double>.to(frames, delay: const Duration(milliseconds: 100));
       expect(a, isNot(equals(b)));
@@ -292,7 +292,7 @@ void main() {
 
     test('mirror vs to not equal', () {
       const a = KFReverseBehavior<double>.mirror();
-      final b = KFReverseBehavior<double>.to(MotionKeyframes([Keyframe.key(0.5, motion: CueMotion.none)]));
+      final b = KFReverseBehavior<double>.to(MotionKeyframes([Keyframe.key(0.5)], motion: CueMotion.none));
       expect(a, isNot(equals(b)));
     });
 
@@ -1348,25 +1348,25 @@ void main() {
   group('Keyframed act equality', () {
     test('OpacityAct.keyframed with same frames are equal', () {
       final frames = MotionKeyframes([
-        Keyframe.key(0.0, motion: CueMotion.none),
-        Keyframe.key(1.0, motion: CueMotion.none),
-      ]);
+        Keyframe.key(0.0),
+        Keyframe.key(1.0),
+      ], motion: CueMotion.none);
       final a = OpacityAct.keyframed(frames: frames);
       final b = OpacityAct.keyframed(frames: frames);
       expect(a, equals(b));
     });
 
     test('OpacityAct.keyframed with different frames are not equal', () {
-      final a = OpacityAct.keyframed(frames: MotionKeyframes([Keyframe.key(0.0, motion: CueMotion.none)]));
-      final b = OpacityAct.keyframed(frames: MotionKeyframes([Keyframe.key(1.0, motion: CueMotion.none)]));
+      final a = OpacityAct.keyframed(frames: MotionKeyframes([Keyframe.key(0.0)], motion: CueMotion.none));
+      final b = OpacityAct.keyframed(frames: MotionKeyframes([Keyframe.key(1.0)], motion: CueMotion.none));
       expect(a, isNot(equals(b)));
     });
 
     test('PaddingAct.keyframed with same frames are equal', () {
       final frames = MotionKeyframes([
-        Keyframe.key(EdgeInsets.zero, motion: CueMotion.none),
-        Keyframe.key(EdgeInsets.all(10), motion: CueMotion.none),
-      ]);
+        Keyframe.key(EdgeInsets.zero),
+        Keyframe.key(EdgeInsets.all(10)),
+      ], motion: CueMotion.none);
       final a = PaddingAct.keyframed(frames: frames);
       final b = PaddingAct.keyframed(frames: frames);
       expect(a, equals(b));
@@ -1374,9 +1374,9 @@ void main() {
 
     test('BlurAct.keyframed with same frames are equal', () {
       final frames = MotionKeyframes([
-        Keyframe.key(0.0, motion: CueMotion.none),
-        Keyframe.key(10.0, motion: CueMotion.none),
-      ]);
+        Keyframe.key(0.0),
+        Keyframe.key(10.0),
+      ], motion: CueMotion.none);
       final a = BlurAct.keyframed(frames: frames);
       final b = BlurAct.keyframed(frames: frames);
       expect(a, equals(b));
@@ -1384,9 +1384,9 @@ void main() {
 
     test('RotateAct.keyframed with same frames are equal', () {
       final frames = MotionKeyframes([
-        Keyframe.key(0.0, motion: CueMotion.none),
-        Keyframe.key(90.0, motion: CueMotion.none),
-      ]);
+        Keyframe.key(0.0),
+        Keyframe.key(90.0),
+      ], motion: CueMotion.none);
       final a = RotateAct.keyframed(frames: frames);
       final b = RotateAct.keyframed(frames: frames);
       expect(a, equals(b));

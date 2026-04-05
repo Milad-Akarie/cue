@@ -58,8 +58,8 @@ void main() {
 
       test('keyframed constructor sets frames', () {
         final frames = FractionalKeyframes<Position>([
-          FractionalKeyframe(const Position(top: 0), at: 0),
-          FractionalKeyframe(const Position(top: 100), at: 1),
+          FKeyframe(const Position(top: 0), at: 0),
+          FKeyframe(const Position(top: 100), at: 1),
         ]);
         final act = PositionAct.keyframed(frames: frames);
         expect(act.frames, frames);
@@ -242,8 +242,8 @@ void main() {
 
       test('creates act with frames', () {
         final frames = FractionalKeyframes<Position>([
-          FractionalKeyframe(const Position(top: 0), at: 0),
-          FractionalKeyframe(const Position(top: 100), at: 1),
+          FKeyframe(const Position(top: 0), at: 0),
+          FKeyframe(const Position(top: 100), at: 1),
         ]);
         final act = PositionAct.internal(
           from: const Position(),
@@ -355,8 +355,8 @@ void main() {
 
     test('keyframed constructor', () {
       final frames = FractionalKeyframes<Position>([
-        FractionalKeyframe(const Position(top: 0), at: 0),
-        FractionalKeyframe(const Position(top: 100), at: 1),
+        FKeyframe(const Position(top: 0), at: 0),
+        FKeyframe(const Position(top: 100), at: 1),
       ]);
       final actor = PositionActor.keyframed(
         frames: frames,
@@ -380,8 +380,8 @@ void main() {
 
     test('keyframed constructor with relativeTo', () {
       final frames = FractionalKeyframes<Position>([
-        FractionalKeyframe(const Position(top: 0), at: 0),
-        FractionalKeyframe(const Position(top: 1), at: 1),
+        FKeyframe(const Position(top: 0), at: 0),
+        FKeyframe(const Position(top: 1), at: 1),
       ]);
       final actor = PositionActor.keyframed(
         frames: frames,
@@ -475,8 +475,8 @@ void main() {
 
     testWidgets('keyframed constructor animates through frames', (tester) async {
       final frames = FractionalKeyframes<Position>([
-        FractionalKeyframe(const Position(top: 0, start: 0), at: 0),
-        FractionalKeyframe(const Position(top: 100, start: 100), at: 1),
+        FKeyframe(const Position(top: 0, start: 0), at: 0),
+        FKeyframe(const Position(top: 100, start: 100), at: 1),
       ]);
 
       final actor = PositionActor.keyframed(
@@ -508,8 +508,8 @@ void main() {
 
     testWidgets('keyframed with relative positions applies both scale and interpolation', (tester) async {
       final frames = FractionalKeyframes<Position>([
-        FractionalKeyframe(const Position(top: 0, start: 0), at: 0),
-        FractionalKeyframe(const Position(top: 0.5, start: 0.5), at: 1),
+        FKeyframe(const Position(top: 0, start: 0), at: 0),
+        FKeyframe(const Position(top: 0.5, start: 0.5), at: 1),
       ]);
 
       final actor = PositionActor.keyframed(
