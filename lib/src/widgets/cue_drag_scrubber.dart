@@ -1,4 +1,5 @@
 import 'package:cue/cue.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 /// Controls what happens when the user releases the drag.
@@ -70,6 +71,17 @@ class CueDragScrubber extends StatefulWidget {
 
   /// What to do when the user lifts their finger.
   final CueDragReleaseMode releaseMode;
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DoubleProperty('distance', distance));
+    properties.add(EnumProperty<Axis>('axis', axis, defaultValue: Axis.vertical));
+    properties.add(EnumProperty<CueDragReleaseMode>('releaseMode', releaseMode, defaultValue: CueDragReleaseMode.fling));
+    properties.add(EnumProperty<CueScrubDirection>('scrubDirection', scrubDirection, defaultValue: CueScrubDirection.auto));
+    properties.add(FlagProperty('forceLinearScrubing', value: forceLinearScrubing, ifTrue: 'forceLinearScrubing'));
+    properties.add(DiagnosticsProperty<CueController>('controller', controller, defaultValue: null));
+  }
 
   @override
   State<CueDragScrubber> createState() => _CueDragScrubberState();

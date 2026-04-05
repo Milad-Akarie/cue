@@ -34,6 +34,12 @@ class _ControlledCue extends Cue {
   final CueController controller;
 
   @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DiagnosticsProperty<CueController>('controller', controller));
+  }
+
+  @override
   State<StatefulWidget> createState() => _ControlledCueState();
 }
 

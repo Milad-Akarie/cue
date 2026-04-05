@@ -25,6 +25,7 @@ part of 'cue.dart';
 /// ```
 /// {@endtemplate}
 class OnToggleCue extends SelfAnimatedCue {
+  /// Default constructor.
   const OnToggleCue({
     super.key,
     required super.child,
@@ -37,15 +38,24 @@ class OnToggleCue extends SelfAnimatedCue {
     super.acts,
   }) : super();
 
+  /// Whether the cue is toggled on (animate forward) or off (animate reverse).
   final bool toggled;
+
+  /// Whether to skip the first animation and jump straight to the correct end state on the first build. Defaults to `true`.
   final bool skipFirstAnimation;
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(FlagProperty('toggled', value: toggled, ifTrue: 'toggled', ifFalse: 'not toggled'));
+    properties.add(FlagProperty('skipFirstAnimation', value: skipFirstAnimation, ifTrue: 'skipFirstAnimation'));
+  }
 
   @override
   State<StatefulWidget> createState() => _ToggledStageState();
 }
 
 class _ToggledStageState extends SelfAnimatedCueState<OnToggleCue> {
-  
   @override
   String get debugName => 'ToggledCue';
 

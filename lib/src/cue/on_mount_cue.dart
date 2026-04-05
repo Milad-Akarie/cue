@@ -40,6 +40,7 @@ part of 'cue.dart';
 /// ```
 /// {@endtemplate}
 class OnMountCue extends SelfAnimatedCue {
+   /// Default constructor.
   const OnMountCue({
     super.key,
     required super.child,

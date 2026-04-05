@@ -30,6 +30,7 @@ part of 'cue.dart';
 /// ```
 /// {@endtemplate}
 class OnScrollVisibleCue extends Cue {
+   /// Default constructor.
   const OnScrollVisibleCue({
     super.key,
     required super.child,
@@ -37,14 +38,20 @@ class OnScrollVisibleCue extends Cue {
     this.enabled = true,
     super.acts,
   }) : super._();
-
+  
+  /// Whether the reveal animation is enabled. Set to `false` to skip the reveal and jump straight to the completed state.
   final bool enabled;
 
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(FlagProperty('enabled', value: enabled, ifFalse: 'disabled'));
+  }
 
   @override
   State<StatefulWidget> createState() => OnScrollVisibleCueState();
 }
-
+/// State class for [OnScrollVisibleCue].
 class OnScrollVisibleCueState extends CueState<OnScrollVisibleCue> with SingleTickerProviderStateMixin {
   @override
   String get debugName => 'OnScrollVisibleCue';

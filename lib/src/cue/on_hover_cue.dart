@@ -18,6 +18,7 @@ part of 'cue.dart';
 /// ```
 /// {@endtemplate}
 class OnHoverCue extends SelfAnimatedCue {
+  /// Default constructor.
   const OnHoverCue({
     super.key,
     required super.child,
@@ -31,6 +32,13 @@ class OnHoverCue extends SelfAnimatedCue {
 
   final MouseCursor cursor;
   final bool opaque;
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DiagnosticsProperty<MouseCursor>('cursor', cursor, defaultValue: MouseCursor.defer));
+    properties.add(FlagProperty('opaque', value: opaque, ifTrue: 'opaque'));
+  }
 
   @override
   State<StatefulWidget> createState() => _OnHoverStageState();

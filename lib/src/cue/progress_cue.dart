@@ -59,6 +59,13 @@ class _ProgressCue extends Cue {
   final ValueGetter<double> progress;
 
   @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DoubleProperty('min', min, defaultValue: 0.0));
+    properties.add(DoubleProperty('max', max, defaultValue: 1.0));
+  }
+
+  @override
   State<StatefulWidget> createState() => _ProgressCueState();
 }
 

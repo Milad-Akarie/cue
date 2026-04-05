@@ -32,6 +32,12 @@ class OnFocusCue extends SelfAnimatedCue {
   final FocusNode? focusNode;
 
   @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DiagnosticsProperty<FocusNode>('focusNode', focusNode, defaultValue: null));
+  }
+
+  @override
   CueState<OnFocusCue> createState() => _OnFocusCueState();
 }
 

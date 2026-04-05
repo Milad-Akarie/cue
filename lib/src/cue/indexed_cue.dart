@@ -79,6 +79,12 @@ class IndexedCue extends Cue {
   final IndexedCueController controller;
 
   @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(IntProperty('index', index));
+  }
+
+  @override
   State<StatefulWidget> createState() => _IndexedCueState();
 }
 

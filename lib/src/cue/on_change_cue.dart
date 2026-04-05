@@ -55,6 +55,14 @@ class OnChangeCue extends OnMountCue {
   final bool fromCurrentValue;
 
   @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DiagnosticsProperty<Object>('value', value, defaultValue: null));
+    properties.add(FlagProperty('skipFirstAnimation', value: skipFirstAnimation, ifTrue: 'skipFirstAnimation'));
+    properties.add(FlagProperty('fromCurrentValue', value: fromCurrentValue, ifTrue: 'fromCurrentValue'));
+  }
+
+  @override
   State<StatefulWidget> createState() => _OnChangeCueState();
 }
 
