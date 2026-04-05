@@ -21,7 +21,7 @@ class OpacityAct extends TweenAct<double> {
   /// ```dart
   /// Actor(
   ///   acts: [
-  ///     .opacity(from: 0.5, to: 1.0),
+  ///     .opacity(from: 0.5), // 'to' defaults to 1.0
   ///   ],
   ///   child: MyWidget(),
   /// )
@@ -106,10 +106,10 @@ class OpacityAct extends TweenAct<double> {
   /// OpacityAct.keyframed(
   ///   frames: Keyframes([
   ///     .key(0.0),
-  ///     .key(1.0, motion: .easeOut(200.ms)),
+  ///     .key(1.0,),
   ///     .key(0.5, motion: .easeInOut(150.ms)),
-  ///     .key(1.0, motion: .smooth()),
-  ///   ]),
+  ///     .key(1.0),
+  ///   ], motion: .smooth()), // default motion for all frames without specific motion
   /// )
   /// ```
   /// {@endtemplate}

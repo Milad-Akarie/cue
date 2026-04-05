@@ -35,7 +35,7 @@ class BlurAct extends TweenAct<double> {
   /// .blur(
   ///   from: 0,
   ///   to: 15,
-  ///   reverse: ReverseBehavior.exclusive(),
+  ///   reverse: .exclusive(),
   /// )
   /// ```
   /// {@endtemplate}
@@ -61,7 +61,7 @@ class BlurAct extends TweenAct<double> {
   ///     .key(0, at: 0.0),
   ///     .key(8, at: 0.5),
   ///     .key(0, at: 1.0),
-  ///   ], duration: 400.ms, curve: Curves.easeIn),
+  ///   ], duration: 400.ms, curve: Curves.easeIn), // default curve for all frames without specific curve
   /// )
   /// ```
   ///
@@ -73,7 +73,7 @@ class BlurAct extends TweenAct<double> {
   ///     .key(0),
   ///     .key(8, motion: .easeOut(150.ms)),
   ///     .key(0, motion: .easeIn(150.ms)),
-  ///   ], motion: .smooth()),
+  ///   ], motion: .smooth()), // default motion for all frames without specific motion
   /// )
   /// ```
   /// {@endtemplate}

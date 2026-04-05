@@ -21,8 +21,8 @@ abstract class ClipAct extends Act {
   /// Actor(
   ///   acts: [
   ///     .clip(borderRadius: BorderRadius.circular(12)),
-  ///     .clipWidth(fromFactor: 0, toFactor: 1),
-  ///     .clipHeight(fromFactor: 0, toFactor: 1),
+  ///     .clipWidth(), // fromFactor and toFactor default to 0 and 1 respectively
+  ///     .clipHeight(), // fromFactor and toFactor default to 0 and 1 respectively
   ///   ],
   ///   child: MyWidget(),
   /// )
@@ -125,11 +125,9 @@ abstract class ClipAct extends Act {
   /// ## Usage
   ///
   /// ```dart
-  /// .clipHeight(from: 0, to: 1)  // reveal top-to-bottom
+  /// .clipHeight()  // reveal top-to-bottom
   ///
   /// .clipHeight(
-  ///   from: 0,
-  ///   to: 1,
   ///   alignment: Alignment.bottomCenter,  // reveal bottom-to-top
   /// )
   /// ```

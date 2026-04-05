@@ -99,7 +99,7 @@ class FractionalSizeAct extends AnimtableAct<FractionalSize, FractionalSize> {
   ///     .key(FractionalSize(widthFactor: 0.5, heightFactor: 0.5)),
   ///     .key(FractionalSize(widthFactor: 1.0, heightFactor: 0.5), motion: .easeOut(200.ms)),
   ///     .key(FractionalSize(widthFactor: 1.0, heightFactor: 1.0), motion: .smooth()),
-  ///   ]),
+  ///   ], motion: .smooth()), // default motion for all frames without specific motion
   /// )
   /// ```
   /// {@endtemplate}

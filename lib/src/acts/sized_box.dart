@@ -1,5 +1,78 @@
 part of 'base/act.dart';
 
+/// {@template sized_box_act}
+/// Animates widget size using width and/or height constraints.
+///
+/// [SizedBoxAct] animates the size of a widget by specifying target dimensions.
+/// You can animate width only, height only, or both simultaneously.
+///
+/// Use [.sizedBox()] factory to create instances. This is the recommended approach
+/// for most size animations.
+///
+/// ## Infinite Dimension Support
+///
+/// [SizedBoxAct] supports animating to `double.infinity` because all values are
+/// normalized before animation occurs. The normalization process converts infinite
+/// values to the maximum available constraint dimensions at animation time, enabling
+/// smooth transitions from finite sizes to fill-available-space behavior.
+///
+/// Like [SizedBox], when using `double.infinity`, the widget must be inside a bounded
+/// constraint. If the constraint is unbounded, an assertion error will be thrown.
+///
+/// ```dart
+/// // Animate from fixed width to filling available space
+/// Actor(
+///   acts: [
+///     .sizedBox(width: .tween(100, double.infinity)),
+///   ],
+///   child: MyWidget(),
+/// )
+/// ```
+///
+/// ## Basic Size Animation
+///
+/// ```dart
+/// // Animate just the width
+/// Actor(
+///   acts: [
+///     .sizedBox(width: .tween(100, 300)),
+///   ],
+///   child: MyWidget(),
+/// )
+/// ```
+///
+/// ## Dual Axis Animation
+///
+/// ```dart
+/// // Animate both width and height
+/// Actor(
+///   acts: [
+///     .sizedBox(
+///       width: .tween(100, 200),
+///       height: .tween(50, 150),
+///     ),
+///   ],
+///   motion: .smooth(damping: 23),
+///   child: MyWidget(),
+/// )
+/// ```
+///
+/// ## Asymmetric Expansion
+///
+/// ```dart
+/// // Expand width while keeping height fixed
+/// Actor(
+///   acts: [
+///     .sizedBox(
+///       width: .tween(80, double.infinity),
+///       height: .fixed(40),  // Fixed height, no animation
+///     ),
+///   ],
+///   motion: .smooth(damping: 23),
+///   child: MyWidget(),
+/// )
+/// ```
+/// {@endtemplate}
 class SizedBoxAct extends DeferredTweenAct<Size> {
   @override
   final ActKey key = const ActKey('SizedBox');
@@ -9,6 +82,57 @@ class SizedBoxAct extends DeferredTweenAct<Size> {
   final AlignmentGeometry alignment;
   final Keyframes<Size>? frames;
 
+  /// {@template act.sized_box}
+  /// Animates widget size with optional width and height tweens.
+  ///
+  /// Specify [width] and/or [height] as [AnimatableValue]s (e.g., using `.tween(100, 300)`)
+  /// to animate those dimensions. Omit either parameter to leave that dimension unchanged.
+  ///
+  /// Values are normalized at animation time, converting `double.infinity` to the maximum
+  /// available constraint dimensions. This allows smooth transitions to fill-available-space.
+  ///
+  /// [alignment] controls how the child aligns within the animated bounds (defaults to center).
+  ///
+  /// ## Width-only Animation
+  ///
+  /// ```dart
+  /// Actor(
+  ///   acts: [
+  ///     .sizedBox(width: .tween(100, double.infinity)),
+  ///   ],
+  ///   motion: .smooth(damping: 23),
+  ///   child: MyWidget(),
+  /// )
+  /// ```
+  ///
+  /// ## Both Dimensions
+  ///
+  /// ```dart
+  /// Actor(
+  ///   acts: [
+  ///     .sizedBox(
+  ///       width: .tween(80, 200),
+  ///       height: .tween(40, 120),
+  ///       alignment: Alignment.topLeft,
+  ///     ),
+  ///   ],
+  ///   motion: .smooth(damping: 23),
+  ///   child: MyWidget(),
+  /// )
+  /// ```
+  ///
+  /// ## Single Fixed Dimension
+  ///
+  /// ```dart
+  /// // Animate only width; height stays the same
+  /// Actor(
+  ///   acts: [
+  ///     .sizedBox(width: .tween(100, 300)),
+  ///   ],
+  ///   child: MyWidget(),
+  /// )
+  /// ```
+  /// {@endtemplate}
   const SizedBoxAct({
     super.motion,
     super.delay,
@@ -18,6 +142,49 @@ class SizedBoxAct extends DeferredTweenAct<Size> {
     ReverseBehavior<Size> super.reverse = const ReverseBehavior.mirror(),
   }) : frames = null;
 
+  /// {@template act.sized_box.keyframed}
+  /// Animates through multiple size keyframes.
+  ///
+  /// [frames] define multiple [Size] targets at different times.
+  ///
+  /// Like the standard constructor, infinite dimensions are normalized to maximum
+  /// constraint dimensions, allowing keyframes to include `double.infinity` values.
+  ///
+  /// [alignment] controls child alignment within the animated bounds (defaults to center).
+  ///
+  /// ## Keyframed Size Animation
+  ///
+  /// ```dart
+  /// Actor(
+  ///   acts: [
+  ///     SizedBoxAct.keyframed(
+  ///       frames: Keyframes([
+  ///         .key(Size(100, 50)),
+  ///         .key(Size(200, 100)),
+  ///         .key(Size(150, 75)),
+  ///       ], motion: .smooth()),
+  ///     ),
+  ///   ],
+  ///   child: MyWidget(),
+  /// )
+  /// ```
+  ///
+  /// ## With Infinite Keyframe
+  ///
+  /// ```dart
+  /// Actor(
+  ///   acts: [
+  ///     SizedBoxAct.keyframed(
+  ///       frames: Keyframes([
+  ///         .key(Size(100, 50)),
+  ///         .key(Size(double.infinity, 100), motion: Spring.bouncy()),  // Normalized at runtime
+  ///       ], motion: Spring.smooth()),
+  ///     ),
+  ///   ],
+  ///   child: MyWidget(),
+  /// )
+  /// ```
+  /// {@endtemplate}
   const SizedBoxAct.keyframed({
     required Keyframes<Size> this.frames,
     super.delay,

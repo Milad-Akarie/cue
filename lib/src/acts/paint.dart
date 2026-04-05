@@ -43,7 +43,7 @@ class PaintAct extends TweenAct<double> {
   ///
   /// ```dart
   /// .paint(
-  ///   painter: Painter.paint((canvas, size, progress) {
+  ///   painter: .paint((canvas, size, progress) {
   ///     canvas.drawLine(
   ///       Offset.zero,
   ///       Offset(size.width * progress, 0),

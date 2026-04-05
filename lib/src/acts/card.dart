@@ -58,8 +58,8 @@ class CardAct extends AnimtableAct<CardProps, CardProps> {
   ///       elevation: .fixed(2), // this value will not animate, stays at 2
   ///       color: .tween(Colors.grey[100], Colors.blue[50]),
   ///       borderRadius: .tween(
-  ///         BorderRadius.circular(4),
-  ///         BorderRadius.circular(12),
+  ///         .circular(4),
+  ///         .circular(12),
   ///       ),
   ///     ),
   ///   ],
@@ -151,8 +151,10 @@ class CardAct extends AnimtableAct<CardProps, CardProps> {
   ///           color: Colors.white,
   ///           borderRadius: BorderRadius.circular(4),
   ///         ),
+  ///       motion: .bouncy()),
   ///       ),
   ///     ],
+  ///     motion: .smooth(), // default motion for all frames without specific motion
   ///   ),
   /// )
   /// ```

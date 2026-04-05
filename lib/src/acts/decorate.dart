@@ -123,9 +123,9 @@ class DecoratedBoxAct extends AnimtableAct<Decoration, Decoration> {
   /// .keyframed(
   ///   frames: Keyframes([
   ///     .key(BoxDecoration(color: Colors.red)),
-  ///     .key(BoxDecoration(color: Colors.yellow), motion: .easeOut(200.ms)),
+  ///     .key(BoxDecoration(color: Colors.yellow)),
   ///     .key(BoxDecoration(color: Colors.blue), motion: .smooth()),
-  ///   ]),
+  ///   ], motion: .easeInOut(500.ms)),
   /// )
   /// ```
   /// {@endtemplate}

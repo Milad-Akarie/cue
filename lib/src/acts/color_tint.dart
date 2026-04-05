@@ -35,7 +35,7 @@ class ColorTintAct extends TweenAct<Color?> {
   /// ColorTintAct(
   ///   from: Colors.transparent,
   ///   to: Colors.red.withOpacity(0.3),
-  ///   blendMode: BlendMode.multiply,
+  ///   blendMode: .multiply,
   /// )
   /// ```
   ///
@@ -45,7 +45,7 @@ class ColorTintAct extends TweenAct<Color?> {
   /// .colorTint(
   ///   from: Colors.transparent,
   ///   to: Colors.blue,
-  ///   reverse: ReverseBehavior.to(Colors.green),
+  ///   reverse: .to(Colors.green),
   /// )
   /// ```
   /// {@endtemplate}
@@ -90,9 +90,9 @@ class ColorTintAct extends TweenAct<Color?> {
   /// ColorTintAct.keyframed(
   ///   frames: Keyframes([
   ///     .key(Colors.transparent),
-  ///     .key(Colors.blue, motion: .smooth()),
+  ///     .key(Colors.blue),
   ///     .key(Colors.transparent, motion: .easeOut(200.ms)),
-  ///   ]),
+  ///   ], motion: .smooth()), // default motion for all frames without specific motion
   ///   blendMode: BlendMode.multiply,
   /// )
   /// ```

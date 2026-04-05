@@ -34,9 +34,9 @@ class AlignAct extends TweenActBase<AlignmentGeometry?, Alignment> {
   ///
   /// ```dart
   /// .align(
-  ///   from: Alignment.topLeft,
-  ///   to: Alignment.bottomRight,
-  ///   reverse: ReverseBehavior.to(Alignment.center),
+  ///   from: .topLeft,
+  ///   to: .bottomRight,
+  ///   reverse: .to(.center),
   /// )
   /// ```
   /// {@endtemplate}
@@ -72,9 +72,9 @@ class AlignAct extends TweenActBase<AlignmentGeometry?, Alignment> {
   /// AlignAct.keyframed(
   ///   frames: Keyframes([
   ///     .key(Alignment.topLeft),
-  ///     .key(Alignment.center, motion: .smooth()),
+  ///     .key(Alignment.center),
   ///     .key(Alignment.bottomRight, motion: .easeInOut(300.ms)),
-  ///   ], motion: .smooth()),
+  ///   ], motion: .smooth()), // default motion for all frames without specific motion
   /// )
   /// ```
   /// {@endtemplate}

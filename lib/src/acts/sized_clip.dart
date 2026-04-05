@@ -1,6 +1,77 @@
 part of 'base/act.dart';
 
+/// {@template sized_clip_act}
+/// Animates widget size with clipping and optional rounding.
+///
+/// [SizedClipAct] animates between two sizes while clipping the child content to the
+/// animated bounds. This is useful for expanding/collapsing animations where children
+/// should be clipped rather than reflowed.
+///
+/// Uses [NSize] for flexible sizing:
+/// - `null` → use child's natural size for that axis
+/// - fixed value (e.g., 200) → fixed pixel size
+/// - `double.infinity` → fill available bounded constraint
+///
+/// Use [Act.sizedClip()] factory to create instances.
+///
+/// ## Infinite Dimension Support
+///
+/// [SizedClipAct] supports using `double.infinity` because values are resolved at
+/// animation time based on available constraints. Like [SizedBox], when using
+/// `double.infinity`, the widget must be inside a bounded constraint. An assertion
+/// error will be thrown if the constraint is unbounded.
+///
+/// ## Basic Clip Animation
+///
+/// ```dart
+/// // Slide and clip content
+/// Actor(
+///   acts: [
+///     .sizedClip(
+///       from: NSize.childSize,
+///       to: NSize(w: 200, h: 100),
+///     ),
+///   ],
+///   motion: .smooth(damping: 23),
+///   child: MyWidget(),
+/// )
+/// ```
+///
+/// ## Rounded Clipping
+///
+/// ```dart
+/// // Expand with rounded corners
+/// Actor(
+///   acts: [
+///     .sizedClip(
+///       from: NSize(w: 100, h: 50),
+///       to: NSize(w: 300, h: 200),
+///       clipGeometry: ClipGeometry.rrect(BorderRadius.circular(16)),
+///     ),
+///   ],
+///   motion: .smooth(damping: 23),
+///   child: MyWidget(),
+/// )
+/// ```
+///
+/// ## Fill Available Space
+///
+/// ```dart
+/// // Animate from fixed size to filling available bounded space
+/// Actor(
+///   acts: [
+///     .sizedClip(
+///       from: NSize(w: 80, h: 60),
+///       to: NSize(w: double.infinity, h: double.infinity),
+///     ),
+///   ],
+///   motion: .smooth(damping: 23),
+///   child: MyWidget(),
+/// )
+/// ```
+/// {@endtemplate}
 class SizedClipAct extends DeferredTweenAct<Size?> {
+  
   @override
   final ActKey key = const ActKey('SizedClip');
 
@@ -12,6 +83,73 @@ class SizedClipAct extends DeferredTweenAct<Size?> {
   final ReverseBehaviorBase<NSize> _reverse;
   final ClipGeometry clipGeometry;
   
+  /// {@template act.sized_clip}
+  /// Animates between two sizes with content clipping.
+  ///
+  /// [from] and [to] are [NSize] specifications supporting:
+  /// - `null` for each axis → use child's natural size
+  /// - fixed values → constrain to those pixel dimensions
+  /// - `double.infinity` → fill available bounded constraints
+  ///
+  /// [alignment] controls child positioning within the clipped bounds (defaults to center).
+  /// [clipBehavior] controls how clipping is applied (defaults to hardEdge).
+  /// [clipGeometry] specifies the clipping shape - rectangular, rounded, or super-ellipse
+  /// (defaults to rectangular).
+  ///
+  /// All infinite dimensions are resolved at animation time based on parent constraints.
+  /// The widget must be within bounded constraints if using `double.infinity`.
+  ///
+  /// ## Width Animation with Child Height
+  ///
+  /// ```dart
+  /// Actor(
+  ///   acts: [
+  ///     .sizedClip(
+  ///       from: NSize.width(100),  // Fixed width, child height
+  ///       to: NSize.width(300),
+  ///       clipGeometry: .rrect(BorderRadius.circular(12)),
+  ///     ),
+  ///   ],
+  ///   motion: .smooth(damping: 23),
+  ///   child: MyWidget(),
+  /// )
+  /// ```
+  ///
+  /// ## Both Dimensions with Custom Alignment
+  ///
+  /// ```dart
+  /// Actor(
+  ///   acts: [
+  ///     .sizedClip(
+  ///       from: NSize(w: 80, h: 60),
+  ///       to: NSize(w: 200, h: 150),
+  ///       alignment: Alignment.topLeft,
+  ///       clipGeometry: .superEllipse(
+  ///         BorderRadius.circular(16),
+  ///       ),
+  ///     ),
+  ///   ],
+  ///   motion: .smooth(damping: 23),
+  ///   child: MyWidget(),
+  /// )
+  /// ```
+  ///
+  /// ## To Infinity
+  ///
+  /// ```dart
+  /// // Must be inside a bounded parent
+  /// Actor(
+  ///   acts: [
+  ///     .sizedClip(
+  ///       to: NSize.infinity,  // Resolved to parent's constraints
+  ///       clipGeometry: .rrect(BorderRadius.circular(20)),
+  ///     ),
+  ///   ],
+  ///   motion: .smooth(damping: 23),
+  ///   child: MyWidget(),
+  /// )
+  /// ```
+  /// {@endtemplate}
   const SizedClipAct({
     this.from = NSize.childSize,
     this.to = NSize.childSize,
@@ -24,6 +162,59 @@ class SizedClipAct extends DeferredTweenAct<Size?> {
   }) : frames = null,
        _reverse = reverse;
 
+  /// {@template act.sized_clip.keyframed}
+  /// Animates through multiple size keyframes with clipping.
+  ///
+  /// [frames] define multiple [NSize] targets at different times, each supporting
+  /// the same resolution rules as the standard constructor:
+  /// - `null` → child's natural size
+  /// - fixed values → pixel dimensions
+  /// - `double.infinity` → fill bounded constraints (resolved at runtime)
+  ///
+  /// [alignment] controls child positioning within clipped bounds (defaults to center).
+  /// [clipBehavior] controls clipping strategy (defaults to hardEdge).
+  /// [clipGeometry] specifies the clipping shape (defaults to rectangle).
+  ///
+  /// ## Keyframed Clip Animation
+  ///
+  /// Using fractional keyframes with a shared duration:
+  ///
+  /// ```dart
+  /// Actor(
+  ///   acts: [
+  ///     SizedClipAct.keyframed(
+  ///       frames: Keyframes.fractional([
+  ///         .key(NSize(w: 100, h: 50), at: 0.0),
+  ///         .key(NSize(w: 200, h: 100), at: 0.5),
+  ///         .key(NSize(w: 150, h: 75), at: 1.0),
+  ///       ], duration: 800.ms),
+  ///       clipGeometry: .rrect(BorderRadius.circular(12)),
+  ///     ),
+  ///   ],
+  ///   child: MyWidget(),
+  /// )
+  /// ```
+  ///
+  /// ## With Infinity Keyframe
+  ///
+  /// ```dart
+  /// // Width animates, height fills available space at last keyframe
+  /// Actor(
+  ///   acts: [
+  ///     SizedClipAct.keyframed(
+  ///       frames: Keyframes([
+  ///         .key(NSize(w: 100, h: 50)),
+  ///         .key(NSize(w: double.infinity, h: double.infinity), motion: Spring.bouncy()),
+  ///       ], motion: Spring.smooth()),
+  ///       alignment: Alignment.center,
+  ///       clipGeometry: .rrect(BorderRadius.circular(16)),
+  ///     ),
+  ///   ],
+  ///   motion: .smooth(damping: 23),
+  ///   child: MyWidget(),
+  /// )
+  /// ```
+  /// {@endtemplate}
   const SizedClipAct.keyframed({
     required Keyframes<NSize> this.frames,
     super.delay,
