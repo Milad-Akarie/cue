@@ -8,7 +8,6 @@ topics:
   - timeline
   - keyframes
   - effects
-  - ui
 
 environment:
   sdk: ^3.10.8
