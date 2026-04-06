@@ -1,4 +1,5 @@
 import 'package:cue/cue.dart';
+import 'package:example/examples/ios_context_menu.dart';
 import 'package:example/examples/options_button.dart';
 import 'package:example/examples/smooth_switch.dart';
 import 'package:example/examples/three_dots_action.dart';
@@ -52,7 +53,7 @@ class _DemoPageState extends State<DemoPage> {
           child: Column(
             mainAxisAlignment: .center,
             children: [
-             OptionsButton()
+             Expanded(child: IosContextMenu())
             ],
           ),
         ),
