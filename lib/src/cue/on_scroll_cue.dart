@@ -5,7 +5,7 @@ part of 'cue.dart';
 /// animation progress.
 ///
 /// Progress is `0.0` when the widget's leading edge enters the bottom of the
-/// viewport, and `1.0` when it reaches the top. Suitable for parallax effects.
+/// viewport, and `1.0` when the widget's trailing edge exits the top. Suitable for parallax effects.
 ///
 /// Must be inside a [Scrollable]. Does not support nested scrollables.
 ///
@@ -102,11 +102,11 @@ class _OnScrollCueState extends CueState<OnScrollCue> with SingleTickerProviderS
 
     // The scroll range during which the child travels through the viewport.
     // Starts when child's leading edge enters the viewport bottom.
-    // Ends when child's leading edge reaches the viewport top.
+    // Ends when child's trailing edge exits the viewport top.
     final scrollRange = viewportDimension + childExtent;
 
     final scrollOffset = _scrollPosition!.pixels;
-    final entryScrollOffset = revealedOffset + childExtent - viewportDimension;
+    final entryScrollOffset = revealedOffset - viewportDimension;
 
     final rawProgress = scrollRange > 0 ? (scrollOffset - entryScrollOffset) / scrollRange : 0.0;
     final progress = rawProgress.clamp(0.0, 1.0);

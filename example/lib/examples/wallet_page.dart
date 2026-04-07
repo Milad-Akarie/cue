@@ -1,29 +1,9 @@
 import 'package:cue/cue.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-
-class WalletPage extends StatefulWidget {
+// Ai-generate code
+class WalletPage extends StatelessWidget {
   const WalletPage({super.key});
-
-  @override
-  State<WalletPage> createState() => _WalletPageState();
-}
-
-class _WalletPageState extends State<WalletPage> {
-  final transactions = [
-    (icon: Iconsax.arrow_up, label: 'Spotify', amount: '-\$12.99', time: 'Today, 9:41 AM', color: Colors.red),
-    (icon: Iconsax.arrow_down, label: 'Salary', amount: '+\$4,250.00', time: 'Today, 12:00 PM', color: Colors.green),
-    (icon: Iconsax.shopping_cart, label: 'Amazon', amount: '-\$89.00', time: 'Yesterday', color: Colors.orange),
-    (icon: Iconsax.dollar_square, label: 'Dividend', amount: '+\$156.32', time: 'Mar 5', color: Colors.green),
-    (icon: Iconsax.card_add, label: 'Netflix', amount: '-\$15.99', time: 'Mar 4', color: Colors.red),
-  ];
-
-  final quickActions = [
-    (icon: Iconsax.wallet_3, label: 'Send'),
-    (icon: Iconsax.receipt_search, label: 'Request'),
-    (icon: Iconsax.refresh, label: 'Top Up'),
-    (icon: Iconsax.chart_21, label: 'Invest'),
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -31,20 +11,21 @@ class _WalletPageState extends State<WalletPage> {
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       body: SafeArea(
+        bottom: false,
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
           child: Cue.onMount(
             motion: .bouncy(),
-            child: Column(
+            child: const Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildHeader(theme),
-                const SizedBox(height: 24),
-                _buildCreditCard(theme),
-                const SizedBox(height: 24),
-                _buildQuickActions(theme),
-                const SizedBox(height: 24),
-                _buildTransactions(theme),
+                _WalletHeader(),
+                SizedBox(height: 24),
+                _CreditCard(),
+                SizedBox(height: 24),
+                _QuickActions(),
+                SizedBox(height: 24),
+                _Transactions(),
               ],
             ),
           ),
@@ -52,8 +33,14 @@ class _WalletPageState extends State<WalletPage> {
       ),
     );
   }
+}
 
-  Widget _buildHeader(ThemeData theme) {
+class _WalletHeader extends StatelessWidget {
+  const _WalletHeader();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Row(
       children: [
         Actor(
@@ -84,8 +71,14 @@ class _WalletPageState extends State<WalletPage> {
       ],
     );
   }
+}
 
-  Widget _buildCreditCard(ThemeData theme) {
+class _CreditCard extends StatelessWidget {
+  const _CreditCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Actor(
       acts: [.scale(from: 0.8), .fadeIn(), .slideY(from: 0.3)],
       delay: 100.ms,
@@ -95,12 +88,12 @@ class _WalletPageState extends State<WalletPage> {
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(24),
-          gradient: LinearGradient(
+          gradient: const LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              const Color(0xFF667EEA),
-              const Color(0xFF764BA2),
+              Color(0xFF667EEA),
+              Color(0xFF764BA2),
             ],
           ),
           boxShadow: [
@@ -130,7 +123,7 @@ class _WalletPageState extends State<WalletPage> {
                 Actor(
                   acts: [.fadeIn(), .blur(from: 8)],
                   delay: 250.ms,
-                  child: Icon(
+                  child: const Icon(
                     Iconsax.wifi,
                     color: Colors.white70,
                     size: 20,
@@ -238,8 +231,21 @@ class _WalletPageState extends State<WalletPage> {
       ),
     );
   }
+}
 
-  Widget _buildQuickActions(ThemeData theme) {
+class _QuickActions extends StatelessWidget {
+  const _QuickActions();
+
+  static final _quickActions = [
+    (icon: Iconsax.wallet_3, label: 'Send'),
+    (icon: Iconsax.receipt_search, label: 'Request'),
+    (icon: Iconsax.refresh, label: 'Top Up'),
+    (icon: Iconsax.chart_21, label: 'Invest'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -258,9 +264,9 @@ class _WalletPageState extends State<WalletPage> {
         Row(
           spacing: 12,
           children: List.generate(
-            quickActions.length,
+            _quickActions.length,
             (index) {
-              final item = quickActions[index];
+              final item = _quickActions[index];
               return Expanded(
                 child: Actor(
                   acts: [
@@ -312,8 +318,22 @@ class _WalletPageState extends State<WalletPage> {
       ],
     );
   }
+}
 
-  Widget _buildTransactions(ThemeData theme) {
+class _Transactions extends StatelessWidget {
+  const _Transactions();
+
+  static final _transactions = [
+    (icon: Iconsax.arrow_up, label: 'Spotify', amount: '-\$12.99', time: 'Today, 9:41 AM', color: Colors.red),
+    (icon: Iconsax.arrow_down, label: 'Salary', amount: '+\$4,250.00', time: 'Today, 12:00 PM', color: Colors.green),
+    (icon: Iconsax.shopping_cart, label: 'Amazon', amount: '-\$89.00', time: 'Yesterday', color: Colors.orange),
+    (icon: Iconsax.dollar_square, label: 'Dividend', amount: '+\$156.32', time: 'Mar 5', color: Colors.green),
+    (icon: Iconsax.card_add, label: 'Netflix', amount: '-\$15.99', time: 'Mar 4', color: Colors.red),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -340,8 +360,8 @@ class _WalletPageState extends State<WalletPage> {
           ),
         ),
         const SizedBox(height: 16),
-        ...List.generate(transactions.length, (index) {
-          final item = transactions[index];
+        ...List.generate(_transactions.length, (index) {
+          final item = _transactions[index];
           return Padding(
             padding: const EdgeInsets.only(bottom: 12),
             child: Actor(
