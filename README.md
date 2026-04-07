@@ -26,8 +26,6 @@ Physics-first Flutter animations with a composable, timeline-driven API for buil
         <img src="https://raw.githubusercontent.com/Milad-Akarie/cue/main/demos/ios_context_menu.gif" alt="iOS context menu demo" width="100%">
       </a>
       <br/>
-      <strong>iOS Context Menu</strong>
-      <br/>
       <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/ios_context_menu.dart">source</a>
     </td>
     <td align="center" width="33%">
@@ -35,16 +33,12 @@ Physics-first Flutter animations with a composable, timeline-driven API for buil
         <img src="https://raw.githubusercontent.com/Milad-Akarie/cue/main/demos/draggable_panel.gif" alt="Draggable panel demo" width="100%">
       </a>
       <br/>
-      <strong>Draggable Panel</strong>
-      <br/>
       <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/draggable_panel.dart">source</a>
     </td>
     <td align="center" width="33%">
       <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/indicator_to_button.dart">
         <img src="https://raw.githubusercontent.com/Milad-Akarie/cue/main/demos/indicator_to_button.gif" alt="Indicator to button demo" width="100%">
       </a>
-      <br/>
-      <strong>Indicator To Button</strong>
       <br/>
       <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/indicator_to_button.dart">source</a>
     </td>
@@ -55,8 +49,6 @@ Physics-first Flutter animations with a composable, timeline-driven API for buil
         <img src="https://raw.githubusercontent.com/Milad-Akarie/cue/main/demos/bottom_bar.gif" alt="Bottom bar demo" width="100%">
       </a>
       <br/>
-      <strong>Bottom Bar</strong>
-      <br/>
       <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/bottom_bar.dart">source</a>
     </td>
     <td align="center" width="33%">
@@ -64,16 +56,12 @@ Physics-first Flutter animations with a composable, timeline-driven API for buil
         <img src="https://raw.githubusercontent.com/Milad-Akarie/cue/main/demos/delete_confirmation.gif" alt="Delete confirmation demo" width="100%">
       </a>
       <br/>
-      <strong>Delete Confirmation</strong>
-      <br/>
       <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/delete_confirmation.dart">source</a>
     </td>
     <td align="center" width="33%">
       <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/expanding_cards.dart">
         <img src="https://raw.githubusercontent.com/Milad-Akarie/cue/main/demos/expanding_cards.gif" alt="Expanding cards demo" width="100%">
       </a>
-      <br/>
-      <strong>Expanding Cards</strong>
       <br/>
       <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/expanding_cards.dart">source</a>
     </td>
@@ -84,16 +72,12 @@ Physics-first Flutter animations with a composable, timeline-driven API for buil
         <img src="https://raw.githubusercontent.com/Milad-Akarie/cue/main/demos/horizintally_expanding_cards.gif" alt="Horizontally expanding cards demo" width="100%">
       </a>
       <br/>
-      <strong>Horizontally Expanding Cards</strong>
-      <br/>
       <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/horizinally_expanding_cards.dart">source</a>
     </td>
     <td align="center" width="33%">
       <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/slack_style_fab.dart">
         <img src="https://raw.githubusercontent.com/Milad-Akarie/cue/main/demos/slack_style_fab.gif" alt="Slack style fab demo" width="100%">
       </a>
-      <br/>
-      <strong>Slack Style FAB</strong>
       <br/>
       <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/slack_style_fab.dart">source</a>
     </td>
@@ -102,7 +86,6 @@ Physics-first Flutter animations with a composable, timeline-driven API for buil
         <img src="https://raw.githubusercontent.com/Milad-Akarie/cue/main/demos/smooth_switch.gif" alt="Smooth switch demo" width="100%">
       </a>
       <br/>
-      <strong>Smooth Switch</strong>
       <br/>
       <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/smooth_switch.dart">source</a>
     </td>
@@ -112,8 +95,6 @@ Physics-first Flutter animations with a composable, timeline-driven API for buil
       <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/three_dots_action.dart">
         <img src="https://raw.githubusercontent.com/Milad-Akarie/cue/main/demos/three_dots_action.dart.gif" alt="Three dots action demo" width="100%">
       </a>
-      <br/>
-      <strong>Three Dots Action</strong>
       <br/>
       <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/three_dots_action.dart">source</a>
     </td>

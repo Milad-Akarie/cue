@@ -1,5 +1,5 @@
 import 'package:cue/cue.dart';
-import 'package:example/examples/draggable_panel.dart';
+import 'package:example/examples/wallet_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
       themeMode: ThemeMode.dark,
-      home: const DemoPage(),
+      home: const WalletPage(),
       debugShowCheckedModeBanner: false,
       builder: (context, child) {
         if (kDebugMode) {
@@ -33,19 +33,4 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class DemoPage extends StatefulWidget {
-  const DemoPage({super.key});
-
-  @override
-  State<DemoPage> createState() => _DemoPageState();
-}
-
-class _DemoPageState extends State<DemoPage> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Cue')),
-      body: DraggablePanel(),
-    );
-  }
-}
+ 
