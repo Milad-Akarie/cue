@@ -2,7 +2,6 @@
 <h1 align="center">                    
   Cue          
 </h1>                    
-
 <p align="center">                    
 <a href="https://img.shields.io/badge/License-MIT-green"><img src="https://img.shields.io/badge/License-MIT-green" alt="MIT License"></a>                    
 <a href="https://github.com/Milad-Akarie/cue/stargazers"><img src="https://img.shields.io/github/stars/Milad-Akarie/cue?style=flat&logo=github&colorB=green&label=stars" alt="stars"></a>                    
@@ -103,9 +102,10 @@ Physics-first Flutter animations with a composable, timeline-driven API for buil
   </tr>
 </table>
 
-Cue separates animation into a few small pieces:
+---
 
 ## Usage
+Cue separates animation into a few small pieces:
 - `Cue` decides when an animation should run.
 - `Actor` decides which widget is animated.
 - `Act` describes the effect that is applied.
@@ -199,6 +199,7 @@ Cue.onToggle(
   ),
 )
 ```
+
 
 ### 2. `Actor`: the renderer
 
