@@ -334,7 +334,7 @@ abstract class Act {
     ReverseBehavior<double> reverse,
   }) = TranslateAct.y;
 
-  /// {@macro act.translate.from_global}
+  /// {@macro act.translate.fromGlobal}
   const factory Act.translateFromGlobal({
     required Offset offset,
     Offset toLocal,
@@ -401,14 +401,14 @@ abstract class Act {
     ReverseBehavior<Offset> reverse,
   }) = SlideAct.down;
 
-  /// {@macro act.slide.from_leading}
+  /// {@macro act.slide.fromLeading}
   const factory Act.slideFromLeading({
     CueMotion? motion,
     Duration delay,
     ReverseBehavior<Offset> reverse,
   }) = SlideAct.fromLeading;
 
-  /// {@macro act.slide.from_trailing}
+  /// {@macro act.slide.fromTrailing}
   const factory Act.slideFromTrailing({
     CueMotion? motion,
     Duration delay,
@@ -571,7 +571,7 @@ abstract class Act {
     ReverseBehavior<double> reverse,
   }) = RotateAct;
 
-  /// {@macro act.rotate_3d}
+  /// {@macro act.rotate3d}
   const factory Act.rotate3D({
     Rotation3D from,
     Rotation3D to,

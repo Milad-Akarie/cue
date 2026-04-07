@@ -141,9 +141,7 @@ class _ParallaxCard extends StatelessWidget {
                 ),
               ),
               child: Actor(
-                acts: [
-                  // .parallax(slide: 0.5, axis: .vertical),
-                ],
+                acts: [.parallax(slide: 0.5, axis: .vertical),],
                 child: Image.network(
                   'https://picsum.photos/id/$imageId/600/600',
                   fit: BoxFit.cover,
