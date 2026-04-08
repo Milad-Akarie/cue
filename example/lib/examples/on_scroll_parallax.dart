@@ -112,21 +112,22 @@ class _ParallaxCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Cue.onScroll(
       acts: [
+        // uncomment to add a subtle 3D rotation effect to the parallax card
         // Rotate3DAct.keyframed(
         //   frames: .fractional([
-        //     .key(Rotation3D(x: 50, z: 10), at: 0.0),
+        //     .key(Rotation3D(x: 60, y: 20, z: 10), at: 0.0),
         //     .key(Rotation3D.zero, at: 0.5),
-        //     .key(Rotation3D(x: -50, z: -20), at: 1.0),
+        //     .key(Rotation3D(x: -60, y: -20, z: -10), at: 1.0),
         //   ]),
         // ),
       ],
       child: Container(
         height: 280,
-        margin: const .symmetric(vertical: 8),
+        margin: .symmetric(vertical: 8),
         decoration: BoxDecoration(borderRadius: .circular(24)),
-        clipBehavior: Clip.hardEdge,
+        clipBehavior: .hardEdge,
         child: Stack(
-          fit: StackFit.expand,
+          fit: .expand,
           children: [
             Container(
               foregroundDecoration: BoxDecoration(
@@ -141,7 +142,7 @@ class _ParallaxCard extends StatelessWidget {
                 ),
               ),
               child: Actor(
-                acts: [.parallax(slide: 0.5, axis: .vertical),],
+                acts: [.parallax(slide: .4, axis: .vertical)],
                 child: Image.network(
                   'https://picsum.photos/id/$imageId/600/600',
                   fit: BoxFit.cover,
