@@ -345,6 +345,7 @@ abstract class TranslateAct extends Act {
 }
 
 class _TranslateOffset extends TweenAct<Offset> implements TranslateAct {
+  
   @override
   final ActKey key = const ActKey('Translate');
 

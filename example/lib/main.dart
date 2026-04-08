@@ -1,3 +1,5 @@
+import 'package:cue/cue.dart';
+import 'package:example/examples/image_grid_modal.dart';
 import 'package:example/examples/on_scroll_visible_example.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -20,11 +22,11 @@ class MyApp extends StatelessWidget {
         ),
       ),
       themeMode: ThemeMode.dark,
-      home: const OnScrollVisibleExample(),
+      home: const ImageGridModal(),
       debugShowCheckedModeBanner: false,
       builder: (context, child) {
         if (kDebugMode) {
-          // return CueDebugTools(child: child!);
+          return CueDebugTools(child: child!);
         }
         return child!;
       },
