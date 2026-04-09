@@ -21,6 +21,29 @@ Physics-first Flutter animations with a composable, timeline-driven API for buil
 <table>
   <tr>
     <td align="center" width="33%">
+      <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/on_scroll_demo.dart">
+        <img src="https://raw.githubusercontent.com/Milad-Akarie/cue/main/demos/on_scroll_demo.gif" alt="On scroll demo" width="100%">
+      </a>
+      <br/>
+      <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/on_scroll_demo.dart">source</a>
+    </td>
+    <td align="center" width="33%">
+      <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/on_scroll_visiable_demo.dart">
+        <img src="https://raw.githubusercontent.com/Milad-Akarie/cue/main/demos/on_scroll_visiable_demo.gif" alt="On scroll visible demo" width="100%">
+      </a>
+      <br/>
+      <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/on_scroll_visiable_demo.dart">source</a>
+    </td>
+    <td align="center" width="33%">
+      <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/page_view_demo.dart">
+        <img src="https://raw.githubusercontent.com/Milad-Akarie/cue/main/demos/page_view_demo.gif" alt="Page view demo" width="100%">
+      </a>
+      <br/>
+      <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/page_view_demo.dart">source</a>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="33%">
       <a href="https://github.com/Milad-Akarie/cue/blob/main/example/lib/examples/ios_context_menu.dart">
         <img src="https://raw.githubusercontent.com/Milad-Akarie/cue/main/demos/ios_context_menu.gif" alt="iOS context menu demo" width="100%">
       </a>

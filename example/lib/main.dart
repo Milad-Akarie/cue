@@ -1,14 +1,16 @@
 import 'package:cue/cue.dart';
-import 'package:example/examples/image_grid_modal.dart';
+import 'package:example/examples/on_scroll_parallax.dart';
+import 'package:example/examples/on_scroll_visible_example.dart';
+import 'package:example/examples/page_view_demo.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const CueApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class CueApp extends StatelessWidget {
+  const CueApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -21,14 +23,67 @@ class MyApp extends StatelessWidget {
         ),
       ),
       themeMode: ThemeMode.dark,
-      home: const ImageGridModal(),
+      home: const OnScrollVisibleExample(),
       debugShowCheckedModeBanner: false,
       builder: (context, child) {
         if (kDebugMode) {
-          return CueDebugTools(child: child!);
+          // return CueDebugTools(child: child!);
         }
         return child!;
       },
+    );
+  }
+}
+
+class BasiceExample extends StatefulWidget {
+  const BasiceExample({super.key});
+
+  @override
+  State<BasiceExample> createState() => _BasiceExampleState();
+}
+
+class _BasiceExampleState extends State<BasiceExample> {
+  bool _forward = false;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Cue'),
+      ),
+      body: SizedBox.expand(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Cue.onToggle(
+              toggled: _forward,
+              motion: .wobbly(),
+              acts: [
+                 .scale(to: 1.2),
+                 .slideY(to: -1),
+                 .rotate(to: 180),
+                 .colorTint(from: Colors.orange, to: Colors.green)
+              ],
+              child: Container(
+                width: 100,
+                height: 100,
+                decoration: BoxDecoration(
+                  color: Colors.orange,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+            ),
+           SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  _forward = !_forward;
+                });
+              },
+              child: const Text('Toggle Animation'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

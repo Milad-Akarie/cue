@@ -1,4 +1,5 @@
 import 'package:cue/cue.dart';
+import 'package:example/examples/bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 
@@ -45,7 +46,6 @@ class _PageViewDemoState extends State<PageViewDemo> {
     ),
   ];
 
-  
   @override
   void dispose() {
     _controller.dispose();
@@ -57,15 +57,15 @@ class _PageViewDemoState extends State<PageViewDemo> {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 247, 247, 247),
       appBar: AppBar(
         title: const Text('Indexed Cue'),
         backgroundColor: Colors.transparent,
       ),
+      bottomNavigationBar: SafeArea(child: BottomBar()),
       body: Padding(
-        padding: const EdgeInsets.only(top: 48.0),
+        padding: const EdgeInsets.only(top: 100.0),
         child: FractionallySizedBox(
-          heightFactor: .75,
+          heightFactor: .95,
           child: PageView.builder(
             controller: _controller,
             itemCount: _pages.length,
@@ -85,10 +85,14 @@ class _PageViewDemoState extends State<PageViewDemo> {
                   ),
                 ],
                 child: Card(
-                  color: colors.surface,
+                  color: colors.surfaceContainer,
                   margin: const .symmetric(vertical: 32),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: .circular(20),
+                    side: BorderSide(color: colors.onSurface.withValues(alpha: 0.1), width: .5),
+                  ),
                   elevation: 8,
-                  shadowColor: colors.primary.withValues(alpha: 0.1),
+                  shadowColor: const Color.fromARGB(255, 84, 83, 84).withValues(alpha: 0.2),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
