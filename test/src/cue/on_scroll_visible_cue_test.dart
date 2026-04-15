@@ -102,11 +102,19 @@ void main() {
     testWidgets('controller starts at progress 1.0', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          home: SingleChildScrollView(
-            child: SizedBox(
-              height: 1000,
-              child: Cue.onScrollVisible(
-                child: const SizedBox(height: 100),
+          home: SizedBox(
+            height: 500,
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: 100,
+                    child: Cue.onScrollVisible(
+                      acts: [.fadeIn()],
+                      child: const Text('Test'),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -114,7 +122,6 @@ void main() {
       );
 
       await tester.pump();
-
       final state = tester.state<OnScrollVisibleCueState>(find.byType(OnScrollVisibleCue));
       expect(state.controller.value, equals(1.0));
     });

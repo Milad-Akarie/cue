@@ -42,6 +42,7 @@ void main() {
             value: 'initial',
             motion: CueMotion.linear(100.ms),
             skipFirstAnimation: false,
+            acts: [.fadeIn()],
             child: const SizedBox(),
           ),
         ),
@@ -59,6 +60,7 @@ void main() {
           home: Cue.onChange(
             value: 'first',
             motion: CueMotion.linear(100.ms),
+            acts: [.fadeIn()],
             child: const SizedBox(),
           ),
         ),
@@ -66,7 +68,7 @@ void main() {
 
       await tester.pumpAndSettle(const Duration(milliseconds: 200));
 
-      final state = tester.state(find.byType(OnChangeCue)) as dynamic;
+      final state = tester.state(find.byType(OnChangeCue)) as SelfAnimatedCueState;
       expect(state.controller.value, equals(1.0));
 
       await tester.pumpWidget(
@@ -74,6 +76,7 @@ void main() {
           home: Cue.onChange(
             value: 'second',
             motion: CueMotion.linear(100.ms),
+            acts: [.fadeIn()],
             child: const SizedBox(),
           ),
         ),

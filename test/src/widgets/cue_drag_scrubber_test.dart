@@ -124,15 +124,17 @@ void main() {
             controller: controller,
             defaultConfig: controller.timeline.defaultConfig,
             reanimateFromCurrent: false,
-            child: CueDragScrubber(
-              distance: 200,
-              releaseMode: CueDragReleaseMode.none,
-              child: const SizedBox(width: 100, height: 100),
+            child: Actor(
+              acts: [.slideX(to: 1)],
+              child: CueDragScrubber(
+                distance: 200,
+                releaseMode: CueDragReleaseMode.none,
+                child: const SizedBox(width: 100, height: 100),
+              ),
             ),
           ),
         ),
       );
-
       final gesture = await tester.startGesture(const Offset(50, 50));
       await gesture.moveBy(const Offset(0, 100));
       await tester.pump();
@@ -152,10 +154,13 @@ void main() {
             controller: controller,
             defaultConfig: controller.timeline.defaultConfig,
             reanimateFromCurrent: false,
-            child: CueDragScrubber(
-              distance: 200,
-              releaseMode: CueDragReleaseMode.snap,
-              child: const SizedBox(width: 100, height: 100),
+            child: Actor(
+              acts: [.slideX(to: 2)],
+              child: CueDragScrubber(
+                distance: 200,
+                releaseMode: CueDragReleaseMode.snap,
+                child: const SizedBox(width: 100, height: 100),
+              ),
             ),
           ),
         ),

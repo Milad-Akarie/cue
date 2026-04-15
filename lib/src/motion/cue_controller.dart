@@ -55,7 +55,8 @@ class CueController extends AnimationController {
            motion: motion,
            reverseMotion: reverseMotion ?? motion,
          ),
-       )..setProgress(value, forward: value > 0.0),
+         initialProgress: value,
+       ),
        super.unbounded();
 
   /// Rebuilds the timeline with a new default motion.
@@ -270,8 +271,10 @@ class CueController extends AnimationController {
   void setProgress(double newValue, {bool forward = true, bool forceLinear = false}) {
     assert(newValue >= 0.0 && newValue <= 1.0, 'The animation value must be between 0.0 and 1.0. Received: $newValue');
     timeline.setProgress(newValue, forward: forward, forceLinear: forceLinear);
-    super.value = newValue;
   }
+
+  @override
+  double get value => timeline.progress;
 
   @override
   AnimationStatus get status => timeline.status;
@@ -457,8 +460,8 @@ class CueController extends AnimationController {
       'Consider specifying a different springDescription, or use animateWith() '
       'with an explicit SpringSimulation if an underdamped spring is intentional.',
     );
-    void listener() => timeline.setProgress(value.clamp(0, 1), forward: forward);
-    addListener(listener);
+    void listener() => timeline.setProgress(super.value.clamp(0, 1), forward: forward);
+   addListener(listener);
     if (forward) {
       return super.animateWith(simulation)..whenComplete(() => removeListener(listener));
     } else {

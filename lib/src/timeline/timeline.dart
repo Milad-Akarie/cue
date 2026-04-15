@@ -37,10 +37,28 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
   @override
   Map<TrackConfig, TrackEntry> get tracks => _tracks;
 
-   final Map<TrackConfig, TrackEntry> _tracks = {};
+  final Map<TrackConfig, TrackEntry> _tracks = {};
 
-  /// Creates a timeline implementation 
-  CueTimelineImpl(this.defaultConfig);
+  double _progressPlaceholder;
+
+  /// Creates a timeline implementation
+  CueTimelineImpl(this.defaultConfig, {double initialProgress = 0.0})
+    : assert(
+        initialProgress >= 0.0 && initialProgress <= 1.0,
+        'Initial progress must be between 0.0 and 1.0. Received: $initialProgress',
+      ),
+      _progressPlaceholder = initialProgress,
+      _status = switch (initialProgress) {
+        0.0 => AnimationStatus.dismissed,
+        1.0 => AnimationStatus.completed,
+        _ => AnimationStatus.forward,
+      };
+
+  /// Creates a timeline from a single track configuration.
+  /// The track is created immediately and available as the default track.
+  factory CueTimelineImpl.fromConfig(TrackConfig config, {double initialProgress = 0.0}) {
+    return CueTimelineImpl(config, initialProgress: initialProgress);
+  }
 
   /// Creates a timeline from a single motion (forward and reverse use the same).
   factory CueTimelineImpl.fromMotion(CueMotion motion, {CueMotion? reverseMotion}) {
@@ -112,7 +130,8 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
   /// when all tokens are released AND it's not the default track.
   @override
   (CueTrack track, ReleaseToken token) obtainTrack(TrackConfig config) {
-   
+    // must obtain here
+    double handOffProgress = progress;
     final entry = tracks.putIfAbsent(
       config,
       () => TrackEntry(buildTrack(config)),
@@ -125,10 +144,13 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
       // we attach the current timeline state to it so that it can be in sync with other tracks
       entry.track.prepare(
         forward: status.isForwardOrCompleted,
-        from: progress,
+        from: handOffProgress,
         exteranlVelocity: dx(_lastT),
       );
     }
+
+    // we now use actual progress
+    _progressPlaceholder = 0.0;
     final token = ReleaseToken(config, this);
     entry.addToken(token);
     return (entry.track, token);
@@ -162,7 +184,7 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
   @override
   double get progress {
     if (tracks.isEmpty) {
-      return 0.0;
+      return _progressPlaceholder;
     }
     final isForward = status.isForwardOrCompleted;
     var longest = tracks.values.first;
@@ -183,6 +205,15 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
   @override
   void setProgress(double value, {bool forward = true, bool forceLinear = false}) {
     _repeatConfig = null;
+    if (tracks.isEmpty) {
+      _progressPlaceholder = value;
+      _status = switch (value) {
+        0.0 => AnimationStatus.dismissed,
+        1.0 => AnimationStatus.completed,
+        _ => forward ? AnimationStatus.forward : AnimationStatus.reverse,
+      };
+      return;
+    }
     if (forward) {
       _setForwardProgress(value, forceLinear: forceLinear);
     } else {

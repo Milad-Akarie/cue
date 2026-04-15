@@ -22,6 +22,7 @@ CueController _createController({
     motion: motion ?? CueMotion.linear(300.ms),
     reverseMotion: reverseMotion,
   );
+  controller.timeline.obtainDefaultTrack();
   addTearDown(controller.dispose);
   return controller;
 }
@@ -281,7 +282,6 @@ void main() {
     group('Value and progress', () {
       test('setProgress updates value', () {
         final controller = _createController();
-
         controller.setProgress(0.5);
         expect(controller.value, equals(0.5));
 
@@ -291,7 +291,6 @@ void main() {
 
       test('setProgress with forward=false', () {
         final controller = _createController();
-
         controller.setProgress(0.5, forward: false);
         expect(controller.value, equals(0.5));
         expect(controller.status, equals(AnimationStatus.reverse));
@@ -613,11 +612,9 @@ void main() {
 
       test('fling with negative velocity animates backward', () async {
         final controller = _createController(motion: CueMotion.linear(300.ms));
-
         controller.setProgress(1.0, forward: true);
-        controller.fling(velocity: -1.0);
+         controller.fling(velocity: -1.0);
         await _pump();
-
         expect(controller.value, lessThan(1.0));
       });
 

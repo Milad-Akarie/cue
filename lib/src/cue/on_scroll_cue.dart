@@ -50,7 +50,10 @@ class _OnScrollCueState extends CueState<OnScrollCue> with SingleTickerProviderS
   @override
   CueController get controller => _controller;
 
-  late final _controller = CueController(vsync: this, motion: .linear(500.ms));
+  late final _controller = CueController(
+    vsync: this,
+    motion: .linear(500.ms),
+  );
 
   ScrollPosition? _scrollPosition;
   double? _cachedRevealedOffset;
@@ -110,7 +113,7 @@ class _OnScrollCueState extends CueState<OnScrollCue> with SingleTickerProviderS
 
     final rawProgress = scrollRange > 0 ? (scrollOffset - entryScrollOffset) / scrollRange : 0.0;
     final progress = rawProgress.clamp(0.0, 1.0);
-
+    if (progress == controller.value) return;
     if (_firstFrame && progress != 0.0 && progress != 1.0) {
       _firstFrame = false;
       _controller.animateTo(progress, forward: true);

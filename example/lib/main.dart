@@ -1,4 +1,15 @@
 import 'package:cue/cue.dart';
+import 'package:example/examples/bottom_bar.dart';
+import 'package:example/examples/delete_confirmation.dart';
+import 'package:example/examples/expanding_cards.dart';
+import 'package:example/examples/horizinally_expanding_cards.dart';
+import 'package:example/examples/on_scroll_parallax.dart';
+import 'package:example/examples/on_scroll_visible_example.dart';
+import 'package:example/examples/options_button.dart';
+import 'package:example/examples/slack_style_fab.dart';
+import 'package:example/examples/smooth_switch.dart';
+import 'package:example/examples/three_dots_action.dart';
+import 'package:example/examples/wallet_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -20,8 +31,8 @@ Widget build(BuildContext context) {
         ),
       ),
       themeMode: ThemeMode.light,
-      showPerformanceOverlay: true,
-      home: const BasiceExample(),
+      // showPerformanceOverlay: true,
+      home: OnScrollParallax(),
       debugShowCheckedModeBanner: false,
       builder: (context, child) {
         if (kDebugMode) {

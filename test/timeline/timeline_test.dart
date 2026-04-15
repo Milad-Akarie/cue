@@ -126,6 +126,8 @@ void main() {
         final mainMotion = CueMotion.linear(300.ms);
         final mainConfig = TrackConfig(motion: mainMotion, reverseMotion: mainMotion);
         final timeline = CueTimelineImpl(mainConfig);
+        // obtain default track to ensure main track exists
+        timeline.obtainDefaultTrack();
 
         final newMotion = CueMotion.curved(500.ms, curve: Curves.easeInOut);
         final newConfig = TrackConfig(motion: newMotion, reverseMotion: newMotion);
@@ -535,6 +537,7 @@ void main() {
         final motion = CueMotion.linear(300.ms);
         final config = TrackConfig(motion: motion, reverseMotion: motion);
         final timeline = CueTimelineImpl(config);
+        timeline.obtainDefaultTrack();
 
         expect(timeline.progress, equals(0.0));
 
@@ -585,6 +588,7 @@ void main() {
         final motion = CueMotion.linear(300.ms);
         final config = TrackConfig(motion: motion, reverseMotion: motion);
         final timeline = CueTimelineImpl(config);
+        timeline.obtainDefaultTrack();
 
         timeline.setProgress(0.7, forward: true);
         expect(timeline.progress, equals(0.7));

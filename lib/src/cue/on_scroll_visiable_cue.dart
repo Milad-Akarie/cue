@@ -60,15 +60,14 @@ class OnScrollVisibleCueState extends CueState<OnScrollVisibleCue> with SingleTi
   @override
   CueController get controller => _controller;
 
-  late final CueController _controller = CueController(vsync: this, motion: .linear(Duration(milliseconds: 500)));
+  late final CueController _controller = CueController(
+    vsync: this,
+    motion: .linear(Duration(milliseconds: 500)),
+    value: 1.0,
+  );
   ScrollPosition? _scrollPosition;
   double? _cachedRevealedOffset;
 
-  @override
-  void initState() {
-    super.initState();
-    _controller.setProgress(1.0, forward: true);
-  }
 
   @override
   void didChangeDependencies() {
@@ -86,11 +85,11 @@ class OnScrollVisibleCueState extends CueState<OnScrollVisibleCue> with SingleTi
       throw FlutterError('Cue.onScrollVisible must be used inside a scrollable widget');
     }
     if (_scrollPosition != position) {
-      _scrollPosition?.removeListener(_trackViiblity);
+      _scrollPosition?.removeListener(_trackVisiblity);
       _scrollPosition = position;
-      _scrollPosition!.addListener(_trackViiblity);
+      _scrollPosition!.addListener(_trackVisiblity);
     }
-    WidgetsBinding.instance.addPostFrameCallback((_) => _trackViiblity());
+    WidgetsBinding.instance.addPostFrameCallback((_) => _trackVisiblity());
   }
 
   @override
@@ -99,7 +98,7 @@ class OnScrollVisibleCueState extends CueState<OnScrollVisibleCue> with SingleTi
     if (widget.enabled != oldWidget.enabled) {
       if (!widget.enabled) {
         _controller.setProgress(1.0, forward: true);
-        _scrollPosition?.removeListener(_trackViiblity);
+        _scrollPosition?.removeListener(_trackVisiblity);
       } else {
         _subscribeToScrollPosition();
       }
@@ -108,14 +107,14 @@ class OnScrollVisibleCueState extends CueState<OnScrollVisibleCue> with SingleTi
 
   @override
   void dispose() {
-    _scrollPosition?.removeListener(_trackViiblity);
+    _scrollPosition?.removeListener(_trackVisiblity);
     _controller.dispose();
     super.dispose();
   }
 
   bool _isFirstFrame = true;
 
-  void _trackViiblity() async {
+  void _trackVisiblity() async {
     if (!mounted) return;
     final renderObject = context.findRenderObject();
     if (renderObject is! RenderBox || !renderObject.attached || !renderObject.hasSize) {
@@ -143,7 +142,7 @@ class OnScrollVisibleCueState extends CueState<OnScrollVisibleCue> with SingleTi
     final forward = (scrollOffset + viewportDimension / 2) < revealedOffset;
 
     final target = visibleFraction.clamp(0.0, 1.0);
-
+    if(visibleFraction == controller.value) return;
     if (target != 1 && target != 0.0 && _isFirstFrame) {
       _isFirstFrame = false;
       _controller.animateTo(target, forward: forward);
