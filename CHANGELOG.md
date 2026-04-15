@@ -1,3 +1,5 @@
+## 0.1.3
+- *CHORE* code clean up + more tests
 ## 0.1.2+1
 - *CHORE* add more visual demos
 ## 0.1.2

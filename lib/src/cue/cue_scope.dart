@@ -56,4 +56,7 @@ class CueScope extends InheritedWidget {
         reanimateFromCurrent != oldWidget.reanimateFromCurrent ||
         defaultConfig != oldWidget.defaultConfig;
   }
+
+  /// Whether the animation is currently running.
+  bool get isAnimating => controller.isAnimating;
 }
