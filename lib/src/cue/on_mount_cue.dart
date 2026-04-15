@@ -68,7 +68,6 @@ class OnMountCueState extends SelfAnimatedCueState<OnMountCue> {
     if (widget.repeat) {
       controller.repeat(reverse: widget.reverseOnRepeat, count: widget.repeatCount);
     } else {
-      
       controller.forward();
     }
   }

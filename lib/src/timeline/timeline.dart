@@ -1,4 +1,3 @@
-
 import 'package:cue/cue.dart';
 import 'package:cue/src/timeline/event_notifier.dart';
 import 'package:cue/src/timeline/track/track.dart';
@@ -243,7 +242,7 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
   }
 
   void _updateStatus() {
-    if(tracks.isEmpty) return;
+    if (tracks.isEmpty) return;
     bool allCompleted = true;
     bool allDismissed = true;
 
