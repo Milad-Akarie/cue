@@ -493,7 +493,7 @@ class _NeedleThumb extends SliderComponentShape {
   }) {
     final size = Size(parentBox.size.width - (2 * horizontalPadding), parentBox.size.height);
     final canvas = context.canvas;
-    final progressX =  horizontalPadding + value * (size.width );
+    final progressX = horizontalPadding + value * (size.width);
     final color = sliderTheme.thumbColor ?? Colors.purple;
     final progressPaint = Paint()
       ..color = color
@@ -522,7 +522,7 @@ class _TimelineTickMarkShape extends SliderTrackShape {
 
   const _TimelineTickMarkShape({required this.start, required this.end, this.horizontalPadding = 16});
 
-@override
+  @override
   Rect getPreferredRect({
     required RenderBox parentBox,
     Offset offset = Offset.zero,
@@ -531,7 +531,7 @@ class _TimelineTickMarkShape extends SliderTrackShape {
     bool? isDiscrete,
   }) {
     const horizontalPadding = 20.0;
-    final trackHeight = parentBox.size.height; 
+    final trackHeight = parentBox.size.height;
     return Rect.fromLTWH(
       offset.dx + horizontalPadding,
       offset.dy + (parentBox.size.height - trackHeight) / 2,

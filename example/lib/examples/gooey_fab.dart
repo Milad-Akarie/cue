@@ -189,7 +189,7 @@ class _GooeyFabState extends State<GooeyFab> {
 }
 
 class _MenuItems extends StatelessWidget {
-  const _MenuItems({ required this.onItemTap});
+  const _MenuItems({required this.onItemTap});
   final VoidCallback onItemTap;
 
   @override
@@ -220,7 +220,7 @@ class _MenuItems extends StatelessWidget {
                     ['Edit', 'Layers', 'Filter'][index],
                     style: theme.textTheme.bodyLarge?.copyWith(color: colors.onPrimary),
                   ),
-                  onTap: onItemTap
+                  onTap: onItemTap,
                 ),
             ],
           ),

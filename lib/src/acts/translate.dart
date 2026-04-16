@@ -692,7 +692,7 @@ class _RenderTranslateFromGlobal extends RenderProxyBox {
     Offset offset = Offset.zero;
     if (_driver.hasAnimatable) {
       offset = _driver.value;
-    } else  {
+    } else {
       offset = _measureOffset();
     }
     transform.translateByDouble(offset.dx, offset.dy, 0, 1);

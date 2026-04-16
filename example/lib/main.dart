@@ -25,9 +25,7 @@ class CueApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFF6C63FF),
         ),
-      ).copyWith(
-         splashFactory: InkSparkle.splashFactory
-      ),
+      ).copyWith(splashFactory: InkSparkle.splashFactory),
       themeMode: ThemeMode.light,
       home: BasiceExample(),
       showPerformanceOverlay: false,

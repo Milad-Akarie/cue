@@ -1,3 +1,6 @@
+## 0.1.4
+- *FIX* debug slider needle jumps on first touch
+- *FIX* lerping Matrix with infinit values throws an error in Scretch act 
 ## 0.1.3
 - *CHORE* code clean up + more tests
 ## 0.1.2+1
