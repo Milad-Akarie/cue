@@ -47,7 +47,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "0.1.3"
+    version: "0.1.4"
   cupertino_icons:
     dependency: "direct main"
     description:
@@ -85,10 +85,11 @@ packages:
   gooey:
     dependency: "direct main"
     description:
-      path: "../../gooey"
-      relative: true
-    source: path
-    version: "0.1.0"
+      name: gooey
+      sha256: "6d9dd0e82beb7f55e61fcbc4479ba88d4cc8d06ca918b698a16d9424d5289098"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.1"
   iconsax:
     dependency: "direct main"
     description:
