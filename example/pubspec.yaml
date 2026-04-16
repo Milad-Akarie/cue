@@ -31,6 +31,9 @@ dependencies:
   flutter:
     sdk: flutter
   iconsax: ^0.0.8
+  gooey: 
+    path: ../../gooey
+
   cue:
     path: ..
 

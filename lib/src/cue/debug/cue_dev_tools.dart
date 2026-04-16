@@ -422,7 +422,6 @@ class _DebugOverlayState extends State<_DebugOverlay> {
                                           ),
                                         ],
                                       ),
-
                                       Container(
                                         padding: const .fromLTRB(0, 12, 0, 4),
                                         decoration: BoxDecoration(
@@ -494,7 +493,7 @@ class _NeedleThumb extends SliderComponentShape {
   }) {
     final size = Size(parentBox.size.width - (2 * horizontalPadding), parentBox.size.height);
     final canvas = context.canvas;
-    final progressX = horizontalPadding + value * size.width;
+    final progressX =  horizontalPadding + value * (size.width );
     final color = sliderTheme.thumbColor ?? Colors.purple;
     final progressPaint = Paint()
       ..color = color
@@ -523,14 +522,23 @@ class _TimelineTickMarkShape extends SliderTrackShape {
 
   const _TimelineTickMarkShape({required this.start, required this.end, this.horizontalPadding = 16});
 
-  @override
+@override
   Rect getPreferredRect({
     required RenderBox parentBox,
     Offset offset = Offset.zero,
     required SliderThemeData sliderTheme,
     bool? isEnabled,
     bool? isDiscrete,
-  }) => offset & parentBox.size;
+  }) {
+    const horizontalPadding = 20.0;
+    final trackHeight = parentBox.size.height; 
+    return Rect.fromLTWH(
+      offset.dx + horizontalPadding,
+      offset.dy + (parentBox.size.height - trackHeight) / 2,
+      parentBox.size.width - horizontalPadding * 2,
+      trackHeight,
+    );
+  }
 
   @override
   void paint(

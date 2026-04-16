@@ -367,7 +367,7 @@ class ScaleAct extends TweenAct<double> {
 /// ```
 ///
 /// {@endtemplate}
-class StretchAct extends TweenActBase<Stretch, Matrix4> {
+class StretchAct extends TweenAct<Stretch> {
   @override
   final ActKey key = const ActKey('Stretch');
 
@@ -455,23 +455,32 @@ class StretchAct extends TweenActBase<Stretch, Matrix4> {
     this.alignment = Alignment.center,
   }) : super.keyframed(from: Stretch.none);
 
+  // @override
+  // Matrix4 transform(_, Stretch value) {
+  //   return Matrix4.diagonal3Values(
+  //     value.x.clamp(0, double.maxFinite),
+  //     value.y.clamp(0, double.maxFinite),
+  //     1.0,
+  //   );
+  // }
+
   @override
-  Matrix4 transform(_, Stretch value) {
-    return Matrix4.diagonal3Values(value.x, value.y, 1.0);
+  Animatable<Stretch> createSingleTween(Stretch from, Stretch to) {
+    return _StretchTween(begin: from, end: to);
   }
 
   @override
-  Animatable<Matrix4> createSingleTween(Matrix4 from, Matrix4 to) {
-    return Matrix4Tween(begin: from, end: to);
-  }
-
-  @override
-  Widget apply(BuildContext context, Animation<Matrix4> animation, Widget child) {
+  Widget apply(BuildContext context, Animation<Stretch> animation, Widget child) {
     return AnimatedBuilder(
       animation: animation,
       builder: (context, child) {
+        final matrix = Matrix4.diagonal3Values(
+          animation.value.x.clamp(0, double.maxFinite),
+          animation.value.y.clamp(0, double.maxFinite),
+          1.0,
+        );
         return Transform(
-          transform: animation.value,
+          transform: matrix,
           alignment: alignment,
           child: child,
         );
@@ -574,4 +583,22 @@ class Stretch {
 
   @override
   int get hashCode => Object.hash(x, y);
+
+  /// Linearly interpolates between two [Stretch] values.
+  Stretch lerpTo(Stretch? other, double t) {
+    if (other == null) {
+      return this;
+    }
+    return Stretch(
+      x: lerpDouble(x, other.x, t) ?? 1.0,
+      y: lerpDouble(y, other.y, t) ?? 1.0,
+    );
+  }
+}
+
+class _StretchTween extends Tween<Stretch> {
+  _StretchTween({required super.begin, required super.end});
+
+  @override
+  Stretch lerp(double t) => begin?.lerpTo(end, t) ?? Stretch.none;
 }

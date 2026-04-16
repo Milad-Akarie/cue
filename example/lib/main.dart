@@ -1,4 +1,6 @@
 import 'package:cue/cue.dart';
+import 'package:example/examples/options_button.dart';
+import 'package:example/examples/slack_style_fab.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -18,6 +20,13 @@ class CueApp extends StatelessWidget {
           seedColor: const Color(0xFF6C63FF),
           brightness: Brightness.dark,
         ),
+      ),
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF6C63FF),
+        ),
+      ).copyWith(
+         splashFactory: InkSparkle.splashFactory
       ),
       themeMode: ThemeMode.light,
       home: BasiceExample(),

@@ -644,13 +644,10 @@ class _RenderTranslateFromGlobal extends RenderProxyBox {
     super.detach();
   }
 
-  void _measure(Offset parentOffset) {
+  Offset _measureOffset() {
     final renderBox = this;
-    if (!renderBox.hasSize) return;
-
     final targetGlobal = renderBox.localToGlobal(Offset.zero);
     Offset beginOffset;
-
     if (_globalOffset case final global?) {
       beginOffset = global - targetGlobal;
     } else {
@@ -659,12 +656,16 @@ class _RenderTranslateFromGlobal extends RenderProxyBox {
       final targetRect = alignment.inscribe(renderBox.size, rect);
       beginOffset = targetRect.topLeft - targetGlobal;
     }
+    return beginOffset;
+  }
+
+  void _buildAnimation() {
+    Offset beginOffset = _measureOffset();
     final builder = CueTweenBuildHelper(
       from: beginOffset,
       to: _toLocal,
       tweenBuilder: (from, to) => Tween<Offset>(begin: from, end: to),
     );
-
     _driver.setAnimatable(builder.buildAnimtable(_driver.context));
   }
 
@@ -680,10 +681,21 @@ class _RenderTranslateFromGlobal extends RenderProxyBox {
   @override
   void paint(PaintingContext context, Offset offset) {
     if (!_driver.hasAnimatable) {
-      _measure(offset);
+      _buildAnimation();
     }
     final translation = _driver.value;
     super.paint(context, offset + translation);
+  }
+
+  @override
+  void applyPaintTransform(RenderObject child, Matrix4 transform) {
+    Offset offset = Offset.zero;
+    if (_driver.hasAnimatable) {
+      offset = _driver.value;
+    } else  {
+      offset = _measureOffset();
+    }
+    transform.translateByDouble(offset.dx, offset.dy, 0, 1);
   }
 
   @override

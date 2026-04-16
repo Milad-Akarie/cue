@@ -392,36 +392,16 @@ void main() {
       });
     });
 
-    group('transform', () {
-      test('transforms Stretch to Matrix4', () {
-        const act = StretchAct();
-
-        final result = act.transform(actContext, const Stretch(x: 2.0, y: 0.5));
-        expect(result, isA<Matrix4>());
-        expect(result.storage[0], closeTo(2.0, 0.001));
-        expect(result.storage[5], closeTo(0.5, 0.001));
-      });
-
-      test('transforms Stretch.none to identity-like matrix', () {
-        const act = StretchAct();
-
-        final result = act.transform(actContext, Stretch.none);
-        expect(result, isA<Matrix4>());
-        expect(result.storage[0], closeTo(1.0, 0.001));
-        expect(result.storage[5], closeTo(1.0, 0.001));
-      });
-    });
-
     group('createSingleTween', () {
-      test('creates Matrix4Tween with correct values', () {
+      test('creates _StretchTween with correct values', () {
         const act = StretchAct();
-        final from = Matrix4.diagonal3Values(1.0, 1.0, 1.0);
-        final to = Matrix4.diagonal3Values(2.0, 0.5, 1.0);
+        const from = Stretch(x: 1.0, y: 1.0);
+        const to = Stretch(x: 2.0, y: 0.5);
         final tween = act.createSingleTween(from, to);
-        expect(tween, isA<Matrix4Tween>());
-        final matrix4Tween = tween as Matrix4Tween;
-        expect(matrix4Tween.begin, from);
-        expect(matrix4Tween.end, to);
+        expect(tween, isA<Tween<Stretch>>());
+        final stretchTween = tween as Tween<Stretch>;
+        expect(stretchTween.begin, from);
+        expect(stretchTween.end, to);
       });
     });
 
@@ -433,7 +413,7 @@ void main() {
 
         track.setProgress(0.5);
 
-        final animation = CueAnimationImpl<Matrix4>(
+        final animation = CueAnimationImpl<Stretch>(
           parent: track,
           token: ReleaseToken(track.config, timeline),
           animtable: animtable,
@@ -457,7 +437,7 @@ void main() {
 
         track.setProgress(0.0);
 
-        final animation = CueAnimationImpl<Matrix4>(
+        final animation = CueAnimationImpl<Stretch>(
           parent: track,
           token: ReleaseToken(track.config, timeline),
           animtable: animtable,
