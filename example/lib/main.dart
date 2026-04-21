@@ -1,8 +1,8 @@
 import 'package:cue/cue.dart';
-import 'package:example/examples/options_button.dart';
-import 'package:example/examples/slack_style_fab.dart';
+import 'package:example/examples/flexiable_space_bar_example.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:gooey/gooey.dart';
 
 void main() {
   runApp(const CueApp());
@@ -27,7 +27,7 @@ class CueApp extends StatelessWidget {
         ),
       ).copyWith(splashFactory: InkSparkle.splashFactory),
       themeMode: ThemeMode.light,
-      home: BasiceExample(),
+      home: FlexibleSpaceBarExample(),
       showPerformanceOverlay: false,
       debugShowCheckedModeBanner: false,
       builder: (context, child) {
@@ -54,6 +54,7 @@ class _BasiceExampleState extends State<BasiceExample> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Cue'),
+        flexibleSpace: FlexibleSpaceBar(),
       ),
       body: SizedBox.expand(
         child: Column(
@@ -92,3 +93,4 @@ class _BasiceExampleState extends State<BasiceExample> {
     );
   }
 }
+

@@ -31,28 +31,24 @@ class _GooeyFabState extends State<GooeyFab> {
               alignment: Alignment.center,
               child: Cue.onToggle(
                 toggled: _open,
-                skipFirstAnimation: false,
-                motion: .smooth(),
                 acts: [.slideY(to: .1)],
+                motion: .bouncy(),
                 child: GooeyZone(
+                  gooiness: 8,
                   color: Colors.black,
-                  blurRadius: 14,
-                  threshold: .5,
-                  shouldSnapshot: false,
                   child: Column(
-                    mainAxisAlignment: .center,
+                    mainAxisAlignment: .start,
                     crossAxisAlignment: .center,
-                    spacing: 8,
                     children: [
                       Padding(
                         padding: const .only(left: 32),
-                        child: Actor(
-                          acts: [
-                            .slideY(to: 1),
-                            .scale(to: 0, alignment: .bottomCenter, motion: .bouncy()),
-                            .unfocus(),
-                          ],
-                          child: GooeyBlob(
+                        child: GooeyBlob(
+                          child: Actor(
+                            acts: [
+                              .sizedClip(to: .zero, from: .square(48), alignment: .topCenter),
+                              .zoomOut(),
+                              .unfocus(),
+                            ],
                             child: IconButton(
                               style: IconButton.styleFrom(
                                 padding: .all(8),
@@ -70,21 +66,25 @@ class _GooeyFabState extends State<GooeyFab> {
                           ),
                         ),
                       ),
-                      GooeyBlob(
-                        shape: .superEllipse(.circular(32)),
-                        child: Actor(
-                          acts: [
-                            .sizedClip(from: .zero, alignment: .bottomCenter),
-                            .fadeIn(),
-                            .focus(from: 6),
-                            .zoomIn(),
-                          ],
-                          child: _MenuItems(
-                            onItemTap: () {
-                              setState(() {
-                                _open = false;
-                              });
-                            },
+                      Actor(
+                        acts: [.translate(from: const Offset(16, -16), to: Offset(0, -10))],
+                        child: GooeyBlob(
+                          shape: .rounded(32),
+                          child: Actor(
+                            delay: 0.ms,
+                            acts: [
+                              .sizedClip(from: .zero, alignment: .topLeft),
+                              .fadeIn(),
+                              .focus(from: 6),
+                              .scale(from: .3, alignment: .topLeft),
+                            ],
+                            child: _MenuItems(
+                              onItemTap: () {
+                                setState(() {
+                                  _open = false;
+                                });
+                              },
+                            ),
                           ),
                         ),
                       ),
@@ -108,11 +108,7 @@ class _GooeyFabState extends State<GooeyFab> {
           builder: (context, rect) {
             return GooeyZone(
               color: Colors.black,
-              threshold: .6,
-              blurRadius: 6,
-              sharpness: .5,
-              overpaintFactor: 0,
-              shouldSnapshot: false,
+              gooiness: 10,
               child: Column(
                 mainAxisSize: .min,
                 spacing: 8,
@@ -134,19 +130,22 @@ class _GooeyFabState extends State<GooeyFab> {
                           ),
                         ),
                       ],
-                      child: GooeyBlob(
-                        child: FloatingActionButton.small(
-                          backgroundColor: Colors.transparent,
-                          heroTag: 'icon_$index',
-                          child: Actor(
-                            acts: [
-                              .zoomIn(),
-                              .fadeIn(),
-                              .focus(),
-                            ],
-                            child: Icon([Iconsax.edit, Iconsax.layer, Iconsax.filter][index], size: 20),
+                      child: SizedBox.square(
+                        dimension: 44,
+                        child: GooeyBlob(
+                          child: FloatingActionButton.small(
+                            backgroundColor: Colors.transparent,
+                            heroTag: 'icon_$index',
+                            child: Actor(
+                              acts: [
+                                .zoomIn(),
+                                .fadeIn(),
+                                .focus(),
+                              ],
+                              child: Icon([Iconsax.edit, Iconsax.layer, Iconsax.filter][index], size: 20),
+                            ),
+                            onPressed: () {},
                           ),
-                          onPressed: () {},
                         ),
                       ),
                     ),
@@ -167,6 +166,7 @@ class _GooeyFabState extends State<GooeyFab> {
                     ],
                     child: GooeyBlob(
                       child: FloatingActionButton(
+                        backgroundColor: Colors.transparent,
                         onPressed: () => Navigator.pop(context),
                         child: Actor(
                           acts: [
@@ -197,7 +197,7 @@ class _MenuItems extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     return SizedBox(
-      width: 200,
+      width: 180,
       child: Padding(
         padding: .symmetric(vertical: 8, horizontal: 4),
         child: Material(
@@ -212,12 +212,12 @@ class _MenuItems extends StatelessWidget {
                 ListTile(
                   visualDensity: VisualDensity(vertical: -2),
                   leading: Icon(
-                    [Iconsax.edit, Iconsax.layer, Iconsax.filter][index],
+                    [Iconsax.edit, Iconsax.layer, Iconsax.filter][index % 3],
                     color: colors.onPrimary,
                     size: 20,
                   ),
                   title: Text(
-                    ['Edit', 'Layers', 'Filter'][index],
+                    ['Edit', 'Layers', 'Filter'][index % 3],
                     style: theme.textTheme.bodyLarge?.copyWith(color: colors.onPrimary),
                   ),
                   onTap: onItemTap,

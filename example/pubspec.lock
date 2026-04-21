@@ -86,10 +86,10 @@ packages:
     dependency: "direct main"
     description:
       name: gooey
-      sha256: "6d9dd0e82beb7f55e61fcbc4479ba88d4cc8d06ca918b698a16d9424d5289098"
+      sha256: "4899b9ad479e6e442c6919cfc14120fa4942d8e27b053f7ccc272bb7554d5c36"
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.1"
+    version: "0.2.0"
   iconsax:
     dependency: "direct main"
     description:

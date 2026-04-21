@@ -31,7 +31,8 @@ dependencies:
   flutter:
     sdk: flutter
   iconsax: ^0.0.8
-  gooey: 0.1.1
+  gooey: 0.2.0
+    
     
 
   cue:
