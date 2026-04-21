@@ -1,5 +1,4 @@
 import 'package:cue/cue.dart';
-import 'package:example/examples/flexiable_space_bar_example.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -26,7 +25,7 @@ class CueApp extends StatelessWidget {
         ),
       ).copyWith(splashFactory: InkSparkle.splashFactory),
       themeMode: ThemeMode.light,
-      home: FlexibleSpaceBarExample(),
+      home: BasiceExample(),
       showPerformanceOverlay: false,
       debugShowCheckedModeBanner: false,
       builder: (context, child) {
