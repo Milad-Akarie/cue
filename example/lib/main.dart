@@ -2,7 +2,6 @@ import 'package:cue/cue.dart';
 import 'package:example/examples/flexiable_space_bar_example.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:gooey/gooey.dart';
 
 void main() {
   runApp(const CueApp());
@@ -93,4 +92,3 @@ class _BasiceExampleState extends State<BasiceExample> {
     );
   }
 }
-

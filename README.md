@@ -666,6 +666,24 @@ Use route integration when modal transitions should be driven by Cue instead of 
 
 Attach drag-based scrubbing to any subtree driven by a `Cue` controller.
 
+### `CueFlexibleSpaceBar`
+
+A drop-in replacement for Flutter's `FlexibleSpaceBar` that provides cue animations driver through context, the animations are driven by the collapse progress of the flexible space bar.
+
+```dart
+CueFlexibleSpaceBar(
+  background: Center(child: 
+    Actor(
+    acts: [.fadeIn(), .zomeIn()], 
+    child: Image.asset('header.jpg'),
+    ),
+  ),
+  title: const Text('Title'), // can animate anyting here as well
+)
+```
+
+Does not react to `SliverAppBar.expandedHeight` changes at runtime. Use a `ValueKey` if you have dynamic heights.
+
 ## Custom Animations
 
 When the built-in acts are not enough, there are two main paths:

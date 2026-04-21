@@ -89,7 +89,7 @@ class FlexibleSpaceBarExample extends StatelessWidget {
             ),
           ),
           SliverPadding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(12),
             sliver: SliverList.builder(
               itemCount: 50,
               itemBuilder: (context, index) => Card(
@@ -99,8 +99,16 @@ class FlexibleSpaceBarExample extends StatelessWidget {
                 ),
                 elevation: 0,
                 child: ListTile(
-                  title: Text('Item $index'),
-                  subtitle: Text('Subtitle $index'),
+                  title: Text(['Hello', 'World', 'Flutter', 'Cue', 'Gooey'][index % 5]),
+                  subtitle: Text(
+                    [
+                      'This is a subtitle',
+                      'Another subtitle',
+                      'Flutter is awesome',
+                      'Cue is amazing',
+                      'Gooey is fun',
+                    ][index % 5],
+                  ),
                 ),
               ),
             ),

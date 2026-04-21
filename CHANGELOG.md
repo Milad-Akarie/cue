@@ -1,3 +1,5 @@
+## 0.1.5
+- *FEAT* Add `CueFlexibleSpaceBar` - animated FlexibleSpaceBar wrapper with Cue motions
 ## 0.1.4
 - *FIX* debug slider needle jumps on first touch
 - *FIX* lerping Matrix with infinit values throws an error in Scretch act 
