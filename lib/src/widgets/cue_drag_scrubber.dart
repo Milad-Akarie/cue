@@ -139,11 +139,11 @@ class _CueDragScrubberState extends State<CueDragScrubber> {
   }
 
   double _primaryOffset(Offset o) => switch (widget.axisDirection) {
-        AxisDirection.up => -o.dy,
-        AxisDirection.down => o.dy,
-        AxisDirection.left => -o.dx,
-        AxisDirection.right => o.dx,
-      };
+    AxisDirection.up => -o.dy,
+    AxisDirection.down => o.dy,
+    AxisDirection.left => -o.dx,
+    AxisDirection.right => o.dx,
+  };
 
   bool _isVertical = true;
   bool _scrubForward = true;
@@ -212,8 +212,7 @@ class _CueDragScrubberState extends State<CueDragScrubber> {
 
   @override
   Widget build(BuildContext context) {
-    _isVertical =
-        widget.axisDirection == AxisDirection.up || widget.axisDirection == AxisDirection.down;
+    _isVertical = widget.axisDirection == AxisDirection.up || widget.axisDirection == AxisDirection.down;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onVerticalDragStart: _isVertical ? _onDragStart : null,

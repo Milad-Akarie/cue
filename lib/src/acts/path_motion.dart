@@ -242,14 +242,14 @@ class _AnimtablePath extends Animatable<Matrix4> {
   ///
   /// [t] ranges from 0 (path start) to 1 (path end).
   /// Returns a Matrix4 with translation to path position and optional rotation.
-@override
-Matrix4 transform(double t) {
-  final tangent = metric.getTangentForOffset(metric.length * t);
-  final pos = tangent?.position ?? Offset.zero;
-  final matrix = Matrix4.translationValues(pos.dx, pos.dy, 0.0);
-  if (autoRotate) {
-    matrix.rotateZ(tangent?.angle ?? 0.0);
+  @override
+  Matrix4 transform(double t) {
+    final tangent = metric.getTangentForOffset(metric.length * t);
+    final pos = tangent?.position ?? Offset.zero;
+    final matrix = Matrix4.translationValues(pos.dx, pos.dy, 0.0);
+    if (autoRotate) {
+      matrix.rotateZ(tangent?.angle ?? 0.0);
+    }
+    return matrix;
   }
-  return matrix;
-}
 }
