@@ -1,6 +1,11 @@
+import 'dart:math';
+
 import 'package:cue/cue.dart';
+import 'package:example/examples/gooey_bottom_bar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:gooey/gooey.dart';
+import 'package:iconsax/iconsax.dart';
 
 void main() {
   runApp(const CueApp());
@@ -24,7 +29,7 @@ class CueApp extends StatelessWidget {
           seedColor: const Color(0xFF6C63FF),
         ),
       ).copyWith(splashFactory: InkSparkle.splashFactory),
-      themeMode: ThemeMode.light,
+      themeMode: ThemeMode.system,
       home: BasiceExample(),
       showPerformanceOverlay: false,
       debugShowCheckedModeBanner: false,
@@ -50,10 +55,7 @@ class _BasiceExampleState extends State<BasiceExample> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Cue'),
-        flexibleSpace: FlexibleSpaceBar(),
-      ),
+      appBar: AppBar(title: const Text('Cue')),
       body: SizedBox.expand(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -67,12 +69,15 @@ class _BasiceExampleState extends State<BasiceExample> {
                 .rotate(to: 180),
                 .colorTint(from: Colors.orange, to: Colors.green),
               ],
-              child: Container(
-                width: 100,
-                height: 100,
-                decoration: BoxDecoration(
-                  color: Colors.orange,
-                  borderRadius: BorderRadius.circular(16),
+              child: CueDragScrubber(
+                distance: -100,
+                child: Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    color: Colors.orange,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                 ),
               ),
             ),
