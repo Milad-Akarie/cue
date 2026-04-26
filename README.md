@@ -666,6 +666,20 @@ Use route integration when modal transitions should be driven by Cue instead of 
 
 Attach drag-based scrubbing to any subtree driven by a `Cue` controller.
 
+```dart
+Cue(
+  controller: _controller,
+  child: CueDragScrubber(
+    axisDirection: AxisDirection.down,
+    distance: 200,
+    child: DecoratedBoxActor(...),
+  ),
+)
+```
+
+- `axisDirection` (required) controls which drag axis and direction map to progress. Use `AxisDirection.up`, `.down`, `.left`, or `.right`.
+- `distance` must be positive. To reverse the drag direction, use the opposite `AxisDirection` instead of a negative distance.
+
 ### `CueFlexibleSpaceBar`
 
 A drop-in replacement for Flutter's `FlexibleSpaceBar` that provides cue animations driver through context, the animations are driven by the collapse progress of the flexible space bar.

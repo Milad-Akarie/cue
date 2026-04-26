@@ -1,3 +1,7 @@
+## 0.2.0
+- *BREAKING* `CueDragScrubber.axis` replaced with required `axisDirection` (`AxisDirection` enum) for explicit directional control
+- *BREAKING* `CueDragScrubber.distance` now asserts positive values; use `AxisDirection` to change drag direction instead of negative distances
+
 ## 0.1.5
 - *FEAT* Add `CueFlexibleSpaceBar` - animated FlexibleSpaceBar wrapper with Cue motions
 ## 0.1.4

@@ -52,14 +52,14 @@ class CueDragScrubber extends StatefulWidget {
     super.key,
     required this.child,
     required this.distance,
+    required this.axisDirection,
     this.controller,
-    this.axis = Axis.vertical,
     this.releaseMode = CueDragReleaseMode.fling,
     this.forceLinearScrubing = true,
     this.hitTestBehavior,
     this.onAnimationEnd,
     this.scrubDirection = CueScrubDirection.auto,
-  });
+  }) : assert(distance > 0, 'distance must be positive; use AxisDirection to change drag direction');
 
   /// Callback fired when the animation completes or is dismissed.
   final ValueChanged<bool>? onAnimationEnd;
@@ -78,15 +78,15 @@ class CueDragScrubber extends StatefulWidget {
 
   /// The number of logical pixels that map to a full progress travel.
   ///
-  /// Always positive. The direction of progress change is controlled by [scrubDirection].
+  /// Must be positive. Use [axisDirection] to change the drag direction.
   final double distance;
 
   /// Optional explicit controller. If omitted, the controller is taken from
   /// the nearest [CueScope] ancestor. Throws at runtime if neither is available.
   final CueController? controller;
 
-  /// The axis along which dragging maps to animation progress.
-  final Axis axis;
+  /// The direction along which dragging maps to animation progress.
+  final AxisDirection axisDirection;
 
   /// What to do when the user lifts their finger.
   final CueDragReleaseMode releaseMode;
@@ -95,7 +95,7 @@ class CueDragScrubber extends StatefulWidget {
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
     properties.add(DoubleProperty('distance', distance));
-    properties.add(EnumProperty<Axis>('axis', axis, defaultValue: Axis.vertical));
+    properties.add(EnumProperty<AxisDirection>('axisDirection', axisDirection));
     properties.add(
       EnumProperty<CueDragReleaseMode>('releaseMode', releaseMode, defaultValue: CueDragReleaseMode.fling),
     );
@@ -138,7 +138,14 @@ class _CueDragScrubberState extends State<CueDragScrubber> {
     }
   }
 
-  double _primaryOffset(Offset o) => widget.axis == Axis.vertical ? o.dy : o.dx;
+  double _primaryOffset(Offset o) => switch (widget.axisDirection) {
+        AxisDirection.up => -o.dy,
+        AxisDirection.down => o.dy,
+        AxisDirection.left => -o.dx,
+        AxisDirection.right => o.dx,
+      };
+
+  bool _isVertical = true;
   bool _scrubForward = true;
 
   void _onDragStart(DragStartDetails d) {
@@ -205,15 +212,16 @@ class _CueDragScrubberState extends State<CueDragScrubber> {
 
   @override
   Widget build(BuildContext context) {
-    final isVertical = widget.axis == Axis.vertical;
+    _isVertical =
+        widget.axisDirection == AxisDirection.up || widget.axisDirection == AxisDirection.down;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onVerticalDragStart: isVertical ? _onDragStart : null,
-      onVerticalDragUpdate: isVertical ? _onDragUpdate : null,
-      onVerticalDragEnd: isVertical ? _onDragEnd : null,
-      onHorizontalDragStart: isVertical ? null : _onDragStart,
-      onHorizontalDragUpdate: isVertical ? null : _onDragUpdate,
-      onHorizontalDragEnd: isVertical ? null : _onDragEnd,
+      onVerticalDragStart: _isVertical ? _onDragStart : null,
+      onVerticalDragUpdate: _isVertical ? _onDragUpdate : null,
+      onVerticalDragEnd: _isVertical ? _onDragEnd : null,
+      onHorizontalDragStart: _isVertical ? null : _onDragStart,
+      onHorizontalDragUpdate: _isVertical ? null : _onDragUpdate,
+      onHorizontalDragEnd: _isVertical ? null : _onDragEnd,
       child: widget.child,
     );
   }

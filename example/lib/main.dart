@@ -1,11 +1,7 @@
-import 'dart:math';
 
 import 'package:cue/cue.dart';
-import 'package:example/examples/gooey_bottom_bar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:gooey/gooey.dart';
-import 'package:iconsax/iconsax.dart';
 
 void main() {
   runApp(const CueApp());
@@ -70,7 +66,8 @@ class _BasiceExampleState extends State<BasiceExample> {
                 .colorTint(from: Colors.orange, to: Colors.green),
               ],
               child: CueDragScrubber(
-                distance: -100,
+                distance: 100,
+                axisDirection: .up,
                 child: Container(
                   width: 100,
                   height: 100,

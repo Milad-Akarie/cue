@@ -1,6 +1,6 @@
 name: cue
 description: "Physics-first Flutter animations with a composable, timeline-driven API"
-version: 0.1.5
+version: 0.2.0
 homepage: https://github.com/Milad-Akarie/cue
 topics: 
   - animation

@@ -22,7 +22,7 @@ class _DraggablePanelState extends State<DraggablePanel> {
           _isDraggedDown = forward;
         });
       },
-      motion: .curved(400.ms, curve: Curves.easeInOut),
+      motion: .easeInOut(400.ms),
       child: CardTheme(
         data: theme.cardTheme.copyWith(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
@@ -78,6 +78,7 @@ class _DraggablePanelState extends State<DraggablePanel> {
               to: .fromSTEB(20, _dragExtent, 20, 24),
               child: CueDragScrubber(
                 distance: _dragExtent,
+                axisDirection: .down,
                 scrubDirection: .forward,
                 child: CardActor(
                   clipBehavior: .antiAlias,
