@@ -248,7 +248,7 @@ class _AnimtablePath extends Animatable<Matrix4> {
     final pos = tangent?.position ?? Offset.zero;
     final matrix = Matrix4.translationValues(pos.dx, pos.dy, 0.0);
     if (autoRotate) {
-      matrix.rotateZ(tangent?.angle ?? 0.0);
+      matrix.rotateZ(-(tangent?.angle ?? 0.0));
     }
     return matrix;
   }

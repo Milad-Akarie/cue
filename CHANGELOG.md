@@ -1,3 +1,6 @@
+## 0.2.0+1
+- *FIX* Path motion auto-rotate angle direction corrected
+
 ## 0.2.0
 - *BREAKING* `CueDragScrubber.axis` replaced with required `axisDirection` (`AxisDirection` enum) for explicit directional control
 - *BREAKING* `CueDragScrubber.distance` now asserts positive values; use `AxisDirection` to change drag direction instead of negative distances
