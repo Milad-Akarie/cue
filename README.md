@@ -742,7 +742,22 @@ Cue works best when call sites stay terse.
 
 In short: use the shorthand named constructors whenever possible. That is the cleanest API Cue offers.
 
-## GitHub Copilot Skill
+## AI Agent Skills
 
-Cue ships a [GitHub Copilot agent skill](.github/skills/cue-animations/SKILL.md) that gives Copilot deep knowledge of the Cue API. Load it in your VS Code Copilot agent to get accurate code generation, act suggestions, and motion guidance without leaving your editor.
+Cue ships animation skills that give AI coding agents deep knowledge of the Cue API for accurate code generation, act suggestions, and motion guidance.
+
+### Quick Install (Recommended)
+
+Install the skills package and get the cue animation skill:
+
+```bash
+skills get cue
+```
+
+### Manual Installation
+
+Copy the skill from the `Cue/skills` folder into your project's AI agent skills directory:
+- **GitHub Copilot**: Copy to `.github/skills/cue-animations/SKILL.md`
+- **Kilo**: Copy to `.kilo/skill/cue-animations.md`
+- **Other agents**: Check your agent's documentation for the correct skills path
 
