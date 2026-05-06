@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "installations": {
+    "copilot": {
+      "cue": {
+        "skills": [
+          {
+            "name": "cue-animations",
+            "installedAt": "2026-05-06T11:18:57.845841Z"
+          }
+        ]
+      }
+    }
+  }
+}
