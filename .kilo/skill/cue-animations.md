@@ -117,7 +117,7 @@ Spring.smooth(damping: 23)       // Smooth, no bounce
 Spring.gentle()                  // Subtle spring
 Spring.bouncy()                  // Bouncy spring
 Spring.wobbly()                  // Very bouncy
-Spring.stiff()                   // Fast, responsive
+Spring.snappy()                   // Fast, responsive
 Spring.iosDefault()              // iOS-style spring
 
 // Custom spring
