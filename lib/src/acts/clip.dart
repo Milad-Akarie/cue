@@ -109,6 +109,7 @@ abstract class ClipAct extends Act {
     double fromFactor,
     double toFactor,
     AlignmentGeometry alignment,
+    Clip clipBehavior,
     CueMotion? motion,
     Duration delay,
   }) = AxisClipAct.horizontal;
@@ -136,6 +137,7 @@ abstract class ClipAct extends Act {
     double fromFactor,
     double toFactor,
     AlignmentGeometry alignment,
+    Clip clipBehavior,
     CueMotion? motion,
     Duration delay,
   }) = AxisClipAct.vertical;
@@ -152,11 +154,15 @@ class AxisClipAct extends TweenAct<double> implements ClipAct {
   /// The alignment point from which the clip expands.
   final AlignmentGeometry alignment;
 
+  /// How to clip content that overflows the size.
+  final Clip clipBehavior;
+
   /// {@macro act.clip.width}
   const AxisClipAct.horizontal({
     double fromFactor = 0,
     double toFactor = 1,
     this.alignment = AlignmentDirectional.centerStart,
+    this.clipBehavior = Clip.hardEdge,
     super.motion,
     super.delay,
   }) : _axis = Axis.horizontal,
@@ -167,6 +173,7 @@ class AxisClipAct extends TweenAct<double> implements ClipAct {
     double fromFactor = 0,
     double toFactor = 1,
     this.alignment = AlignmentDirectional.topCenter,
+    this.clipBehavior = Clip.hardEdge,
     super.motion,
     super.delay,
   }) : _axis = Axis.vertical,
@@ -180,6 +187,7 @@ class AxisClipAct extends TweenAct<double> implements ClipAct {
       animation: animation,
       builder: (context, child) {
         return ClipRect(
+          clipBehavior: clipBehavior,
           child: Align(
             alignment: effectiveAlignment,
             widthFactor: _axis == Axis.horizontal ? animation.value.clamp(0, 1) : null,
@@ -199,7 +207,8 @@ class AxisClipAct extends TweenAct<double> implements ClipAct {
             other is AxisClipAct &&
             super == other &&
             _axis == other._axis &&
-            alignment == other.alignment;
+            alignment == other.alignment &&
+            clipBehavior == other.clipBehavior;
   }
 
   @override
