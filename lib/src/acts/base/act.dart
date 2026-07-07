@@ -539,6 +539,7 @@ abstract class Act {
     double fromFactor,
     double toFactor,
     AlignmentGeometry alignment,
+    Clip clipBehavior,
     CueMotion? motion,
     Duration delay,
   }) = ClipAct.height;
@@ -548,6 +549,7 @@ abstract class Act {
     double fromFactor,
     double toFactor,
     AlignmentGeometry alignment,
+    Clip clipBehavior,
     CueMotion? motion,
     Duration delay,
   }) = ClipAct.width;
