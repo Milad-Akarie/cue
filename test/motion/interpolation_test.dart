@@ -13,7 +13,7 @@ import 'package:cue/src/motion/cue_motion.dart';
 import 'package:cue/src/motion/cue_simulation.dart';
 import 'package:cue/src/motion/spring_motion.dart';
 import 'package:cue/src/motion/utils.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 // ---------------------------------------------------------------------------

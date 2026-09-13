@@ -1,8 +1,8 @@
 import 'dart:math' as math;
 
 import 'package:cue/src/motion/cue_motion.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
+import 'package:flutter/widgets.dart';
 
 /// A mixin that extends [Simulation] with Cue-specific capabilities.
 ///

@@ -1,5 +1,5 @@
 import 'package:cue/cue.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:gooey/gooey.dart';
 import 'package:iconsax/iconsax.dart';
 

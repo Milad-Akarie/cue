@@ -1,6 +1,6 @@
 import 'package:cue/cue.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Signature for the function that shows the modal, passed to [triggerBuilder].
 @optionalTypeArgs

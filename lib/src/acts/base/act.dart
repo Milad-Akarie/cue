@@ -6,7 +6,7 @@ import 'package:cue/src/acts/base/deferred_tween_act.dart';
 import 'package:cue/src/acts/base/animatable_act.dart';
 import 'package:cue/src/acts/base/tween_act.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/rendering.dart';
 
 part '../sized_clip.dart';

@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+
+import 'package:flutter/widgets.dart';
 
 /// Extensions on [int] for convenient duration literals.
 ///

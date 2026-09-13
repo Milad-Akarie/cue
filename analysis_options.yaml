@@ -6,3 +6,6 @@ formatter:
 linter:
   rules:
     public_member_api_docs: true
+analyzer:
+  exclude:
+    - build/**

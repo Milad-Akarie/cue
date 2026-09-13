@@ -1,6 +1,6 @@
 import 'package:cue/cue.dart';
 import 'package:example/examples/bottom_bar.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:iconsax/iconsax.dart';
 
 class PageViewDemo extends StatefulWidget {

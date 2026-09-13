@@ -1,6 +1,6 @@
 import 'package:cue/cue.dart';
 import 'package:cue/src/core/curves.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// A mixin for ModalRoutes that want to use Cue for their transition animations.
 mixin CueModalRouteMixin<T extends Object?> on ModalRoute<T> {

@@ -1,7 +1,7 @@
 import 'package:cue/cue.dart';
 import 'package:cue/src/motion/cue_simulation.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 /// Describes how a value travels from one point to another over time.
 ///

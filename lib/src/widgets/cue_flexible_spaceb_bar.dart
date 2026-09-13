@@ -1,7 +1,7 @@
 import 'dart:ui' show clampDouble;
 
 import 'package:cue/cue.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// A Cue version of [FlexibleSpaceBar], it drives cue animations based on the collapse progress of the flexible space bar.
 ///

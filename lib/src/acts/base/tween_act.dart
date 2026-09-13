@@ -2,7 +2,7 @@ import 'package:cue/cue.dart';
 import 'package:cue/src/acts/base/animatable_act.dart';
 import 'package:cue/src/motion/cue_motion.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 /// Signature for a function that transforms a value from its stored type `T`
 /// to an animated type `R`.

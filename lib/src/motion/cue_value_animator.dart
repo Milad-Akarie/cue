@@ -1,6 +1,6 @@
 import 'package:cue/cue.dart';
 import 'package:cue/src/timeline/track/track.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 /// A standalone [Animation<T>] for animating a single value using [CueMotion].
 ///

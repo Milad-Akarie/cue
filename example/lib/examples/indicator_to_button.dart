@@ -1,5 +1,5 @@
 import 'package:cue/cue.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class IndicatorToButton extends StatefulWidget {
   const IndicatorToButton({super.key});

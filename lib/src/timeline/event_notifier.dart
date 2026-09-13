@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+
+import 'package:flutter/foundation.dart';
 
 /// A function that disposes of an event listener by removing it from the notification list.
 typedef EventDisposer = void Function();

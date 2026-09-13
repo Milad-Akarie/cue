@@ -3,9 +3,10 @@ import 'dart:async';
 import 'package:cue/cue.dart';
 import 'package:cue/src/timeline/track/track_config.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/rendering.dart';
 import 'dart:math' as math;
+
 
 part 'indexed_cue.dart';
 part 'on_change_cue.dart';

@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:cue/cue.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 /// Custom tween act and widget for animating arbitrary types with a builder.
 typedef TweenActorBuilder<T> = Widget Function(BuildContext context, CueAnimation<T> animation);

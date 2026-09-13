@@ -3,9 +3,9 @@ import 'package:cue/src/acts/base/tween_act.dart';
 import 'package:cue/src/timeline/event_notifier.dart';
 import 'package:cue/src/timeline/track/track.dart';
 import 'package:cue/src/timeline/track/track_config.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
 
 /// An [AnimationController] that drives animations through a [CueTimeline].
 ///

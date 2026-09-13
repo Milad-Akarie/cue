@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+
+import 'package:flutter/widgets.dart';
 
 /// A curve that constrains the input value [t] to a normalized range [min, max].
 ///

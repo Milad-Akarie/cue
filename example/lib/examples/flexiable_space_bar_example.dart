@@ -2,7 +2,7 @@
 // it's not meant to be a real world example as alot of hardcoded values and images are used,
 // it's just to show the capabilities of Cue and Gooey and how it can be used to create complex animations with ease.
 import 'package:cue/cue.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:gooey/gooey.dart';
 
 class FlexibleSpaceBarExample extends StatelessWidget {
