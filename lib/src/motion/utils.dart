@@ -1,4 +1,3 @@
-
 import 'package:flutter/widgets.dart';
 
 /// Extensions on [int] for convenient duration literals.

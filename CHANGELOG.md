@@ -1,3 +1,6 @@
+## 0.4.0
+- *CHORE* Migrate to using UI libs
+
 ## 0.3.1
 - *FEAT* Added `Position.fromSTWH` constructor for start/top/width/height positioning
 - *FIX* `Position._lerpNullable` now properly handles null interpolation (switches at t=0.5 instead of treating null as 0)
