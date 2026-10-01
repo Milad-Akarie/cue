@@ -177,6 +177,28 @@ void main() {
         expect(timeline.status, equals(AnimationStatus.forward));
       });
 
+      test('Track obtained after setProgress(0.0, forward: true) with no tracks plays forward', () {
+        final motion = CueMotion.linear(300.ms);
+        final config = TrackConfig(motion: motion, reverseMotion: motion);
+        final timeline = CueTimelineImpl(config);
+
+        timeline.setProgress(0.0, forward: true);
+        final (track, _) = timeline.obtainDefaultTrack();
+
+        expect(track.status, equals(AnimationStatus.forward));
+      });
+
+      test('Track obtained after setProgress(1.0, forward: false) with no tracks plays in reverse', () {
+        final motion = CueMotion.linear(300.ms);
+        final config = TrackConfig(motion: motion, reverseMotion: motion);
+        final timeline = CueTimelineImpl(config);
+
+        timeline.setProgress(1.0, forward: false);
+        final (track, _) = timeline.obtainDefaultTrack();
+
+        expect(track.status, equals(AnimationStatus.reverse));
+      });
+
       test('setProgress with no tracks updates initial progress', () {
         final motion = CueMotion.linear(300.ms);
         final config = TrackConfig(motion: motion, reverseMotion: motion);

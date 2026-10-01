@@ -142,7 +142,7 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
       // this mean the track is newly created
       // we attach the current timeline state to it so that it can be in sync with other tracks
       entry.track.prepare(
-        forward: status.isForwardOrCompleted,
+        forward: _isForward,
         from: handOffProgress,
         exteranlVelocity: dx(_lastT),
       );
@@ -176,6 +176,19 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
 
   AnimationStatus _status = AnimationStatus.dismissed;
 
+  /// The direction of the last [setProgress], [prepare] or [prepareForRepeat].
+  ///
+  /// [AnimationStatus.dismissed] and [AnimationStatus.completed] don't carry a
+  /// direction, so a track obtained while the timeline is at 0.0 or 1.0 is
+  /// prepared with this instead.
+  bool _lastForward = true;
+
+  bool get _isForward => switch (_status) {
+    AnimationStatus.forward => true,
+    AnimationStatus.reverse => false,
+    AnimationStatus.dismissed || AnimationStatus.completed => _lastForward,
+  };
+
   /// Overall timeline progress (0-1).
   ///
   /// Returns the progress of the longest-duration track in the current direction.
@@ -204,6 +217,7 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
   @override
   void setProgress(double value, {bool forward = true, bool forceLinear = false}) {
     _repeatConfig = null;
+    _lastForward = forward;
     if (tracks.isEmpty) {
       _progressPlaceholder = value;
       _status = switch (value) {
@@ -289,6 +303,7 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
   @override
   void prepare({required bool forward, double? from, double? target, double? velocity}) {
     _repeatConfig = null;
+    _lastForward = forward;
     _cycleOffset = 0.0;
     fireEvent(TimelinePrepareEvent(forward));
     _lastT = 0.0;
@@ -315,6 +330,7 @@ class CueTimelineImpl extends CueTimeline with AnimationLocalStatusListenersMixi
   @override
   void prepareForRepeat(RepeatConfig config) {
     _repeatConfig = config;
+    _lastForward = true;
     _lastT = 0.0;
     _cycleOffset = 0.0;
     _prepareInternal(true, config.from ?? 0.0, config.target);

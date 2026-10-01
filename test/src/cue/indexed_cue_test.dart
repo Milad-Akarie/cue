@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/scheduler.dart';
@@ -389,6 +391,40 @@ void main() {
       expect(find.text('index 0'), findsOneWidget);
       expect(find.text('index 1'), findsOneWidget);
       expect(find.text('index 2'), findsOneWidget);
+    });
+
+    testWidgets('items at rest use the act values for their own side', (tester) async {
+      final controller = CueIndexController(
+        length: 3,
+        vsync: const _TestTickerProvider(),
+        initialIndex: 1,
+      );
+
+      Widget item(int index) => Cue.indexed(
+        controller: controller,
+        index: index,
+        acts: [.rotate(from: 10, reverse: .to(-10))],
+        child: SizedBox(key: ValueKey(index), width: 10, height: 10),
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Column(children: [item(0), item(1), item(2)]),
+        ),
+      );
+
+      double degreesOf(int index) {
+        final transition = tester.widget<MatrixTransition>(
+          find.ancestor(of: find.byKey(ValueKey(index)), matching: find.byType(MatrixTransition)),
+        );
+        return transition.animation.value * 180 / math.pi;
+      }
+
+      // Before the current index: reverse side, so `reverse: .to(-10)` applies.
+      expect(degreesOf(0), closeTo(-10, 0.001));
+      expect(degreesOf(1), closeTo(0, 0.001));
+      // After the current index: forward side, so `from: 10` applies.
+      expect(degreesOf(2), closeTo(10, 0.001));
     });
   });
 
